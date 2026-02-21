@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Honeykode Technologies",
+    "url": "https://honeykode.com/",
+    "image": "/assets/img/wordpress/honeykode.png"
+  },
+  {
+    "name": "Friends School",
+    "url": "https://thefriendsschool.com/",
+    "image": "/assets/img/wordpress/thefriendsschool.png"
+  },
+  {
+    "name": "FVC",
+    "url": "https://products.fvc.com",
+    "image": "/assets/img/wordpress/fvc.png"
+  },
+  {
+    "name": "Changethu Ayurveda",
+    "url": "https://changethuayurveda.com/",
+    "image": "/assets/img/wordpress/changethu.png"
+  },
+  {
+    "name": "Chatpot",
+    "url": "https://chatpot.io/",
+    "image": "/assets/img/wordpress/chatpot.png"
+  },
+  {
+    "name": "Roopmahal",
+    "url": "https://roopmahal.in/",
+    "image": "/assets/img/wordpress/roopmahal.jpg"
+  },
+  {
+    "name": "Smile Stylers",
+    "url": "https://smilestylers.net/",
+    "image": "/assets/img/wordpress/smilestylers.png"
+  },
+  {
+    "name": "Janica",
+    "url": "https://janicaherbal.com/",
+    "image": "/assets/img/wordpress/janika_logo_transparent.png"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "slug": "aws-s3-static-website-hosting",
+    "title": "AWS: S3 Static Website Hosting",
+    "date": "2024-08-26",
+    "tags": ["AWS", "S3", "DevOps", "CI/CD"],
+    "excerpt": "Learn how to host a static website on AWS S3 using CodeCommit, CodePipeline, and Lambda for automated deployments.",
+    "externalUrl": "https://medium.com/@rahulvadakkiniyil/aws-s3-static-website-hosting-using-code-commit-code-pipeline-lambda-82a6d77c2f21",
+    "hasLocalContent": true
+  },
+  {
+    "slug": "automating-ami-snapshot-cleanup",
+    "title": "Automating AMI and Snapshot Cleanup with AWS Lambda",
+    "date": "2024-08-27",
+    "tags": ["AWS", "Lambda", "Automation", "Cost Optimization"],
+    "excerpt": "A step-by-step guide to automating the cleanup of unused AMIs and snapshots using AWS Lambda to reduce costs.",
+    "externalUrl": "https://medium.com/@rahulvadakkiniyil/automating-ami-and-snapshot-cleanup-with-aws-lambda-a-step-by-step-guide-4b6d62a61312",
+    "hasLocalContent": true
+  },
+  {
+    "slug": "optimizing-with-reverse-proxy",
+    "title": "Optimizing with Reverse Proxy: Apache and Nginx Guide",
+    "date": "2024-08-29",
+    "tags": ["Nginx", "Apache", "DevOps", "Web Server"],
+    "excerpt": "A comprehensive guide to using Apache and Nginx as reverse proxies for optimizing web application performance.",
+    "externalUrl": "https://medium.com/@rahulvadakkiniyil/optimizing-with-reverse-proxy-a-comprehensive-guide-to-using-apache-and-nginx-42e526cd57e5",
+    "hasLocalContent": true
+  },
+  {
+    "slug": "mastering-load-balancers",
+    "title": "Mastering Load Balancers: Listeners, Rules & Traffic Routing",
+    "date": "2024-08-31",
+    "tags": ["AWS", "Load Balancer", "Networking", "DevOps"],
+    "excerpt": "Understanding listeners, rules, and traffic routing strategies for effective load balancing in cloud environments.",
+    "externalUrl": "https://medium.com/@rahulvadakkiniyil/mastering-load-balancers-understanding-listeners-rules-and-traffic-routing-strategies-c62c4b3df530",
+    "hasLocalContent": true
+  },
+  {
+    "slug": "40-days-in-kubernetes",
+    "title": "40 Days in Kubernetes",
+    "date": "2024-09-01",
+    "tags": ["Kubernetes", "DevOps", "Containers", "Learning"],
+    "excerpt": "A journey through 40 days of learning Kubernetes - from pods and deployments to advanced orchestration concepts.",
+    "externalUrl": "https://rahulvadakkiniyil.hashnode.dev/",
+    "hasLocalContent": true
+  }
+]

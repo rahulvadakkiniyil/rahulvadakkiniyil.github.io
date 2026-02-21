@@ -1,0 +1,9 @@
+[
+  { "name": "Cloud: AWS, Azure", "level": 86 },
+  { "name": "Terraform", "level": 50 },
+  { "name": "Git and GitHub", "level": 60 },
+  { "name": "Python", "level": 40 },
+  { "name": "Docker", "level": 60 },
+  { "name": "Monitoring", "level": 55 },
+  { "name": "Linux Fundamentals", "level": 70 }
+]

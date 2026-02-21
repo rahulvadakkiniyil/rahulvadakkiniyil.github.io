@@ -1,0 +1,20 @@
+{
+  "name": "Rahul Vadakkiniyil",
+  "firstName": "Rahul",
+  "lastName": "Vadakkiniyil",
+  "title": "DevOps Engineer",
+  "subtitle": "Cloud Engineer",
+  "from": "Kannur",
+  "livesIn": "Thiruvananthapuram",
+  "age": 28,
+  "gender": "Male",
+  "email": "rahulvadakkiniyil@gmail.com",
+  "phone": "+91-6282563317",
+  "address": "Phase1 Kazhakkutam Thiruvananthapuram",
+  "linkedin": "https://www.linkedin.com/in/rahulvadakkiniyil",
+  "resumeUrl": "/assets/doc/Rahul Vadakkiniyil.pdf",
+  "expLetterUrl": "/assets/doc/Rahul Vadakkiniyil- Exp Letter.pdf",
+  "photo": "/assets/img/person.jpg",
+  "heroBackground": "/assets/img/bg_image_1.jpg",
+  "bio": "Results-driven DevOps Engineer with 3 years of hands-on experience designing, implementing, and maintaining CI/CD pipelines, cloud infrastructure, and automation solutions. Skilled in managing scalable, secure, and highly available environments on AWS and Azure."
+}
