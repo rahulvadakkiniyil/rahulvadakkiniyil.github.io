@@ -3,34 +3,32 @@
 // Matching the style of 3D-interactive-portfolio
 // ============================================================
 
-import { Application } from 'https://unpkg.com/@splinetool/runtime@1.9.3/build/runtime.js';
-
-// ===== Skills Data (matching the Spline keyboard keycap names) =====
+// ===== Skills Data (DevOps tools mapped to keyboard keys) =====
 const SKILLS = {
-    js: { label: "JavaScript", desc: "yeeting code into the DOM since '95, no cap!" },
-    ts: { label: "TypeScript", desc: "JavaScript's overachieving cousin who's always flexing" },
-    html: { label: "HTML", desc: "the internet's granddad, still bussin' fr fr!" },
-    css: { label: "CSS", desc: "styling with the ultimate drip, no cap" },
-    react: { label: "React", desc: '"use using" — using use = useUsing("use")' },
-    vue: { label: "Vue", desc: "the chill pill for your frontend, it hits different!" },
-    nextjs: { label: "Next.js", desc: "the drama queen of front-end frameworks, and we stan!" },
-    tailwind: { label: "Tailwind", desc: "utility classes hitting different fr fr" },
-    nodejs: { label: "Node.js", desc: "JavaScript said 'sike, I'm backend now', deadass!" },
-    express: { label: "Express", desc: "middlewares go dummy hard, no cap!" },
-    postgres: { label: "PostgreSQL", desc: "SQL but make it fashion, purr" },
-    mongodb: { label: "MongoDB", desc: "flexin' with that NoSQL drip, respectfully!" },
-    git: { label: "Git", desc: "the code's personal bodyguard, no cap!" },
-    github: { label: "GitHub", desc: "sliding into those pull requests, IYKYK!" },
-    prettier: { label: "Prettier", desc: "making your code not a whole mess, thank u next" },
-    npm: { label: "NPM", desc: "package manager said 'I gotchu fam', period!" },
-    firebase: { label: "Firebase", desc: "your app's ultimate wingman!" },
-    wordpress: { label: "WordPress", desc: "the grandpa of CMS, still rocking that cane" },
-    linux: { label: "Linux", desc: "where 'chmod 777' is the ultimate flex" },
-    docker: { label: "Docker", desc: "The best containerization!" },
-    nginx: { label: "NginX", desc: "reverse proxy go zoom zoom, sheesh!" },
-    aws: { label: "AWS", desc: "always extra, making everything more complicated, period!" },
-    vim: { label: "Vim", desc: "exit? In this economy? Ight, imma head out!" },
-    vercel: { label: "Vercel", desc: "The triangle company, helps you deploy and go touch grass!" },
+    docker: { label: "Docker", desc: "Containerization king — build once, run anywhere!", icon: "🐳" },
+    kubernetes: { label: "Kubernetes", desc: "Container orchestration at scale — pods, services, and deployments!", icon: "☸️" },
+    jenkins: { label: "Jenkins", desc: "The OG CI/CD pipeline builder — automate all the things!", icon: "🔧" },
+    gitlab: { label: "GitLab CI", desc: "DevOps lifecycle in one platform — from plan to monitor!", icon: "🦊" },
+    aws: { label: "AWS", desc: "The cloud giant — EC2, S3, Lambda and 200+ services!", icon: "☁️" },
+    azure: { label: "Azure", desc: "Microsoft's cloud powerhouse — enterprise-grade infrastructure!", icon: "⚡" },
+    terraform: { label: "Terraform", desc: "Infrastructure as Code — provision clouds with HCL!", icon: "🏗️" },
+    ansible: { label: "Ansible", desc: "Agentless automation — playbooks that configure everything!", icon: "📜" },
+    prometheus: { label: "Prometheus", desc: "Metrics and alerting — time-series monitoring done right!", icon: "🔥" },
+    grafana: { label: "Grafana", desc: "Beautiful dashboards — visualize all your metrics!", icon: "📊" },
+    linux: { label: "Linux", desc: "The backbone of servers — chmod 777 is the ultimate flex!", icon: "🐧" },
+    git: { label: "Git", desc: "Version control — because 'final_v2_FINAL' isn't a strategy!", icon: "🌿" },
+    nginx: { label: "Nginx", desc: "Reverse proxy and load balancer — serving millions of requests!", icon: "🌐" },
+    python: { label: "Python", desc: "Scripting & automation — the DevOps engineer's Swiss army knife!", icon: "🐍" },
+    bash: { label: "Bash", desc: "Shell scripting — piping commands like a plumber!", icon: "💻" },
+    helm: { label: "Helm", desc: "Kubernetes package manager — charts for every deployment!", icon: "⎈" },
+    argocd: { label: "ArgoCD", desc: "GitOps continuous delivery — sync your K8s clusters!", icon: "🔄" },
+    vault: { label: "Vault", desc: "Secrets management — keeping credentials safe and rotated!", icon: "🔐" },
+    gcp: { label: "GCP", desc: "Google Cloud Platform — BigQuery, GKE, and more!", icon: "🌩️" },
+    elasticsearch: { label: "ELK Stack", desc: "Log aggregation and search — find that needle in the haystack!", icon: "🔍" },
+    github: { label: "GitHub Actions", desc: "CI/CD workflows right in your repo — automate on push!", icon: "🐙" },
+    sonarqube: { label: "SonarQube", desc: "Code quality and security scanning — clean code, happy team!", icon: "🛡️" },
+    trivy: { label: "Trivy", desc: "Container vulnerability scanner — secure your images!", icon: "🔒" },
+    go: { label: "Go", desc: "Cloud-native language — built for performance and concurrency!", icon: "🚀" },
 };
 
 // ===== Theme Toggle =====
@@ -46,7 +44,6 @@ themeToggle.addEventListener('click', () => {
     html.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
     updateParticleColor();
-    updateSplineTheme(next);
 });
 
 // ===== Preloader =====
@@ -94,235 +91,118 @@ function triggerHeroAnimations() {
     });
 }
 
-// ===== Spline 3D Keyboard =====
-let splineApp = null;
+// ===== 3D Interactive Hero Keyboard =====
 let activeSection = 'hero';
+
+// Keyboard layout — 5 rows of DevOps tools
+const HERO_KB_ROWS = [
+    ['docker', 'kubernetes', 'jenkins', 'gitlab', 'aws'],
+    ['azure', 'terraform', 'ansible', 'prometheus', 'grafana'],
+    ['linux', 'git', 'nginx', 'python', 'bash'],
+    ['helm', 'argocd', 'github', 'vault', 'gcp'],
+    ['go', 'elasticsearch', 'sonarqube', 'trivy'],
+];
+
+const heroKeyboard = document.getElementById('heroKeyboard');
+const heroScene = document.getElementById('heroKeyboardScene');
+const heroTooltipEl = document.getElementById('heroKeyTooltip');
+const heroTooltipTitle = document.getElementById('heroTooltipTitle');
+const heroTooltipDesc = document.getElementById('heroTooltipDesc');
+
+// Also wire up the skill display in the skills section
 const skillDisplay = document.getElementById('skillDisplay');
 const skillHeading = document.getElementById('skillHeading');
 const skillDesc = document.getElementById('skillDesc');
 
-const KEYBOARD_STATES = {
-    hero: {
-        scale: { x: 0.25, y: 0.25, z: 0.25 },
-        position: { x: 400, y: -200, z: 0 },
-        rotation: { x: 0, y: 0, z: 0 },
-    },
-    about: {
-        scale: { x: 0.35, y: 0.35, z: 0.35 },
-        position: { x: 0, y: -40, z: 0 },
-        rotation: { x: 0, y: Math.PI / 12, z: 0 },
-    },
-    skills: {
-        scale: { x: 0.4, y: 0.4, z: 0.4 },
-        position: { x: 0, y: -40, z: 0 },
-        rotation: { x: 0, y: Math.PI / 12, z: 0 },
-    },
-    projects: {
-        scale: { x: 0.3, y: 0.3, z: 0.3 },
-        position: { x: 0, y: -40, z: 0 },
-        rotation: { x: Math.PI, y: Math.PI / 3, z: Math.PI },
-    },
-    experience: {
-        scale: { x: 0.25, y: 0.25, z: 0.25 },
-        position: { x: 300, y: -100, z: 0 },
-        rotation: { x: 0.2, y: -Math.PI / 6, z: 0 },
-    },
-    contact: {
-        scale: { x: 0.3, y: 0.3, z: 0.3 },
-        position: { x: 0, y: -60, z: 0 },
-        rotation: { x: -0.3, y: Math.PI / 4, z: 0.1 },
-    },
-};
-
-// Mobile states (smaller scale)
-const KEYBOARD_STATES_MOBILE = {
-    hero: {
-        scale: { x: 0.15, y: 0.15, z: 0.15 },
-        position: { x: 0, y: -200, z: 0 },
-        rotation: { x: 0, y: 0, z: 0 },
-    },
-    about: {
-        scale: { x: 0.18, y: 0.18, z: 0.18 },
-        position: { x: 0, y: -40, z: 0 },
-        rotation: { x: 0, y: Math.PI / 6, z: 0 },
-    },
-    skills: {
-        scale: { x: 0.2, y: 0.2, z: 0.2 },
-        position: { x: 0, y: -40, z: 0 },
-        rotation: { x: 0, y: Math.PI / 6, z: 0 },
-    },
-    projects: {
-        scale: { x: 0.18, y: 0.18, z: 0.18 },
-        position: { x: 0, y: -40, z: 0 },
-        rotation: { x: Math.PI, y: Math.PI / 3, z: Math.PI },
-    },
-    experience: {
-        scale: { x: 0.15, y: 0.15, z: 0.15 },
-        position: { x: 0, y: -100, z: 0 },
-        rotation: { x: 0.2, y: -Math.PI / 6, z: 0 },
-    },
-    contact: {
-        scale: { x: 0.18, y: 0.18, z: 0.18 },
-        position: { x: 0, y: -60, z: 0 },
-        rotation: { x: -0.3, y: Math.PI / 4, z: 0.1 },
-    },
-};
-
-function isMobile() {
-    return window.innerWidth <= 768;
-}
-
-function getKeyboardState(section) {
-    const states = isMobile() ? KEYBOARD_STATES_MOBILE : KEYBOARD_STATES;
-    return states[section] || states.hero;
-}
-
-async function initSpline() {
-    try {
-        const splineCanvas = document.getElementById('spline-canvas');
-        splineApp = new Application(splineCanvas);
-        await splineApp.load('skills-keyboard.spline');
-
-        splineLoaded = true;
-        finishLoading();
-
-        // Set initial keyboard state
-        applyKeyboardState('hero', true);
-
-        // Setup keyboard interaction events
-        setupSplineEvents();
-
-        // Update theme-specific text visibility
-        updateSplineTheme(html.getAttribute('data-theme'));
-
-    } catch (err) {
-        console.warn('Spline failed to load:', err);
-        // Hide spline container if it fails
-        document.getElementById('spline-container').style.display = 'none';
-        splineLoaded = true;
-        finishLoading();
+function showHeroTooltip(label, desc) {
+    heroTooltipTitle.textContent = label;
+    heroTooltipDesc.textContent = desc;
+    heroTooltipEl.classList.add('visible');
+    // Also update skills section display
+    if (skillDisplay) {
+        skillHeading.textContent = label;
+        skillDesc.textContent = desc;
+        skillDisplay.classList.add('visible');
     }
 }
 
-function applyKeyboardState(section, immediate) {
-    if (!splineApp) return;
-    const kbd = splineApp.findObjectByName('keyboard');
-    if (!kbd) return;
+function hideHeroTooltip() {
+    heroTooltipEl.classList.remove('visible');
+    if (skillDisplay) skillDisplay.classList.remove('visible');
+}
 
-    const state = getKeyboardState(section);
-    const duration = immediate ? 0 : 600;
+function buildHeroKeyboard() {
+    if (!heroKeyboard) return;
+    heroKeyboard.innerHTML = '';
 
-    if (immediate) {
-        kbd.scale.x = state.scale.x;
-        kbd.scale.y = state.scale.y;
-        kbd.scale.z = state.scale.z;
-        kbd.position.x = state.position.x;
-        kbd.position.y = state.position.y;
-        kbd.position.z = state.position.z;
-        kbd.rotation.x = state.rotation.x;
-        kbd.rotation.y = state.rotation.y;
-        kbd.rotation.z = state.rotation.z;
-    } else {
-        // Smooth lerp animation
-        const startScale = { x: kbd.scale.x, y: kbd.scale.y, z: kbd.scale.z };
-        const startPos = { x: kbd.position.x, y: kbd.position.y, z: kbd.position.z };
-        const startRot = { x: kbd.rotation.x, y: kbd.rotation.y, z: kbd.rotation.z };
-        const startTime = performance.now();
+    HERO_KB_ROWS.forEach((row, rowIdx) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'hk-row';
 
-        function lerpStep(now) {
-            const t = Math.min((now - startTime) / duration, 1);
-            const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+        row.forEach((key, keyIdx) => {
+            const skill = SKILLS[key];
+            if (!skill) return;
 
-            kbd.scale.x = startScale.x + (state.scale.x - startScale.x) * ease;
-            kbd.scale.y = startScale.y + (state.scale.y - startScale.y) * ease;
-            kbd.scale.z = startScale.z + (state.scale.z - startScale.z) * ease;
+            const keyEl = document.createElement('button');
+            keyEl.className = 'hk-key';
+            keyEl.style.animationDelay = `${(rowIdx * 5 + keyIdx) * 0.04}s`;
 
-            kbd.position.x = startPos.x + (state.position.x - startPos.x) * ease;
-            kbd.position.y = startPos.y + (state.position.y - startPos.y) * ease;
-            kbd.position.z = startPos.z + (state.position.z - startPos.z) * ease;
+            // Key face (top)
+            const face = document.createElement('div');
+            face.className = 'hk-key-face';
+            face.innerHTML = `<span class="hk-key-icon">${skill.icon}</span><span class="hk-key-text">${skill.label}</span>`;
+            keyEl.appendChild(face);
 
-            kbd.rotation.x = startRot.x + (state.rotation.x - startRot.x) * ease;
-            kbd.rotation.y = startRot.y + (state.rotation.y - startRot.y) * ease;
-            kbd.rotation.z = startRot.z + (state.rotation.z - startRot.z) * ease;
+            // Key side (bottom depth)
+            const side = document.createElement('div');
+            side.className = 'hk-key-side';
+            keyEl.appendChild(side);
 
-            if (t < 1) requestAnimationFrame(lerpStep);
-        }
-        requestAnimationFrame(lerpStep);
+            keyEl.addEventListener('mouseenter', () => showHeroTooltip(skill.label, skill.desc));
+            keyEl.addEventListener('mouseleave', () => hideHeroTooltip());
+            keyEl.addEventListener('click', () => {
+                showHeroTooltip(skill.label, skill.desc);
+                keyEl.classList.add('hk-pressed');
+                setTimeout(() => keyEl.classList.remove('hk-pressed'), 300);
+            });
+
+            rowEl.appendChild(keyEl);
+        });
+
+        heroKeyboard.appendChild(rowEl);
+    });
+}
+
+// Mouse-tracking 3D tilt for the keyboard
+let kbTiltX = 0, kbTiltY = 0, kbTargetX = 0, kbTargetY = 0;
+
+function handleKeyboardTilt(e) {
+    if (!heroScene) return;
+    const rect = heroScene.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    kbTargetX = ((e.clientY - cy) / rect.height) * 12;  // tilt range
+    kbTargetY = ((e.clientX - cx) / rect.width) * -12;
+}
+
+function animateKeyboardTilt() {
+    kbTiltX += (kbTargetX - kbTiltX) * 0.08;
+    kbTiltY += (kbTargetY - kbTiltY) * 0.08;
+    if (heroKeyboard) {
+        heroKeyboard.style.transform = `rotateX(${22 + kbTiltX}deg) rotateY(${kbTiltY}deg)`;
     }
+    requestAnimationFrame(animateKeyboardTilt);
 }
 
-function setupSplineEvents() {
-    if (!splineApp) return;
+document.addEventListener('mousemove', handleKeyboardTilt);
+animateKeyboardTilt();
 
-    // Key press events - show skill info
-    splineApp.addEventListener('keyDown', (e) => {
-        if (!e.target || !e.target.name) return;
-        const skill = SKILLS[e.target.name];
-        if (skill) {
-            showSkillDisplay(skill.label, skill.desc);
-            // Also set Spline variables if they exist
-            try {
-                splineApp.setVariable('heading', skill.label);
-                splineApp.setVariable('desc', skill.desc);
-            } catch (_) {}
-        }
-    });
+// Build & mark loaded
+buildHeroKeyboard();
+splineLoaded = true;
+finishLoading();
 
-    splineApp.addEventListener('keyUp', () => {
-        hideSkillDisplay();
-        try {
-            splineApp.setVariable('heading', '');
-            splineApp.setVariable('desc', '');
-        } catch (_) {}
-    });
-
-    // Mouse hover on keycaps
-    splineApp.addEventListener('mouseHover', (e) => {
-        if (!e.target || !e.target.name) return;
-        const skill = SKILLS[e.target.name];
-        if (skill) {
-            showSkillDisplay(skill.label, skill.desc);
-            try {
-                splineApp.setVariable('heading', skill.label);
-                splineApp.setVariable('desc', skill.desc);
-            } catch (_) {}
-        }
-    });
-}
-
-function showSkillDisplay(heading, desc) {
-    skillHeading.textContent = heading;
-    skillDesc.textContent = desc;
-    skillDisplay.classList.add('visible');
-}
-
-function hideSkillDisplay() {
-    skillDisplay.classList.remove('visible');
-}
-
-function updateSplineTheme(theme) {
-    if (!splineApp) return;
-    try {
-        // Toggle text layers based on theme
-        const textDesktopDark = splineApp.findObjectByName('text-desktop-dark');
-        const textDesktopLight = splineApp.findObjectByName('text-desktop');
-        const textMobileDark = splineApp.findObjectByName('text-mobile-dark');
-        const textMobileLight = splineApp.findObjectByName('text-mobile');
-
-        const isDark = theme === 'dark';
-        const mobile = isMobile();
-
-        if (textDesktopDark) textDesktopDark.visible = isDark && !mobile;
-        if (textDesktopLight) textDesktopLight.visible = !isDark && !mobile;
-        if (textMobileDark) textMobileDark.visible = isDark && mobile;
-        if (textMobileLight) textMobileLight.visible = !isDark && mobile;
-    } catch (_) {}
-}
-
-// Initialize Spline
-initSpline();
-
-// ===== Scroll-based section detection for keyboard animation =====
+// ===== Scroll-based section detection =====
 function updateActiveSection() {
     const sections = ['hero', 'about', 'skills', 'projects', 'experience', 'contact'];
     const scrollY = window.scrollY;
@@ -334,11 +214,7 @@ function updateActiveSection() {
             newSection = id;
         }
     }
-
-    if (newSection !== activeSection) {
-        activeSection = newSection;
-        applyKeyboardState(activeSection, false);
-    }
+    activeSection = newSection;
 }
 
 window.addEventListener('scroll', updateActiveSection);
