@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Study: Jenkins Shared Library — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../blog.html">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Case Study</span>
+        <span class="post-date">CI/CD</span>
+        <span class="post-read-time">10 min read</span>
+      </div>
+      <h1 class="post-heading">Jenkins Shared Library for Enterprise CI/CD</h1>
+      <p class="post-subtitle">How I built a reusable Jenkins shared library that standardized CI/CD pipelines across 40+ microservices — reducing Jenkinsfile boilerplate by 80% and cutting onboarding time from days to hours.</p>
+    </div>
+  </header>
+
+  <article class="post-content">
+    <div class="container">
+
+      <nav class="post-toc">
+        <h3>Table of Contents</h3>
+        <ul>
+          <li><a href="#problem">The Problem</a></li>
+          <li><a href="#architecture">Library Architecture</a></li>
+          <li><a href="#core-steps">Core Pipeline Steps</a></li>
+          <li><a href="#standardized-jenkinsfile">The Standardized Jenkinsfile</a></li>
+          <li><a href="#environment-promotion">Environment Promotion</a></li>
+          <li><a href="#quality-gates">Quality Gates</a></li>
+          <li><a href="#notifications">Notifications &amp; Reporting</a></li>
+          <li><a href="#testing">Testing the Library</a></li>
+          <li><a href="#results">Results &amp; Impact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Section 1: The Problem -->
+      <section class="post-section" id="problem">
+        <h2>The Problem</h2>
+        <p>Our platform consisted of <strong>40+ microservices</strong> spanning Java, Node.js, Python, and Go. Each service had its own Jenkinsfile — copy-pasted from a "template" that had diverged into dozens of incompatible variants over two years. The average Jenkinsfile was <strong>600+ lines</strong> of duplicated pipeline logic.</p>
+
+        <div class="post-callout-warning">
+          <strong>The maintenance nightmare was real:</strong> A single pipeline change — say, updating the Docker registry URL or adding a new security scan — required opening pull requests across all 40 repositories. Some repos would be missed. Others would get partial updates. Nobody owned the pipeline logic, so entropy compounded with every sprint.
+        </div>
+
+        <p>The pain points were clear:</p>
+        <ul>
+          <li><strong>Inconsistent stages</strong> — some services ran security scans, others skipped them entirely. No two Jenkinsfiles had the same stage order.</li>
+          <li><strong>No standardization</strong> — environment promotion logic was hard-coded differently in every pipeline. Some deployed to staging via <code>kubectl apply</code>, others used Helm, a few used raw manifests.</li>
+          <li><strong>Onboarding friction</strong> — new developers spent <strong>2+ days</strong> trying to understand a 600-line Jenkinsfile before they could ship their first change.</li>
+          <li><strong>Drift between environments</strong> — dev, staging, and production deployments used different code paths, making production issues impossible to reproduce in lower environments.</li>
+          <li><strong>Scattered credentials</strong> — Docker registry tokens, Kubernetes configs, and SonarQube keys were hard-coded or inconsistently referenced across pipelines.</li>
+        </ul>
+
+        <p>The team needed a single source of truth for CI/CD logic — a shared library that every microservice could consume with a minimal, declarative Jenkinsfile.</p>
+      </section>
+
+      <!-- Section 2: Library Architecture -->
+      <section class="post-section" id="architecture">
+        <h2>Library Architecture</h2>
+        <p>Jenkins Shared Libraries follow a specific directory convention. I structured the library into three layers: global pipeline steps in <code>vars/</code>, reusable helper classes in <code>src/</code>, and static templates in <code>resources/</code>.</p>
+
+        <div class="code-label">Repository Structure</div>
+<pre><code><span class="fn">jenkins-shared-library/</span>
+├── <span class="fn">vars/</span>                        <span class="cm"># Global pipeline steps (DSL)</span>
+│   ├── <span class="str">buildApp.groovy</span>          <span class="cm"># Multi-language build step</span>
+│   ├── <span class="str">dockerBuild.groovy</span>       <span class="cm"># Docker build + tag + push</span>
+│   ├── <span class="str">scanImage.groovy</span>         <span class="cm"># Trivy vulnerability scanning</span>
+│   ├── <span class="str">deployK8s.groovy</span>         <span class="cm"># Helm deploy to Kubernetes</span>
+│   ├── <span class="str">qualityGate.groovy</span>       <span class="cm"># SonarQube + coverage checks</span>
+│   ├── <span class="str">notifySlack.groovy</span>       <span class="cm"># Slack notifications</span>
+│   └── <span class="str">standardPipeline.groovy</span>  <span class="cm"># Full pipeline orchestrator</span>
+├── <span class="fn">src/</span>                        <span class="cm"># Helper classes (package structure)</span>
+│   └── <span class="fn">com/company/pipeline/</span>
+│       ├── <span class="str">BuildConfig.groovy</span>   <span class="cm"># Build configuration POJO</span>
+│       ├── <span class="str">DeployConfig.groovy</span>  <span class="cm"># Deployment configuration</span>
+│       └── <span class="str">Utils.groovy</span>        <span class="cm"># Shared utility methods</span>
+├── <span class="fn">resources/</span>                  <span class="cm"># Static templates</span>
+│   ├── <span class="str">helm-values-dev.yaml</span>    <span class="cm"># Dev Helm overrides</span>
+│   ├── <span class="str">helm-values-staging.yaml</span> <span class="cm"># Staging Helm overrides</span>
+│   └── <span class="str">helm-values-prod.yaml</span>   <span class="cm"># Production Helm overrides</span>
+├── <span class="fn">test/</span>                       <span class="cm"># Pipeline unit tests</span>
+│   └── <span class="str">groovy/</span>
+│       ├── <span class="str">BuildAppTest.groovy</span>
+│       └── <span class="str">DeployK8sTest.groovy</span>
+└── <span class="str">Jenkinsfile</span>                <span class="cm"># Self-test pipeline</span></code></pre>
+
+        <div class="post-callout-info">
+          <strong>How Jenkins loads the library:</strong> The library is configured as a <em>Global Pipeline Library</em> in Jenkins settings, pointing to the Git repository. Teams reference it with <code>@Library('pipeline-lib') _</code> at the top of their Jenkinsfiles. Jenkins fetches the library at build time and makes all <code>vars/</code> steps available as first-class DSL commands.
+        </div>
+      </section>
+
+      <!-- Section 3: Core Pipeline Steps -->
+      <section class="post-section" id="core-steps">
+        <h2>Core Pipeline Steps</h2>
+        <p>Each file in <code>vars/</code> exposes a single callable step. Here are the four foundational steps that power every pipeline.</p>
+
+        <h3>buildApp.groovy — Multi-Language Build</h3>
+        <p>This step auto-detects the project language and runs the appropriate build command. It supports Java/Maven, Node.js, Python, and Go out of the box.</p>
+
+        <div class="code-label">vars/buildApp.groovy</div>
+<pre><code><span class="kw">def</span> <span class="fn">call</span>(Map config = [:]) {
+    <span class="kw">def</span> language = config.language ?: <span class="fn">detectLanguage</span>()
+    <span class="fn">echo</span> <span class="str">"Building ${language} application..."</span>
+
+    <span class="kw">switch</span>(language) {
+        <span class="kw">case</span> <span class="str">'java'</span>:
+            <span class="fn">sh</span> <span class="str">'mvn clean package -DskipTests -B'</span>
+            <span class="kw">break</span>
+        <span class="kw">case</span> <span class="str">'node'</span>:
+            <span class="fn">sh</span> <span class="str">'npm ci && npm run build'</span>
+            <span class="kw">break</span>
+        <span class="kw">case</span> <span class="str">'python'</span>:
+            <span class="fn">sh</span> <span class="str">'pip install -r requirements.txt && python setup.py build'</span>
+            <span class="kw">break</span>
+        <span class="kw">case</span> <span class="str">'go'</span>:
+            <span class="fn">sh</span> <span class="str">'go mod download && go build -o app ./cmd/...'</span>
+            <span class="kw">break</span>
+        <span class="kw">default</span>:
+            <span class="fn">error</span> <span class="str">"Unsupported language: ${language}"</span>
+    }
+}
+
+<span class="kw">private def</span> <span class="fn">detectLanguage</span>() {
+    <span class="kw">if</span> (<span class="fn">fileExists</span>(<span class="str">'pom.xml'</span>))          <span class="kw">return</span> <span class="str">'java'</span>
+    <span class="kw">if</span> (<span class="fn">fileExists</span>(<span class="str">'package.json'</span>))     <span class="kw">return</span> <span class="str">'node'</span>
+    <span class="kw">if</span> (<span class="fn">fileExists</span>(<span class="str">'requirements.txt'</span>)) <span class="kw">return</span> <span class="str">'python'</span>
+    <span class="kw">if</span> (<span class="fn">fileExists</span>(<span class="str">'go.mod'</span>))           <span class="kw">return</span> <span class="str">'go'</span>
+    <span class="fn">error</span> <span class="str">'Could not detect project language'</span>
+}</code></pre>
+
+        <h3>dockerBuild.groovy — Build, Tag &amp; Push</h3>
+        <p>Handles Docker image construction with consistent tagging using the Git commit SHA and branch name.</p>
+
+        <div class="code-label">vars/dockerBuild.groovy</div>
+<pre><code><span class="kw">def</span> <span class="fn">call</span>(Map config) {
+    <span class="kw">def</span> registry  = config.registry ?: <span class="str">'registry.company.com'</span>
+    <span class="kw">def</span> imageName = config.imageName
+    <span class="kw">def</span> commitSha = <span class="fn">sh</span>(script: <span class="str">'git rev-parse --short HEAD'</span>, returnStdout: <span class="kw">true</span>).trim()
+    <span class="kw">def</span> tag       = <span class="str">"${env.BRANCH_NAME}-${commitSha}"</span>
+    <span class="kw">def</span> fullImage = <span class="str">"${registry}/${imageName}:${tag}"</span>
+
+    <span class="fn">echo</span> <span class="str">"Building Docker image: ${fullImage}"</span>
+
+    <span class="fn">sh</span> <span class="str">"""
+        docker build -t ${fullImage} \
+            --label git.commit=${commitSha} \
+            --label git.branch=${env.BRANCH_NAME} \
+            --no-cache .
+    """</span>
+
+    <span class="fn">withCredentials</span>([<span class="fn">usernamePassword</span>(
+        credentialsId: <span class="str">'docker-registry-creds'</span>,
+        usernameVariable: <span class="str">'DOCKER_USER'</span>,
+        passwordVariable: <span class="str">'DOCKER_PASS'</span>
+    )]) {
+        <span class="fn">sh</span> <span class="str">"echo \$DOCKER_PASS | docker login ${registry} -u \$DOCKER_USER --password-stdin"</span>
+        <span class="fn">sh</span> <span class="str">"docker push ${fullImage}"</span>
+    }
+
+    <span class="kw">return</span> fullImage
+}</code></pre>
+
+        <h3>scanImage.groovy — Trivy Vulnerability Scanning</h3>
+        <p>Runs Trivy against the built image and fails the build if CRITICAL vulnerabilities are found.</p>
+
+        <div class="code-label">vars/scanImage.groovy</div>
+<pre><code><span class="kw">def</span> <span class="fn">call</span>(Map config) {
+    <span class="kw">def</span> image       = config.image
+    <span class="kw">def</span> severities  = config.failOn ?: <span class="str">'CRITICAL'</span>
+    <span class="kw">def</span> exitCode    = config.exitCode ?: <span class="num">1</span>
+
+    <span class="fn">echo</span> <span class="str">"Scanning image: ${image} (fail on: ${severities})"</span>
+
+    <span class="cm">// Generate HTML report for archiving</span>
+    <span class="fn">sh</span> <span class="str">"""
+        trivy image --format template \
+            --template '@/usr/local/share/trivy/html.tpl' \
+            --output trivy-report.html \
+            ${image}
+    """</span>
+    <span class="fn">archiveArtifacts</span> artifacts: <span class="str">'trivy-report.html'</span>
+
+    <span class="cm">// Fail on specified severities</span>
+    <span class="kw">def</span> scanResult = <span class="fn">sh</span>(
+        script: <span class="str">"trivy image --exit-code ${exitCode} --severity ${severities} ${image}"</span>,
+        returnStatus: <span class="kw">true</span>
+    )
+
+    <span class="kw">if</span> (scanResult != <span class="num">0</span>) {
+        <span class="fn">error</span> <span class="str">"Trivy scan found ${severities} vulnerabilities in ${image}"</span>
+    }
+}</code></pre>
+
+        <h3>deployK8s.groovy — Helm Deploy to Kubernetes</h3>
+        <p>Deploys the application to a target Kubernetes namespace using Helm, with environment-specific value overrides.</p>
+
+        <div class="code-label">vars/deployK8s.groovy</div>
+<pre><code><span class="kw">def</span> <span class="fn">call</span>(Map config) {
+    <span class="kw">def</span> environment = config.environment     <span class="cm">// dev | staging | production</span>
+    <span class="kw">def</span> namespace   = config.namespace ?: environment
+    <span class="kw">def</span> releaseName = config.releaseName
+    <span class="kw">def</span> chartPath   = config.chartPath ?: <span class="str">'./helm'</span>
+    <span class="kw">def</span> image       = config.image
+
+    <span class="kw">def</span> valuesFile = <span class="fn">libraryResource</span>(<span class="str">"helm-values-${environment}.yaml"</span>)
+    <span class="fn">writeFile</span> file: <span class="str">'env-values.yaml'</span>, text: valuesFile
+
+    <span class="fn">withCredentials</span>([<span class="fn">file</span>(credentialsId: <span class="str">"kubeconfig-${environment}"</span>, variable: <span class="str">'KUBECONFIG'</span>)]) {
+        <span class="fn">sh</span> <span class="str">"""
+            helm upgrade --install ${releaseName} ${chartPath} \
+                --namespace ${namespace} \
+                --create-namespace \
+                --values env-values.yaml \
+                --set image.repository=${image.split(':')[0]} \
+                --set image.tag=${image.split(':')[1]} \
+                --wait --timeout 300s
+        """</span>
+    }
+
+    <span class="fn">echo</span> <span class="str">"Deployed ${releaseName} to ${environment} (ns: ${namespace})"</span>
+}</code></pre>
+      </section>
+
+      <!-- Section 4: The Standardized Jenkinsfile -->
+      <section class="post-section" id="standardized-jenkinsfile">
+        <h2>The Standardized Jenkinsfile</h2>
+        <p>The ultimate goal was to reduce every microservice's Jenkinsfile to a <strong>simple, declarative configuration</strong>. The <code>standardPipeline</code> step orchestrates all the individual steps in the correct order.</p>
+
+        <div class="post-callout-tip">
+          <strong>Before vs After:</strong> The average Jenkinsfile went from 600 lines of copy-pasted pipeline logic to 18 lines of declarative configuration. Every service gets the same stages, the same quality gates, and the same deployment flow — automatically.
+        </div>
+
+        <div class="code-label">Before: 600-Line Jenkinsfile (abbreviated)</div>
+<pre><code><span class="cm">// Every microservice had this — 600+ lines of duplicated logic</span>
+<span class="kw">pipeline</span> {
+    agent <span class="kw">any</span>
+    environment {
+        REGISTRY     = <span class="str">'registry.company.com'</span>
+        IMAGE_NAME   = <span class="str">'order-service'</span>
+        SONAR_HOST   = <span class="str">'https://sonar.company.com'</span>
+        <span class="cm">// ... 20 more environment variables</span>
+    }
+    stages {
+        stage(<span class="str">'Checkout'</span>)    { steps { <span class="cm">/* ... 15 lines ... */</span> } }
+        stage(<span class="str">'Build'</span>)       { steps { <span class="cm">/* ... 40 lines ... */</span> } }
+        stage(<span class="str">'Test'</span>)        { steps { <span class="cm">/* ... 50 lines ... */</span> } }
+        stage(<span class="str">'Sonar'</span>)       { steps { <span class="cm">/* ... 35 lines ... */</span> } }
+        stage(<span class="str">'Docker'</span>)      { steps { <span class="cm">/* ... 45 lines ... */</span> } }
+        stage(<span class="str">'Scan'</span>)        { steps { <span class="cm">/* ... 30 lines ... */</span> } }
+        stage(<span class="str">'Deploy Dev'</span>)  { steps { <span class="cm">/* ... 60 lines ... */</span> } }
+        stage(<span class="str">'Deploy Stg'</span>)  { steps { <span class="cm">/* ... 60 lines ... */</span> } }
+        stage(<span class="str">'Deploy Prod'</span>) { steps { <span class="cm">/* ... 80 lines ... */</span> } }
+        <span class="cm">// ... more stages, post blocks, error handling ...</span>
+    }
+    post { <span class="cm">/* ... 50 lines of notification logic ... */</span> }
+    <span class="cm">// Total: ~600 lines, copy-pasted across 40+ repos</span>
+}</code></pre>
+
+        <div class="code-label">After: 18-Line Jenkinsfile</div>
+<pre><code><span class="kw">@Library</span>(<span class="str">'pipeline-lib'</span>) _
+
+<span class="fn">standardPipeline</span> {
+    appName     = <span class="str">'order-service'</span>
+    language    = <span class="str">'java'</span>
+    imageName   = <span class="str">'platform/order-service'</span>
+    chartPath   = <span class="str">'./helm'</span>
+
+    <span class="cm">// Quality gates</span>
+    sonarProject    = <span class="str">'order-service'</span>
+    coverageMin     = <span class="num">80</span>
+    trivySeverity   = <span class="str">'CRITICAL,HIGH'</span>
+
+    <span class="cm">// Deployment targets</span>
+    deployDev       = <span class="kw">true</span>
+    deployStaging   = <span class="kw">true</span>
+    deployProd      = <span class="kw">true</span>
+    prodApproval    = <span class="kw">true</span>
+
+    slackChannel    = <span class="str">'#order-service-builds'</span>
+}</code></pre>
+
+        <p>That is the <strong>entire Jenkinsfile</strong>. Eighteen lines. The shared library handles checkout, build, test, scanning, quality gates, Docker image creation, Helm deployment to three environments, approval gates, and Slack notifications — all from this single declaration.</p>
+      </section>
+
+      <!-- Section 5: Environment Promotion -->
+      <section class="post-section" id="environment-promotion">
+        <h2>Environment Promotion</h2>
+        <p>The shared library enforces a strict promotion flow: <strong>dev &rarr; staging &rarr; production</strong>. Each environment has its own Kubernetes namespace, Helm values, and gating criteria.</p>
+
+        <div class="code-label">vars/standardPipeline.groovy (promotion flow)</div>
+<pre><code><span class="cm">// Inside the standardPipeline orchestrator</span>
+<span class="kw">if</span> (config.deployDev) {
+    stage(<span class="str">'Deploy to Dev'</span>) {
+        <span class="fn">deployK8s</span>(
+            environment: <span class="str">'dev'</span>,
+            namespace:   <span class="str">"dev-${config.appName}"</span>,
+            releaseName: config.appName,
+            chartPath:   config.chartPath,
+            image:       dockerImage
+        )
+    }
+}
+
+<span class="kw">if</span> (config.deployStaging) {
+    stage(<span class="str">'Deploy to Staging'</span>) {
+        <span class="fn">deployK8s</span>(
+            environment: <span class="str">'staging'</span>,
+            namespace:   <span class="str">"staging-${config.appName}"</span>,
+            releaseName: config.appName,
+            chartPath:   config.chartPath,
+            image:       dockerImage
+        )
+    }
+}
+
+<span class="kw">if</span> (config.deployProd) {
+    stage(<span class="str">'Production Approval'</span>) {
+        <span class="kw">when</span> { expression { config.prodApproval == <span class="kw">true</span> } }
+        <span class="fn">timeout</span>(time: <span class="num">24</span>, unit: <span class="str">'HOURS'</span>) {
+            <span class="fn">input</span> message: <span class="str">"Deploy ${config.appName} to production?"</span>,
+                  submitter: <span class="str">'platform-leads,devops'</span>
+        }
+    }
+    stage(<span class="str">'Deploy to Production'</span>) {
+        <span class="fn">deployK8s</span>(
+            environment: <span class="str">'production'</span>,
+            namespace:   <span class="str">"prod-${config.appName}"</span>,
+            releaseName: config.appName,
+            chartPath:   config.chartPath,
+            image:       dockerImage
+        )
+    }
+}</code></pre>
+
+        <div class="post-callout-info">
+          <strong>Namespace isolation:</strong> Each service gets its own namespace per environment (e.g., <code>dev-order-service</code>, <code>staging-order-service</code>, <code>prod-order-service</code>). This provides resource isolation, RBAC boundaries, and clean <code>kubectl</code> targeting without risk of cross-service interference.
+        </div>
+
+        <p>The <code>resources/</code> directory holds environment-specific Helm values. Production gets stricter resource limits, higher replica counts, and production-grade database connection strings — all without any per-repo configuration.</p>
+      </section>
+
+      <!-- Section 6: Quality Gates -->
+      <section class="post-section" id="quality-gates">
+        <h2>Quality Gates</h2>
+        <p>Every pipeline enforces mandatory quality gates before the Docker image is built. If any gate fails, the pipeline stops and notifies the team.</p>
+
+        <div class="code-label">vars/qualityGate.groovy</div>
+<pre><code><span class="kw">def</span> <span class="fn">call</span>(Map config) {
+    <span class="kw">def</span> sonarProject = config.sonarProject
+    <span class="kw">def</span> coverageMin  = config.coverageMin ?: <span class="num">80</span>
+    <span class="kw">def</span> language     = config.language
+
+    <span class="cm">// Run unit tests with coverage</span>
+    stage(<span class="str">'Unit Tests'</span>) {
+        <span class="kw">switch</span>(language) {
+            <span class="kw">case</span> <span class="str">'java'</span>:
+                <span class="fn">sh</span> <span class="str">'mvn test jacoco:report -B'</span>
+                <span class="fn">junit</span> <span class="str">'**/target/surefire-reports/*.xml'</span>
+                <span class="fn">jacoco</span> execPattern: <span class="str">'**/target/jacoco.exec'</span>,
+                       minimumLineCoverage: <span class="str">"${coverageMin}"</span>
+                <span class="kw">break</span>
+            <span class="kw">case</span> <span class="str">'node'</span>:
+                <span class="fn">sh</span> <span class="str">'npm test -- --coverage --ci'</span>
+                <span class="fn">cobertura</span> coberturaReportFile: <span class="str">'coverage/cobertura-coverage.xml'</span>
+                <span class="kw">break</span>
+            <span class="kw">case</span> <span class="str">'python'</span>:
+                <span class="fn">sh</span> <span class="str">'pytest --cov=. --cov-report=xml --junitxml=test-results.xml'</span>
+                <span class="fn">junit</span> <span class="str">'test-results.xml'</span>
+                <span class="kw">break</span>
+            <span class="kw">case</span> <span class="str">'go'</span>:
+                <span class="fn">sh</span> <span class="str">'go test -coverprofile=coverage.out -v ./...'</span>
+                <span class="kw">break</span>
+        }
+    }
+
+    <span class="cm">// SonarQube analysis</span>
+    stage(<span class="str">'SonarQube Analysis'</span>) {
+        <span class="fn">withSonarQubeEnv</span>(<span class="str">'sonar-server'</span>) {
+            <span class="fn">sh</span> <span class="str">"""
+                sonar-scanner \
+                    -Dsonar.projectKey=${sonarProject} \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=\${SONAR_HOST_URL} \
+                    -Dsonar.login=\${SONAR_AUTH_TOKEN}
+            """</span>
+        }
+        <span class="fn">timeout</span>(time: <span class="num">5</span>, unit: <span class="str">'MINUTES'</span>) {
+            <span class="kw">def</span> qg = <span class="fn">waitForQualityGate</span>()
+            <span class="kw">if</span> (qg.status != <span class="str">'OK'</span>) {
+                <span class="fn">error</span> <span class="str">"SonarQube quality gate failed: ${qg.status}"</span>
+            }
+        }
+    }
+}</code></pre>
+
+        <div class="post-callout-warning">
+          <strong>Zero tolerance for CRITICAL vulnerabilities:</strong> Trivy scanning blocks the pipeline if any CRITICAL severity CVE is detected. HIGH severity findings generate warnings but allow the build to proceed, giving teams time to plan remediation without blocking deployments entirely.
+        </div>
+      </section>
+
+      <!-- Section 7: Notifications & Reporting -->
+      <section class="post-section" id="notifications">
+        <h2>Notifications &amp; Reporting</h2>
+        <p>Every pipeline run sends structured Slack notifications on both success and failure. Failures include direct links to the console output and the failing stage name for rapid debugging.</p>
+
+        <div class="code-label">vars/notifySlack.groovy</div>
+<pre><code><span class="kw">def</span> <span class="fn">call</span>(Map config) {
+    <span class="kw">def</span> channel = config.channel ?: <span class="str">'#ci-cd-alerts'</span>
+    <span class="kw">def</span> status  = config.status    <span class="cm">// SUCCESS | FAILURE | UNSTABLE</span>
+    <span class="kw">def</span> appName = config.appName
+
+    <span class="kw">def</span> colorMap = [
+        <span class="str">'SUCCESS'</span> : <span class="str">'good'</span>,
+        <span class="str">'FAILURE'</span> : <span class="str">'danger'</span>,
+        <span class="str">'UNSTABLE'</span>: <span class="str">'warning'</span>
+    ]
+
+    <span class="kw">def</span> emoji = status == <span class="str">'SUCCESS'</span> ? <span class="str">':white_check_mark:'</span> : <span class="str">':x:'</span>
+    <span class="kw">def</span> commitMsg = <span class="fn">sh</span>(script: <span class="str">'git log -1 --pretty=%B'</span>, returnStdout: <span class="kw">true</span>).trim()
+    <span class="kw">def</span> author   = <span class="fn">sh</span>(script: <span class="str">'git log -1 --pretty=%an'</span>, returnStdout: <span class="kw">true</span>).trim()
+
+    <span class="kw">def</span> message = <span class="str">"""
+        ${emoji} *${appName}* - Build #${env.BUILD_NUMBER} ${status}
+        *Branch:* ${env.BRANCH_NAME}
+        *Commit:* ${commitMsg}
+        *Author:* ${author}
+        *Duration:* ${currentBuild.durationString.replace(' and counting', '')}
+        *Console:* <${env.BUILD_URL}console|View Logs>
+    """</span>
+
+    <span class="fn">slackSend</span>(
+        channel: channel,
+        color: colorMap[status],
+        message: message
+    )
+}</code></pre>
+
+        <p>The orchestrator wraps the entire pipeline in a <code>try/catch/finally</code> block so that notifications fire regardless of outcome:</p>
+
+        <div class="code-label">Notification integration in standardPipeline.groovy</div>
+<pre><code><span class="kw">try</span> {
+    <span class="cm">// ... all pipeline stages ...</span>
+    <span class="fn">notifySlack</span>(channel: config.slackChannel, status: <span class="str">'SUCCESS'</span>, appName: config.appName)
+} <span class="kw">catch</span> (Exception e) {
+    currentBuild.result = <span class="str">'FAILURE'</span>
+    <span class="fn">notifySlack</span>(channel: config.slackChannel, status: <span class="str">'FAILURE'</span>, appName: config.appName)
+    <span class="kw">throw</span> e
+}</code></pre>
+      </section>
+
+      <!-- Section 8: Testing the Library -->
+      <section class="post-section" id="testing">
+        <h2>Testing the Library</h2>
+        <p>A shared library that 40+ services depend on must be tested rigorously. I used <strong>Jenkins Pipeline Unit</strong> for unit testing individual steps, and a self-referencing Jenkinsfile for integration testing.</p>
+
+        <div class="code-label">test/groovy/BuildAppTest.groovy</div>
+<pre><code><span class="kw">import</span> com.lesfurets.jenkins.unit.BasePipelineTest
+<span class="kw">import</span> org.junit.Before
+<span class="kw">import</span> org.junit.Test
+<span class="kw">import static</span> org.junit.Assert.*
+
+<span class="kw">class</span> <span class="fn">BuildAppTest</span> <span class="kw">extends</span> BasePipelineTest {
+
+    <span class="kw">@Before</span>
+    <span class="kw">void</span> <span class="fn">setUp</span>() {
+        <span class="kw">super</span>.setUp()
+        helper.registerAllowedMethod(<span class="str">'sh'</span>, [String], { cmd ->
+            <span class="fn">addShellMock</span>(cmd)
+        })
+        helper.registerAllowedMethod(<span class="str">'fileExists'</span>, [String], { file ->
+            <span class="kw">return</span> file == <span class="str">'pom.xml'</span>  <span class="cm">// Simulate Java project</span>
+        })
+    }
+
+    <span class="kw">@Test</span>
+    <span class="kw">void</span> <span class="fn">testDetectsJavaProject</span>() {
+        <span class="kw">def</span> script = loadScript(<span class="str">'vars/buildApp.groovy'</span>)
+        script.call([:])
+
+        <span class="fn">assertJobStatusSuccess</span>()
+        <span class="fn">assertThat</span>(helper.callStack)
+            .filteredOn { it.methodName == <span class="str">'sh'</span> }
+            .extracting { it.args[<span class="num">0</span>] }
+            .contains(<span class="str">'mvn clean package -DskipTests -B'</span>)
+    }
+
+    <span class="kw">@Test</span>
+    <span class="kw">void</span> <span class="fn">testExplicitLanguageOverride</span>() {
+        <span class="kw">def</span> script = loadScript(<span class="str">'vars/buildApp.groovy'</span>)
+        script.call([language: <span class="str">'node'</span>])
+
+        <span class="fn">assertThat</span>(helper.callStack)
+            .filteredOn { it.methodName == <span class="str">'sh'</span> }
+            .extracting { it.args[<span class="num">0</span>] }
+            .contains(<span class="str">'npm ci && npm run build'</span>)
+    }
+}</code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Self-testing pipeline:</strong> The library's own <code>Jenkinsfile</code> loads itself with <code>@Library('pipeline-lib@${BRANCH_NAME}')</code> and runs a test service through the full pipeline. Every PR to the shared library is validated end-to-end before merging — preventing broken library versions from reaching consumers.
+        </div>
+      </section>
+
+      <!-- Section 9: Results & Impact -->
+      <section class="post-section" id="results">
+        <h2>Results &amp; Impact</h2>
+        <p>After rolling out the shared library across all 40+ microservices, the results were immediate and measurable.</p>
+
+        <table style="width:100%; border-collapse:collapse; margin:1.5rem 0;">
+          <thead>
+            <tr style="text-align:left; border-bottom:2px solid rgba(124,92,252,0.3);">
+              <th style="padding:0.75rem;">Metric</th>
+              <th style="padding:0.75rem;">Before</th>
+              <th style="padding:0.75rem;">After</th>
+              <th style="padding:0.75rem;">Improvement</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:0.75rem;">Jenkinsfile size</td>
+              <td style="padding:0.75rem;">~600 lines</td>
+              <td style="padding:0.75rem;">~20 lines</td>
+              <td style="padding:0.75rem;"><strong>97% reduction</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:0.75rem;">Pipeline change effort</td>
+              <td style="padding:0.75rem;">40 PRs across repos</td>
+              <td style="padding:0.75rem;">1 PR to shared lib</td>
+              <td style="padding:0.75rem;"><strong>Single source of truth</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:0.75rem;">Developer onboarding</td>
+              <td style="padding:0.75rem;">2+ days</td>
+              <td style="padding:0.75rem;">~2 hours</td>
+              <td style="padding:0.75rem;"><strong>12x faster</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:0.75rem;">Pipeline consistency</td>
+              <td style="padding:0.75rem;">Varied wildly</td>
+              <td style="padding:0.75rem;">100% identical flow</td>
+              <td style="padding:0.75rem;"><strong>Full standardization</strong></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+              <td style="padding:0.75rem;">Security scan coverage</td>
+              <td style="padding:0.75rem;">~30% of services</td>
+              <td style="padding:0.75rem;">100% of services</td>
+              <td style="padding:0.75rem;"><strong>Mandatory enforcement</strong></td>
+            </tr>
+            <tr>
+              <td style="padding:0.75rem;">Deployment rollback time</td>
+              <td style="padding:0.75rem;">Manual, ~30 min</td>
+              <td style="padding:0.75rem;">Automated, ~2 min</td>
+              <td style="padding:0.75rem;"><strong>15x faster</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Beyond the numbers, the cultural impact was significant. Developers stopped thinking about pipeline plumbing and focused on application code. The DevOps team shifted from firefighting 40 different pipeline configurations to maintaining one well-tested library. Security and compliance teams gained confidence that every service was scanned and gated identically.</p>
+
+        <div class="post-callout-info">
+          <strong>Key takeaway:</strong> A Jenkins Shared Library is not just a code-reuse pattern — it is an <em>organizational alignment tool</em>. It encodes your team's CI/CD standards into executable code, making the right way the easy way. When a new microservice is created, the team writes 20 lines and inherits the entire platform's best practices automatically.
+        </div>
+      </section>
+
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

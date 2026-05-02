@@ -1,524 +1,385 @@
-// ============================================================
-// 3D INTERACTIVE PORTFOLIO - SCRIPT
-// Matching the style of 3D-interactive-portfolio
-// ============================================================
-
-// ===== Skills Data (DevOps tools mapped to keyboard keys) =====
-const SKILLS = {
-    docker: { label: "Docker", desc: "Containerization king — build once, run anywhere!", icon: "🐳" },
-    kubernetes: { label: "Kubernetes", desc: "Container orchestration at scale — pods, services, and deployments!", icon: "☸️" },
-    jenkins: { label: "Jenkins", desc: "The OG CI/CD pipeline builder — automate all the things!", icon: "🔧" },
-    gitlab: { label: "GitLab CI", desc: "DevOps lifecycle in one platform — from plan to monitor!", icon: "🦊" },
-    aws: { label: "AWS", desc: "The cloud giant — EC2, S3, Lambda and 200+ services!", icon: "☁️" },
-    azure: { label: "Azure", desc: "Microsoft's cloud powerhouse — enterprise-grade infrastructure!", icon: "⚡" },
-    terraform: { label: "Terraform", desc: "Infrastructure as Code — provision clouds with HCL!", icon: "🏗️" },
-    ansible: { label: "Ansible", desc: "Agentless automation — playbooks that configure everything!", icon: "📜" },
-    prometheus: { label: "Prometheus", desc: "Metrics and alerting — time-series monitoring done right!", icon: "🔥" },
-    grafana: { label: "Grafana", desc: "Beautiful dashboards — visualize all your metrics!", icon: "📊" },
-    linux: { label: "Linux", desc: "The backbone of servers — chmod 777 is the ultimate flex!", icon: "🐧" },
-    git: { label: "Git", desc: "Version control — because 'final_v2_FINAL' isn't a strategy!", icon: "🌿" },
-    nginx: { label: "Nginx", desc: "Reverse proxy and load balancer — serving millions of requests!", icon: "🌐" },
-    python: { label: "Python", desc: "Scripting & automation — the DevOps engineer's Swiss army knife!", icon: "🐍" },
-    bash: { label: "Bash", desc: "Shell scripting — piping commands like a plumber!", icon: "💻" },
-    helm: { label: "Helm", desc: "Kubernetes package manager — charts for every deployment!", icon: "⎈" },
-    argocd: { label: "ArgoCD", desc: "GitOps continuous delivery — sync your K8s clusters!", icon: "🔄" },
-    vault: { label: "Vault", desc: "Secrets management — keeping credentials safe and rotated!", icon: "🔐" },
-    gcp: { label: "GCP", desc: "Google Cloud Platform — BigQuery, GKE, and more!", icon: "🌩️" },
-    elasticsearch: { label: "ELK Stack", desc: "Log aggregation and search — find that needle in the haystack!", icon: "🔍" },
-    github: { label: "GitHub Actions", desc: "CI/CD workflows right in your repo — automate on push!", icon: "🐙" },
-    sonarqube: { label: "SonarQube", desc: "Code quality and security scanning — clean code, happy team!", icon: "🛡️" },
-    trivy: { label: "Trivy", desc: "Container vulnerability scanner — secure your images!", icon: "🔒" },
-    go: { label: "Go", desc: "Cloud-native language — built for performance and concurrency!", icon: "🚀" },
-};
-
-// ===== Theme Toggle =====
-const themeToggle = document.getElementById('themeToggle');
-const html = document.documentElement;
-
+// Theme toggle
+const themeToggle = document.getElementById('theme-toggle');
 const savedTheme = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', savedTheme);
+document.documentElement.setAttribute('data-theme', savedTheme);
 
 themeToggle.addEventListener('click', () => {
-    const current = html.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
-    updateParticleColor();
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeToggle.classList.add('swinging');
+  setTimeout(() => themeToggle.classList.remove('swinging'), 800);
 });
 
-// ===== Preloader =====
-const preloaderFill = document.getElementById('preloaderFill');
-const preloaderText = document.getElementById('preloaderText');
-let loadProgress = 0;
-let splineLoaded = false;
+// Mobile menu toggle
+const navToggle = document.getElementById('nav-toggle');
+const navLinks = document.getElementById('nav-links');
 
-function animatePreloader() {
-    // Slow down if spline hasn't loaded yet
-    const target = splineLoaded ? 100 : 85;
-    loadProgress += (target - loadProgress) * 0.04;
-    preloaderFill.style.width = loadProgress + '%';
-    preloaderText.textContent = Math.round(loadProgress) + '%';
-
-    if (loadProgress < 99.5) {
-        requestAnimationFrame(animatePreloader);
-    }
-}
-animatePreloader();
-
-function finishLoading() {
-    preloaderFill.style.width = '100%';
-    preloaderText.textContent = '100%';
-    setTimeout(() => {
-        document.getElementById('preloader').classList.add('hidden');
-        triggerHeroAnimations();
-    }, 400);
-}
-
-// Fallback: if spline takes too long, load anyway after 6s
-setTimeout(() => {
-    if (!splineLoaded) {
-        splineLoaded = true;
-        finishLoading();
-    }
-}, 6000);
-
-// ===== Hero Blur-In Animations =====
-function triggerHeroAnimations() {
-    const blurElements = document.querySelectorAll('.hero-section .blur-in');
-    blurElements.forEach(el => {
-        const delay = parseFloat(el.dataset.delay || 0) * 1000;
-        setTimeout(() => el.classList.add('visible'), delay);
-    });
-}
-
-// ===== 3D Interactive Hero Keyboard =====
-let activeSection = 'hero';
-
-// Keyboard layout — 5 rows of DevOps tools
-const HERO_KB_ROWS = [
-    ['docker', 'kubernetes', 'jenkins', 'gitlab', 'aws'],
-    ['azure', 'terraform', 'ansible', 'prometheus', 'grafana'],
-    ['linux', 'git', 'nginx', 'python', 'bash'],
-    ['helm', 'argocd', 'github', 'vault', 'gcp'],
-    ['go', 'elasticsearch', 'sonarqube', 'trivy'],
-];
-
-const heroKeyboard = document.getElementById('heroKeyboard');
-const heroScene = document.getElementById('heroKeyboardScene');
-const heroTooltipEl = document.getElementById('heroKeyTooltip');
-const heroTooltipTitle = document.getElementById('heroTooltipTitle');
-const heroTooltipDesc = document.getElementById('heroTooltipDesc');
-
-// Also wire up the skill display in the skills section
-const skillDisplay = document.getElementById('skillDisplay');
-const skillHeading = document.getElementById('skillHeading');
-const skillDesc = document.getElementById('skillDesc');
-
-function showHeroTooltip(label, desc) {
-    heroTooltipTitle.textContent = label;
-    heroTooltipDesc.textContent = desc;
-    heroTooltipEl.classList.add('visible');
-    // Also update skills section display
-    if (skillDisplay) {
-        skillHeading.textContent = label;
-        skillDesc.textContent = desc;
-        skillDisplay.classList.add('visible');
-    }
-}
-
-function hideHeroTooltip() {
-    heroTooltipEl.classList.remove('visible');
-    if (skillDisplay) skillDisplay.classList.remove('visible');
-}
-
-function buildHeroKeyboard() {
-    if (!heroKeyboard) return;
-    heroKeyboard.innerHTML = '';
-
-    HERO_KB_ROWS.forEach((row, rowIdx) => {
-        const rowEl = document.createElement('div');
-        rowEl.className = 'hk-row';
-
-        row.forEach((key, keyIdx) => {
-            const skill = SKILLS[key];
-            if (!skill) return;
-
-            const keyEl = document.createElement('button');
-            keyEl.className = 'hk-key';
-            keyEl.style.animationDelay = `${(rowIdx * 5 + keyIdx) * 0.04}s`;
-
-            // Key face (top)
-            const face = document.createElement('div');
-            face.className = 'hk-key-face';
-            face.innerHTML = `<span class="hk-key-icon">${skill.icon}</span><span class="hk-key-text">${skill.label}</span>`;
-            keyEl.appendChild(face);
-
-            // Key side (bottom depth)
-            const side = document.createElement('div');
-            side.className = 'hk-key-side';
-            keyEl.appendChild(side);
-
-            keyEl.addEventListener('mouseenter', () => showHeroTooltip(skill.label, skill.desc));
-            keyEl.addEventListener('mouseleave', () => hideHeroTooltip());
-            keyEl.addEventListener('click', () => {
-                showHeroTooltip(skill.label, skill.desc);
-                keyEl.classList.add('hk-pressed');
-                setTimeout(() => keyEl.classList.remove('hk-pressed'), 300);
-            });
-
-            rowEl.appendChild(keyEl);
-        });
-
-        heroKeyboard.appendChild(rowEl);
-    });
-}
-
-// Mouse-tracking 3D tilt for the keyboard
-let kbTiltX = 0, kbTiltY = 0, kbTargetX = 0, kbTargetY = 0;
-
-function handleKeyboardTilt(e) {
-    if (!heroScene) return;
-    const rect = heroScene.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    kbTargetX = ((e.clientY - cy) / rect.height) * 12;  // tilt range
-    kbTargetY = ((e.clientX - cx) / rect.width) * -12;
-}
-
-function animateKeyboardTilt() {
-    kbTiltX += (kbTargetX - kbTiltX) * 0.08;
-    kbTiltY += (kbTargetY - kbTiltY) * 0.08;
-    if (heroKeyboard) {
-        heroKeyboard.style.transform = `rotateX(${22 + kbTiltX}deg) rotateY(${kbTiltY}deg)`;
-    }
-    requestAnimationFrame(animateKeyboardTilt);
-}
-
-document.addEventListener('mousemove', handleKeyboardTilt);
-animateKeyboardTilt();
-
-// Build & mark loaded
-buildHeroKeyboard();
-splineLoaded = true;
-finishLoading();
-
-// ===== Scroll-based section detection =====
-function updateActiveSection() {
-    const sections = ['hero', 'about', 'skills', 'projects', 'experience', 'contact'];
-    const scrollY = window.scrollY;
-    let newSection = 'hero';
-
-    for (const id of sections) {
-        const el = document.getElementById(id);
-        if (el && scrollY >= el.offsetTop - window.innerHeight * 0.4) {
-            newSection = id;
-        }
-    }
-    activeSection = newSection;
-}
-
-window.addEventListener('scroll', updateActiveSection);
-
-// ===== Particle Canvas Background =====
-const particleCanvas = document.getElementById('particle-canvas');
-const pCtx = particleCanvas.getContext('2d');
-let particles = [];
-const PARTICLE_COUNT = 40;
-let mouseParticle = { x: 0, y: 0 };
-
-function getParticleColor() {
-    return html.getAttribute('data-theme') === 'dark' ? '255, 255, 255' : '0, 0, 0';
-}
-
-let currentParticleColor = getParticleColor();
-
-function updateParticleColor() {
-    currentParticleColor = getParticleColor();
-}
-
-function resizeParticleCanvas() {
-    particleCanvas.width = window.innerWidth;
-    particleCanvas.height = window.innerHeight;
-}
-
-function initParticles() {
-    resizeParticleCanvas();
-    particles = [];
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-        particles.push({
-            x: Math.random() * particleCanvas.width,
-            y: Math.random() * particleCanvas.height,
-            size: Math.random() * 2 + 0.5,
-            alpha: Math.random() * 0.5 + 0.1,
-            targetAlpha: Math.random() * 0.5 + 0.1,
-            dx: (Math.random() - 0.5) * 0.3,
-            dy: (Math.random() - 0.5) * 0.3,
-            magnetism: 0.1 + Math.random() * 4,
-            translateX: 0,
-            translateY: 0,
-        });
-    }
-}
-
-function animateParticles() {
-    requestAnimationFrame(animateParticles);
-    pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-
-    particles.forEach((p, i) => {
-        const edges = [
-            p.x + p.translateX - p.size,
-            particleCanvas.width - p.x - p.translateX - p.size,
-            p.y + p.translateY - p.size,
-            particleCanvas.height - p.y - p.translateY - p.size,
-        ];
-        const closestEdge = Math.min(...edges);
-        const edgeFactor = Math.min(Math.max(closestEdge / 20, 0), 1);
-
-        if (edgeFactor > 0.5) {
-            p.alpha += 0.01;
-            if (p.alpha > p.targetAlpha) p.alpha = p.targetAlpha;
-        } else {
-            p.alpha = p.targetAlpha * edgeFactor;
-        }
-
-        p.x += p.dx;
-        p.y += p.dy;
-        p.translateX += (mouseParticle.x / (50 / p.magnetism) - p.translateX) / 50;
-        p.translateY += (mouseParticle.y / (50 / p.magnetism) - p.translateY) / 50;
-
-        if (p.x < -p.size || p.x > particleCanvas.width + p.size ||
-            p.y < -p.size || p.y > particleCanvas.height + p.size) {
-            particles[i] = {
-                ...p,
-                x: Math.random() * particleCanvas.width,
-                y: Math.random() * particleCanvas.height,
-                alpha: 0,
-            };
-            return;
-        }
-
-        pCtx.beginPath();
-        pCtx.arc(p.x + p.translateX, p.y + p.translateY, p.size, 0, Math.PI * 2);
-        pCtx.fillStyle = `rgba(${currentParticleColor}, ${p.alpha})`;
-        pCtx.fill();
-    });
-}
-
-initParticles();
-animateParticles();
-
-document.addEventListener('mousemove', e => {
-    const rect = particleCanvas.getBoundingClientRect();
-    mouseParticle.x = e.clientX - rect.left - particleCanvas.width / 2;
-    mouseParticle.y = e.clientY - rect.top - particleCanvas.height / 2;
+navToggle.addEventListener('click', () => {
+  navToggle.classList.toggle('active');
+  navLinks.classList.toggle('open');
 });
 
-window.addEventListener('resize', resizeParticleCanvas);
+// Smooth scroll for nav links and close mobile menu
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    navToggle.classList.remove('active');
+    navLinks.classList.remove('open');
 
-// ===== Three.js 3D Background =====
-const canvas = document.getElementById('three-canvas');
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-camera.position.z = 30;
-
-const sphereGroup = new THREE.Group();
-scene.add(sphereGroup);
-const sphereGeo = new THREE.IcosahedronGeometry(0.3, 1);
-
-for (let i = 0; i < 50; i++) {
-    const mat = new THREE.MeshBasicMaterial({
-        color: new THREE.Color().setHSL(0.06 + Math.random() * 0.04, 0.8, 0.6),
-        transparent: true,
-        opacity: 0.15 + Math.random() * 0.15,
-    });
-    const mesh = new THREE.Mesh(sphereGeo, mat);
-    const x = (Math.random() - 0.5) * 60;
-    const y = (Math.random() - 0.5) * 60;
-    const z = (Math.random() - 0.5) * 30 - 10;
-    mesh.position.set(x, y, z);
-    mesh.userData = { baseX: x, baseY: y, phase: Math.random() * Math.PI * 2 };
-    const s = 0.5 + Math.random() * 1.5;
-    mesh.scale.set(s, s, s);
-    sphereGroup.add(mesh);
-}
-
-function createRing(radius, tube, color, pos, rot) {
-    const geo = new THREE.TorusGeometry(radius, tube, 16, 64);
-    const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.06 });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(...pos);
-    mesh.rotation.set(...rot);
-    scene.add(mesh);
-    return mesh;
-}
-
-const ring1 = createRing(8, 0.08, 0xFF7A3B, [-15, 5, -25], [Math.PI / 3, 0, 0]);
-const ring2 = createRing(5, 0.06, 0xFF7A3B, [18, 8, -22], [Math.PI / 4, Math.PI / 6, 0]);
-const ring3 = createRing(3, 0.05, 0xFF7A3B, [-20, -10, -18], [Math.PI / 5, 0, Math.PI / 3]);
-
-let mX = 0, mY = 0, tMX = 0, tMY = 0;
-let scrollOffset = 0;
-
-document.addEventListener('mousemove', e => {
-    tMX = (e.clientX / window.innerWidth - 0.5) * 2;
-    tMY = (e.clientY / window.innerHeight - 0.5) * 2;
+    const href = link.getAttribute('href');
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  });
 });
 
-window.addEventListener('scroll', () => { scrollOffset = window.scrollY; });
-
-let frame = 0;
-function animateThree() {
-    requestAnimationFrame(animateThree);
-    frame++;
-    const time = frame * 0.008;
-
-    mX += (tMX - mX) * 0.03;
-    mY += (tMY - mY) * 0.03;
-
-    camera.position.x = mX * 3;
-    camera.position.y = -mY * 3 - scrollOffset * 0.006;
-    camera.lookAt(0, -scrollOffset * 0.006, 0);
-
-    sphereGroup.children.forEach(mesh => {
-        mesh.position.x = mesh.userData.baseX + Math.sin(time + mesh.userData.phase) * 2;
-        mesh.position.y = mesh.userData.baseY + Math.cos(time * 0.7 + mesh.userData.phase) * 2;
-        mesh.material.opacity = 0.1 + Math.sin(time * 1.5 + mesh.userData.phase) * 0.08;
-    });
-
-    ring1.rotation.z += 0.002;
-    ring2.rotation.z -= 0.003;
-    ring2.rotation.y += 0.001;
-    ring3.rotation.x += 0.001;
-    ring3.rotation.z += 0.002;
-
-    renderer.render(scene, camera);
-}
-animateThree();
-
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+// Smooth scroll for any anchor link on the page
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', (e) => {
+    const href = anchor.getAttribute('href');
+    if (href === '#') return;
+    const target = document.querySelector(href);
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
 });
 
-// ===== Navbar =====
+// Navbar scroll effect
 const navbar = document.getElementById('navbar');
-const navToggle = document.getElementById('navToggle');
-const navLinksContainer = document.getElementById('navLinks');
-const navLinkEls = document.querySelectorAll('.nav-link');
 
 window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
-
-    let current = '';
-    document.querySelectorAll('section[id]').forEach(sec => {
-        if (window.scrollY >= sec.offsetTop - 200) current = sec.id;
-    });
-    navLinkEls.forEach(link => {
-        link.classList.toggle('active', link.dataset.section === current);
-    });
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
 });
 
-navToggle.addEventListener('click', () => navLinksContainer.classList.toggle('open'));
+// Active nav link on scroll
+const sections = document.querySelectorAll('section[id]');
 
-navLinkEls.forEach(link => {
-    link.addEventListener('click', e => {
-        e.preventDefault();
-        const target = document.getElementById(link.dataset.section);
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-        navLinksContainer.classList.remove('open');
-    });
-});
+function updateActiveLink() {
+  const scrollY = window.scrollY + 120;
 
-// ===== Scroll Reveal Animations =====
-const revealObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const delay = parseFloat(entry.target.dataset.delay || 0) * 1000;
-            setTimeout(() => entry.target.classList.add('visible'), delay);
-        }
-    });
+  sections.forEach(section => {
+    const top = section.offsetTop;
+    const height = section.offsetHeight;
+    const id = section.getAttribute('id');
+    const link = document.querySelector(`.nav-links a[href="#${id}"]`);
+
+    if (link) {
+      link.classList.toggle('active', scrollY >= top && scrollY < top + height);
+    }
+  });
+}
+
+window.addEventListener('scroll', updateActiveLink);
+
+// Fade-in on scroll with stagger
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-document.querySelectorAll('.reveal-up, .blur-in:not(.hero-section .blur-in)').forEach(el => {
-    revealObserver.observe(el);
+document.querySelectorAll(
+  '.section-label, .section-title, .about-intro, .about-block, .project-card, .blog-card, .contact-form, .hero-stats'
+).forEach(el => {
+  el.classList.add('fade-in');
+  observer.observe(el);
 });
 
-// ===== Counter Animation =====
-let countersStarted = false;
-const aboutObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting && !countersStarted) {
-            countersStarted = true;
-            document.querySelectorAll('.stat-number').forEach(stat => {
-                const target = parseFloat(stat.dataset.target);
-                const isDecimal = target % 1 !== 0;
-                const start = performance.now();
-                function update(now) {
-                    const progress = Math.min((now - start) / 2000, 1);
-                    const eased = 1 - Math.pow(1 - progress, 3);
-                    stat.textContent = isDecimal ? (eased * target).toFixed(1) : Math.floor(eased * target);
-                    if (progress < 1) requestAnimationFrame(update);
-                }
-                requestAnimationFrame(update);
-            });
-        }
+// Contact form
+document.getElementById('contact-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  btn.textContent = 'Sent!';
+  btn.style.background = '#34d399';
+  e.target.reset();
+  setTimeout(() => {
+    btn.textContent = 'Send Message';
+    btn.style.background = '';
+  }, 3000);
+});
+
+// Back to top button
+const backToTop = document.getElementById('back-to-top');
+
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('visible', window.scrollY > 400);
+});
+
+backToTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ===== DevOps Quiz Challenge =====
+(function() {
+  const quizBody = document.getElementById('quiz-body');
+  const quizFooter = document.getElementById('quiz-footer');
+  const quizResult = document.getElementById('quiz-result');
+  const submitBtn = document.getElementById('quiz-submit');
+  const feedback = document.getElementById('quiz-feedback');
+  const progressFill = document.getElementById('quiz-progress-fill');
+  const currentDisplay = document.getElementById('quiz-current');
+  const quizIcon = document.querySelector('.quiz-icon');
+  if (!quizBody) return;
+
+  // Question bank — 40 questions, 10 randomly picked each visit
+  const questionBank = [
+    { q: 'What does CI/CD stand for?', o: ['Continuous Integration / Continuous Delivery', 'Code Inspection / Code Deployment', 'Container Integration / Container Delivery', 'Cloud Infrastructure / Cloud Deployment'], a: 0 },
+    { q: 'Which tool is used for container orchestration?', o: ['Terraform', 'Kubernetes', 'Ansible', 'Jenkins'], a: 1 },
+    { q: 'What is the default port for HTTPS?', o: ['80', '8080', '443', '22'], a: 2 },
+    { q: 'Which command lists running Docker containers?', o: ['docker images', 'docker ps', 'docker run', 'docker build'], a: 1 },
+    { q: 'What does IaC stand for?', o: ['Infrastructure as Code', 'Internet as Cloud', 'Integration and Configuration', 'Internal API Controller'], a: 0 },
+    { q: 'Which cloud provider offers EC2 instances?', o: ['Google Cloud', 'Azure', 'AWS', 'DigitalOcean'], a: 2 },
+    { q: 'What file format does Kubernetes use for manifests?', o: ['JSON only', 'XML', 'YAML', 'TOML'], a: 2 },
+    { q: 'Which tool is a pull-based GitOps operator?', o: ['Jenkins', 'ArgoCD', 'CircleCI', 'Travis CI'], a: 1 },
+    { q: 'What is the smallest deployable unit in Kubernetes?', o: ['Container', 'Node', 'Pod', 'Service'], a: 2 },
+    { q: 'Which protocol does SSH use by default?', o: ['Port 21', 'Port 22', 'Port 80', 'Port 443'], a: 1 },
+    { q: 'What does Terraform use to track infrastructure state?', o: ['terraform.log', 'terraform.tfstate', '.terraform.lock', 'main.tf'], a: 1 },
+    { q: 'Which monitoring tool uses PromQL?', o: ['Grafana', 'Datadog', 'Prometheus', 'Nagios'], a: 2 },
+    { q: 'What is a Helm chart?', o: ['A Docker image format', 'A Kubernetes package manager template', 'A CI/CD pipeline config', 'An AWS service'], a: 1 },
+    { q: 'Which command initializes a Terraform project?', o: ['terraform start', 'terraform init', 'terraform begin', 'terraform setup'], a: 1 },
+    { q: 'What is the purpose of a load balancer?', o: ['Store data', 'Distribute traffic across servers', 'Monitor logs', 'Build containers'], a: 1 },
+    { q: 'Which Linux command shows disk usage?', o: ['ls -la', 'df -h', 'top', 'ps aux'], a: 1 },
+    { q: 'What does DNS stand for?', o: ['Data Network Service', 'Domain Name System', 'Digital Node Server', 'Distributed Name Schema'], a: 1 },
+    { q: 'Which file defines a Docker image?', o: ['docker-compose.yml', 'Dockerfile', 'Makefile', 'package.json'], a: 1 },
+    { q: 'What is a rolling update in Kubernetes?', o: ['Deleting all pods at once', 'Gradually replacing pods with new ones', 'Scaling to zero replicas', 'Restarting the cluster'], a: 1 },
+    { q: 'Which AWS service provides serverless functions?', o: ['EC2', 'S3', 'Lambda', 'RDS'], a: 2 },
+    { q: 'What is the purpose of a reverse proxy?', o: ['Direct client requests to backend servers', 'Encrypt hard drives', 'Run containers', 'Compile source code'], a: 0 },
+    { q: 'Which tool automates server configuration?', o: ['Docker', 'Ansible', 'Git', 'Nginx'], a: 1 },
+    { q: 'What does kubectl apply -f do?', o: ['Deletes a resource', 'Applies a config file to the cluster', 'Lists all pods', 'Scales a deployment'], a: 1 },
+    { q: 'Which VCS platform offers GitHub Actions?', o: ['GitLab', 'Bitbucket', 'GitHub', 'Azure DevOps'], a: 2 },
+    { q: 'What is a Docker volume used for?', o: ['Network routing', 'Persisting data outside containers', 'CPU allocation', 'Image building'], a: 1 },
+    { q: 'Which HTTP status code means "Not Found"?', o: ['200', '301', '404', '500'], a: 2 },
+    { q: 'What does the "D" in ACID stand for?', o: ['Distributed', 'Durability', 'Deployment', 'Dependency'], a: 1 },
+    { q: 'Which Kubernetes object exposes a deployment to the network?', o: ['ConfigMap', 'Service', 'Secret', 'Volume'], a: 1 },
+    { q: 'What is blue-green deployment?', o: ['Running two identical environments and switching traffic', 'Deploying only on weekdays', 'Using color-coded Docker images', 'A logging strategy'], a: 0 },
+    { q: 'Which command shows real-time Linux system processes?', o: ['ls', 'cat', 'top', 'mkdir'], a: 2 },
+    { q: 'What is the default Kubernetes namespace?', o: ['kube-system', 'default', 'production', 'main'], a: 1 },
+    { q: 'Which AWS service is a managed Kubernetes platform?', o: ['ECS', 'EKS', 'ECR', 'ELB'], a: 1 },
+    { q: 'What is a canary deployment?', o: ['Deploying to a small subset of users first', 'Deploying at midnight', 'Using yellow warning flags', 'Rolling back automatically'], a: 0 },
+    { q: 'Which tool visualizes Prometheus metrics?', o: ['Kibana', 'Grafana', 'Splunk', 'PagerDuty'], a: 1 },
+    { q: 'What is the purpose of a Kubernetes Ingress?', o: ['Manage secrets', 'Route external HTTP traffic to services', 'Store config data', 'Scale pods automatically'], a: 1 },
+    { q: 'Which command shows Git commit history?', o: ['git status', 'git log', 'git diff', 'git branch'], a: 1 },
+    { q: 'What does a service mesh like Istio provide?', o: ['Container storage', 'Traffic management between microservices', 'DNS resolution', 'Image building'], a: 1 },
+    { q: 'Which Terraform command previews changes?', o: ['terraform apply', 'terraform plan', 'terraform destroy', 'terraform validate'], a: 1 },
+    { q: 'What is the purpose of a liveness probe in Kubernetes?', o: ['Check if a pod should receive traffic', 'Check if a container is still running', 'Monitor network latency', 'Track CPU usage'], a: 1 },
+    { q: 'Which Linux command changes file permissions?', o: ['chown', 'chmod', 'chgrp', 'mv'], a: 1 },
+  ];
+
+  // Shuffle and pick 10
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const questions = shuffle(questionBank).slice(0, 10);
+  let currentQ = 0;
+  let score = 0;
+  let selectedOption = -1;
+  let answered = false;
+
+  function renderQuestion() {
+    const q = questions[currentQ];
+    selectedOption = -1;
+    answered = false;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Check Answer';
+    feedback.className = 'quiz-feedback';
+    feedback.textContent = '';
+
+    const labels = ['A', 'B', 'C', 'D'];
+    quizBody.innerHTML = `
+      <div class="quiz-question">
+        <div class="quiz-question-number">Question ${currentQ + 1} of 10</div>
+        <div class="quiz-question-text">${q.q}</div>
+        <div class="quiz-options">
+          ${q.o.map((opt, i) => `
+            <div class="quiz-option" data-index="${i}">
+              <span class="quiz-option-marker">${labels[i]}</span>
+              <span>${opt}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    // Bind option clicks
+    quizBody.querySelectorAll('.quiz-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (answered) return;
+        quizBody.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedOption = parseInt(opt.dataset.index);
+        submitBtn.disabled = false;
+      });
     });
-}, { threshold: 0.3 });
+  }
 
-const aboutSection = document.getElementById('about');
-if (aboutSection) aboutObserver.observe(aboutSection);
+  function checkAnswer() {
+    if (answered) {
+      // Move to next question
+      currentQ++;
+      if (currentQ < 10) {
+        renderQuestion();
+      } else {
+        showResult();
+      }
+      return;
+    }
 
-// ===== Project Filters =====
-const filterBtns = document.querySelectorAll('.filter-btn');
-const projectCards = document.querySelectorAll('.project-card');
+    answered = true;
+    const q = questions[currentQ];
+    const options = quizBody.querySelectorAll('.quiz-option');
 
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const filter = btn.dataset.filter;
+    // Disable all options
+    options.forEach(o => o.classList.add('disabled'));
 
-        projectCards.forEach(card => {
-            if (filter === 'all' || card.dataset.category === filter) {
-                card.classList.remove('filtered-out');
-                card.style.position = '';
-                card.style.visibility = '';
-            } else {
-                card.classList.add('filtered-out');
-            }
-        });
+    if (selectedOption === q.a) {
+      score++;
+      options[selectedOption].classList.remove('selected');
+      options[selectedOption].classList.add('correct');
+      feedback.textContent = 'Correct!';
+      feedback.className = 'quiz-feedback visible correct';
+    } else {
+      options[selectedOption].classList.remove('selected');
+      options[selectedOption].classList.add('wrong');
+      options[q.a].classList.add('correct');
+      feedback.textContent = 'Wrong! The correct answer is highlighted.';
+      feedback.className = 'quiz-feedback visible wrong';
+      quizBody.querySelector('.quiz-question').classList.add('quiz-shake');
+    }
+
+    // Update progress
+    currentDisplay.textContent = score;
+    progressFill.style.width = (score / 10 * 100) + '%';
+
+    submitBtn.textContent = currentQ < 9 ? 'Next Question' : 'See Results';
+    submitBtn.disabled = false;
+  }
+
+  function showResult() {
+    quizBody.style.display = 'none';
+    quizFooter.style.display = 'none';
+    progressFill.style.width = (score / 10 * 100) + '%';
+    currentDisplay.textContent = score;
+
+    if (score >= 8) {
+      progressFill.classList.add('complete');
+      quizIcon.classList.add('unlocked');
+
+      quizResult.innerHTML = `
+        <span class="quiz-result-icon">&#127881;</span>
+        <h3>Impressive!</h3>
+        <p>You scored ${score}/10. You clearly know your DevOps stuff!</p>
+        <button class="btn btn-primary" id="quiz-retry">Play Again</button>
+      `;
+      quizResult.style.display = 'block';
+
+      // Confetti burst
+      launchConfetti();
+    } else {
+      quizResult.innerHTML = `
+        <span class="quiz-result-icon">${score >= 5 ? '&#128170;' : '&#129300;'}</span>
+        <h3>${score >= 5 ? 'Not Bad!' : 'Keep Learning!'}</h3>
+        <p>You got ${score} out of 10. The questions change every time — give it another shot!</p>
+        <button class="btn btn-primary" id="quiz-retry">Try Again</button>
+      `;
+      quizResult.style.display = 'block';
+    }
+
+    document.getElementById('quiz-retry').addEventListener('click', () => {
+      const newQuestions = shuffle(questionBank).slice(0, 10);
+      questions.length = 0;
+      newQuestions.forEach(q => questions.push(q));
+      currentQ = 0;
+      score = 0;
+      selectedOption = -1;
+      answered = false;
+      progressFill.style.width = '0%';
+      progressFill.classList.remove('complete');
+      quizIcon.classList.remove('unlocked');
+      currentDisplay.textContent = '0';
+      quizResult.style.display = 'none';
+      quizBody.style.display = 'block';
+      quizFooter.style.display = 'flex';
+      renderQuestion();
     });
-});
+  }
 
-// ===== Contact Form =====
-document.getElementById('contact-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const original = btn.textContent;
-    btn.textContent = 'Message Sent!';
-    btn.style.background = '#22c55e';
-    btn.style.borderColor = '#22c55e';
-    btn.style.color = '#fff';
-    setTimeout(() => {
-        btn.textContent = original;
-        btn.style.background = '';
-        btn.style.borderColor = '';
-        btn.style.color = '';
-        e.target.reset();
-    }, 3000);
-});
+  // Simple confetti
+  function launchConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'confetti-canvas';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-// ===== Smooth Scrolling for anchor links =====
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-        const target = document.getElementById(a.getAttribute('href').slice(1));
-        if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-});
+    const colors = ['#7c5cfc', '#c084fc', '#34d399', '#febc2e', '#60a5fa', '#ff5f57'];
+    const particles = [];
+
+    for (let i = 0; i < 120; i++) {
+      particles.push({
+        x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+        y: canvas.height / 2,
+        vx: (Math.random() - 0.5) * 16,
+        vy: Math.random() * -18 - 4,
+        w: Math.random() * 8 + 4,
+        h: Math.random() * 6 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * 360,
+        rotV: (Math.random() - 0.5) * 12,
+        life: 1,
+      });
+    }
+
+    let frame = 0;
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.vy += 0.4;
+        p.y += p.vy;
+        p.rot += p.rotV;
+        p.life -= 0.008;
+        if (p.life <= 0) return;
+        alive = true;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+
+      frame++;
+      if (alive && frame < 200) {
+        requestAnimationFrame(animate);
+      } else {
+        canvas.remove();
+      }
+    }
+    animate();
+  }
+
+  submitBtn.addEventListener('click', checkAnswer);
+
+  // Start
+  renderQuestion();
+})();

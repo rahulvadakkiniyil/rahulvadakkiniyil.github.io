@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disaster Recovery on AWS: RTO & RPO Strategies — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Guide</span>
+        <span class="post-date">Sep 10, 2025</span>
+        <span class="post-read-time">7 min read</span>
+      </div>
+      <h1 class="post-heading">Disaster Recovery on AWS: RTO &amp; RPO Strategies That Actually Work</h1>
+      <p class="post-subtitle">Practical DR patterns with cost analysis and automated failover using Route 53, cross-region replication, and Lambda-based health monitoring.</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#rto-rpo">Understanding RTO and RPO</a></li>
+        <li><a href="#four-strategies">Four DR Strategies</a></li>
+        <li><a href="#cost-comparison">Cost Comparison</a></li>
+        <li><a href="#pilot-light">Pilot Light Implementation</a></li>
+        <li><a href="#route53-failover">Route 53 Health Checks &amp; Failover</a></li>
+        <li><a href="#s3-replication">Cross-Region S3 Replication</a></li>
+        <li><a href="#lambda-health">Lambda Health Monitoring</a></li>
+        <li><a href="#testing-dr">Testing Your DR Plan</a></li>
+        <li><a href="#real-incidents">Lessons from Real Incidents</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="rto-rpo">
+      <h2>Understanding RTO and RPO</h2>
+      <p><strong>Recovery Time Objective (RTO)</strong> is the maximum acceptable time your application can be offline after a disaster. If your RTO is 1 hour, your systems must be fully operational within 60 minutes of an outage. <strong>Recovery Point Objective (RPO)</strong> is the maximum acceptable amount of data loss measured in time. An RPO of 15 minutes means you can afford to lose at most 15 minutes of data.</p>
+      <p>These two metrics drive every architectural decision in your DR plan. A tighter RTO means more infrastructure running in standby (higher cost). A tighter RPO means more frequent data replication (higher complexity and cost). The business impact analysis should guide these targets: a payment processing system demands sub-minute RTO/RPO, while an internal reporting dashboard might tolerate hours of downtime.</p>
+      <p>To determine your targets, start by classifying workloads into tiers. Tier 1 (mission-critical) applications like customer-facing APIs and transaction databases need aggressive targets. Tier 2 (business-important) systems like internal tools can tolerate moderate downtime. Tier 3 (non-essential) services like dev environments can be rebuilt from scratch with minimal urgency.</p>
+    </div>
+
+    <div class="post-section" id="four-strategies">
+      <h2>Four DR Strategies</h2>
+      <p>AWS documentation defines four distinct DR strategies, each representing a different tradeoff between cost and recovery speed. Understanding all four lets you match the right strategy to each workload tier.</p>
+
+      <h3>1. Backup &amp; Restore</h3>
+      <p>The simplest and cheapest strategy. You take regular backups (EBS snapshots, RDS automated backups, S3 cross-region replication) and restore them in a new region when disaster strikes. RTO is typically 4-24 hours depending on data volume. RPO equals your backup frequency.</p>
+
+      <h3>2. Pilot Light</h3>
+      <p>A minimal version of your environment runs in the DR region at all times. Core data services (like RDS read replicas) stay synchronized, but application servers are stopped. During failover, you start the application tier and scale up. RTO is typically 1-2 hours.</p>
+
+      <h3>3. Warm Standby</h3>
+      <p>A scaled-down but fully functional copy of your production environment runs continuously in the DR region. All components are live but at reduced capacity (e.g., minimum instance counts). During failover, you scale up to full production capacity. RTO is typically 15-30 minutes.</p>
+
+      <h3>4. Multi-Region Active-Active</h3>
+      <p>Your application runs at full capacity in two or more regions simultaneously, serving traffic from all regions. Data is replicated bidirectionally using DynamoDB Global Tables or Aurora Global Database. Failover is nearly instantaneous since all regions are already handling traffic. RTO is near-zero, but cost is roughly 2x or more.</p>
+    </div>
+
+    <div class="post-section" id="cost-comparison">
+      <h2>Cost Comparison</h2>
+      <p>Here is a realistic monthly cost comparison for a mid-size web application (assuming ~$5,000/month primary region cost):</p>
+      <ul>
+        <li><strong>Backup &amp; Restore</strong> — DR cost: ~$200-500/month (S3 storage, snapshot storage). RTO: 4-24 hrs. RPO: 1-24 hrs.</li>
+        <li><strong>Pilot Light</strong> — DR cost: ~$500-1,200/month (RDS replica, minimal infra). RTO: 1-2 hrs. RPO: minutes.</li>
+        <li><strong>Warm Standby</strong> — DR cost: ~$2,000-3,500/month (scaled-down full stack). RTO: 15-30 min. RPO: seconds-minutes.</li>
+        <li><strong>Multi-Region Active-Active</strong> — DR cost: ~$5,000-7,000/month (full duplicate + replication overhead). RTO: near-zero. RPO: near-zero.</li>
+      </ul>
+      <p>Most organizations use a hybrid approach: Active-Active for Tier 1 workloads, Warm Standby for Tier 2, and Backup &amp; Restore for Tier 3.</p>
+    </div>
+
+    <div class="post-section" id="pilot-light">
+      <h2>Pilot Light Implementation</h2>
+      <p>Pilot Light is the most popular DR strategy because it provides reasonable recovery times at a fraction of active-active costs. Here is a Terraform configuration for the essential DR infrastructure:</p>
+
+      <pre><code><span class="cm"># Pilot Light DR infrastructure in us-west-2</span>
+
+<span class="kw">resource</span> <span class="str">"aws_db_instance"</span> <span class="str">"dr_replica"</span> {
+  <span class="kw">replicate_source_db</span>    = <span class="str">"arn:aws:rds:us-east-1:123456789:db:production-db"</span>
+  <span class="kw">instance_class</span>         = <span class="str">"db.r6g.large"</span>
+  <span class="kw">availability_zone</span>      = <span class="str">"us-west-2a"</span>
+  <span class="kw">storage_encrypted</span>      = <span class="num">true</span>
+  <span class="kw">multi_az</span>               = <span class="num">false</span>  <span class="cm"># Keep costs low in DR</span>
+  <span class="kw">skip_final_snapshot</span>    = <span class="num">false</span>
+
+  <span class="kw">tags</span> = {
+    <span class="kw">Environment</span> = <span class="str">"disaster-recovery"</span>
+    <span class="kw">Tier</span>        = <span class="str">"pilot-light"</span>
+  }
+}
+
+<span class="cm"># AMI copy for quick EC2 launch in DR region</span>
+<span class="kw">resource</span> <span class="str">"aws_ami_copy"</span> <span class="str">"dr_app_ami"</span> {
+  <span class="kw">name</span>              = <span class="str">"dr-app-server-ami"</span>
+  <span class="kw">source_ami_id</span>     = <span class="str">"ami-0abcdef1234567890"</span>
+  <span class="kw">source_ami_region</span> = <span class="str">"us-east-1"</span>
+  <span class="kw">encrypted</span>         = <span class="num">true</span>
+}
+
+<span class="cm"># Launch template ready to go but no instances running</span>
+<span class="kw">resource</span> <span class="str">"aws_launch_template"</span> <span class="str">"dr_app"</span> {
+  <span class="kw">name</span>          = <span class="str">"dr-app-server"</span>
+  <span class="kw">image_id</span>      = aws_ami_copy.dr_app_ami.id
+  <span class="kw">instance_type</span> = <span class="str">"c6i.xlarge"</span>
+
+  <span class="kw">user_data</span> = base64encode(templatefile(<span class="str">"scripts/app-init.sh"</span>, {
+    <span class="kw">db_endpoint</span> = aws_db_instance.dr_replica.endpoint
+    <span class="kw">region</span>      = <span class="str">"us-west-2"</span>
+  }))
+}</code><span class="code-label">Terraform</span></pre>
+    </div>
+
+    <div class="post-section" id="route53-failover">
+      <h2>Route 53 Health Checks &amp; Failover</h2>
+      <p>Route 53 is the backbone of automated DNS failover. You configure health checks against your primary region, and Route 53 automatically routes traffic to the DR region when the primary becomes unhealthy.</p>
+
+      <pre><code><span class="cm"># Create health check for primary region</span>
+aws route53 create-health-check \
+  --caller-reference <span class="str">"primary-health-$(date +%s)"</span> \
+  --health-check-config '{
+    <span class="str">"IPAddress"</span>: <span class="str">"203.0.113.10"</span>,
+    <span class="str">"Port"</span>: <span class="num">443</span>,
+    <span class="str">"Type"</span>: <span class="str">"HTTPS"</span>,
+    <span class="str">"ResourcePath"</span>: <span class="str">"/health"</span>,
+    <span class="str">"RequestInterval"</span>: <span class="num">10</span>,
+    <span class="str">"FailureThreshold"</span>: <span class="num">3</span>,
+    <span class="str">"EnableSNI"</span>: <span class="num">true</span>
+  }'
+
+<span class="cm"># Create failover DNS records</span>
+aws route53 change-resource-record-sets \
+  --hosted-zone-id <span class="str">Z1234567890</span> \
+  --change-batch '{
+    <span class="str">"Changes"</span>: [
+      {
+        <span class="str">"Action"</span>: <span class="str">"CREATE"</span>,
+        <span class="str">"ResourceRecordSet"</span>: {
+          <span class="str">"Name"</span>: <span class="str">"api.example.com"</span>,
+          <span class="str">"Type"</span>: <span class="str">"A"</span>,
+          <span class="str">"SetIdentifier"</span>: <span class="str">"primary"</span>,
+          <span class="str">"Failover"</span>: <span class="str">"PRIMARY"</span>,
+          <span class="str">"TTL"</span>: <span class="num">60</span>,
+          <span class="str">"ResourceRecords"</span>: [{ <span class="str">"Value"</span>: <span class="str">"203.0.113.10"</span> }],
+          <span class="str">"HealthCheckId"</span>: <span class="str">"health-check-id-here"</span>
+        }
+      },
+      {
+        <span class="str">"Action"</span>: <span class="str">"CREATE"</span>,
+        <span class="str">"ResourceRecordSet"</span>: {
+          <span class="str">"Name"</span>: <span class="str">"api.example.com"</span>,
+          <span class="str">"Type"</span>: <span class="str">"A"</span>,
+          <span class="str">"SetIdentifier"</span>: <span class="str">"secondary"</span>,
+          <span class="str">"Failover"</span>: <span class="str">"SECONDARY"</span>,
+          <span class="str">"TTL"</span>: <span class="num">60</span>,
+          <span class="str">"ResourceRecords"</span>: [{ <span class="str">"Value"</span>: <span class="str">"198.51.100.20"</span> }]
+        }
+      }
+    ]
+  }'</code><span class="code-label">Shell</span></pre>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Set your DNS TTL to 60 seconds or less for failover records. A high TTL means clients will cache the old (failed) IP address and continue sending traffic to the downed region long after Route 53 has updated.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="s3-replication">
+      <h2>Cross-Region S3 Replication</h2>
+      <p>S3 Cross-Region Replication (CRR) ensures your object data is continuously copied to the DR region. This is essential for static assets, configuration files, backups, and any data stored in S3.</p>
+
+      <pre><code><span class="cm"># Enable versioning (required for replication)</span>
+aws s3api put-bucket-versioning \
+  --bucket <span class="str">my-app-assets-us-east-1</span> \
+  --versioning-configuration <span class="str">Status=Enabled</span>
+
+aws s3api put-bucket-versioning \
+  --bucket <span class="str">my-app-assets-us-west-2</span> \
+  --versioning-configuration <span class="str">Status=Enabled</span>
+
+<span class="cm"># Configure replication</span>
+aws s3api put-bucket-replication \
+  --bucket <span class="str">my-app-assets-us-east-1</span> \
+  --replication-configuration '{
+    <span class="str">"Role"</span>: <span class="str">"arn:aws:iam::123456789:role/s3-replication-role"</span>,
+    <span class="str">"Rules"</span>: [
+      {
+        <span class="str">"ID"</span>: <span class="str">"ReplicateAll"</span>,
+        <span class="str">"Status"</span>: <span class="str">"Enabled"</span>,
+        <span class="str">"Priority"</span>: <span class="num">1</span>,
+        <span class="str">"Filter"</span>: { <span class="str">"Prefix"</span>: <span class="str">""</span> },
+        <span class="str">"Destination"</span>: {
+          <span class="str">"Bucket"</span>: <span class="str">"arn:aws:s3:::my-app-assets-us-west-2"</span>,
+          <span class="str">"StorageClass"</span>: <span class="str">"STANDARD"</span>,
+          <span class="str">"ReplicationTime"</span>: {
+            <span class="str">"Status"</span>: <span class="str">"Enabled"</span>,
+            <span class="str">"Time"</span>: { <span class="str">"Minutes"</span>: <span class="num">15</span> }
+          },
+          <span class="str">"Metrics"</span>: {
+            <span class="str">"Status"</span>: <span class="str">"Enabled"</span>,
+            <span class="str">"EventThreshold"</span>: { <span class="str">"Minutes"</span>: <span class="num">15</span> }
+          }
+        },
+        <span class="str">"DeleteMarkerReplication"</span>: { <span class="str">"Status"</span>: <span class="str">"Enabled"</span> }
+      }
+    ]
+  }'</code><span class="code-label">Shell</span></pre>
+    </div>
+
+    <div class="post-section" id="lambda-health">
+      <h2>Lambda Health Monitoring</h2>
+      <p>While Route 53 health checks cover basic HTTP endpoint monitoring, you often need custom health checks that validate business logic, database connectivity, and downstream dependencies. A Lambda function running on a schedule can perform deep health checks and trigger failover actions.</p>
+
+      <pre><code><span class="kw">import</span> boto3
+<span class="kw">import</span> json
+<span class="kw">import</span> requests
+<span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+route53 = boto3.client(<span class="str">'route53'</span>)
+sns = boto3.client(<span class="str">'sns'</span>)
+cloudwatch = boto3.client(<span class="str">'cloudwatch'</span>)
+
+<span class="kw">HEALTH_ENDPOINTS</span> = [
+    {<span class="str">'name'</span>: <span class="str">'api'</span>, <span class="str">'url'</span>: <span class="str">'https://api.example.com/health'</span>, <span class="str">'timeout'</span>: <span class="num">5</span>},
+    {<span class="str">'name'</span>: <span class="str">'auth'</span>, <span class="str">'url'</span>: <span class="str">'https://auth.example.com/health'</span>, <span class="str">'timeout'</span>: <span class="num">5</span>},
+    {<span class="str">'name'</span>: <span class="str">'payments'</span>, <span class="str">'url'</span>: <span class="str">'https://payments.example.com/health'</span>, <span class="str">'timeout'</span>: <span class="num">3</span>},
+]
+
+<span class="kw">SNS_TOPIC_ARN</span> = <span class="str">'arn:aws:sns:us-east-1:123456789:dr-alerts'</span>
+<span class="kw">FAILURE_THRESHOLD</span> = <span class="num">3</span>
+
+<span class="kw">def</span> <span class="str">lambda_handler</span>(event, context):
+    results = []
+    failures = []
+
+    <span class="kw">for</span> endpoint <span class="kw">in</span> HEALTH_ENDPOINTS:
+        <span class="kw">try</span>:
+            resp = requests.get(
+                endpoint[<span class="str">'url'</span>],
+                timeout=endpoint[<span class="str">'timeout'</span>]
+            )
+            healthy = resp.status_code == <span class="num">200</span>
+            latency = resp.elapsed.total_seconds() * <span class="num">1000</span>
+        <span class="kw">except</span> Exception <span class="kw">as</span> e:
+            healthy = <span class="num">False</span>
+            latency = <span class="num">0</span>
+            failures.append({<span class="str">'endpoint'</span>: endpoint[<span class="str">'name'</span>], <span class="str">'error'</span>: str(e)})
+
+        <span class="cm"># Publish metric to CloudWatch</span>
+        cloudwatch.put_metric_data(
+            Namespace=<span class="str">'DR/HealthChecks'</span>,
+            MetricData=[{
+                <span class="str">'MetricName'</span>: <span class="str">'EndpointHealth'</span>,
+                <span class="str">'Dimensions'</span>: [{<span class="str">'Name'</span>: <span class="str">'Service'</span>, <span class="str">'Value'</span>: endpoint[<span class="str">'name'</span>]}],
+                <span class="str">'Value'</span>: <span class="num">1</span> <span class="kw">if</span> healthy <span class="kw">else</span> <span class="num">0</span>,
+                <span class="str">'Unit'</span>: <span class="str">'Count'</span>
+            }]
+        )
+        results.append({<span class="str">'service'</span>: endpoint[<span class="str">'name'</span>], <span class="str">'healthy'</span>: healthy, <span class="str">'latency_ms'</span>: latency})
+
+    <span class="cm"># Alert if any critical service is down</span>
+    <span class="kw">if</span> failures:
+        sns.publish(
+            TopicArn=SNS_TOPIC_ARN,
+            Subject=<span class="str">f'DR ALERT: {len(failures)} endpoint(s) unhealthy'</span>,
+            Message=json.dumps({
+                <span class="str">'timestamp'</span>: datetime.utcnow().isoformat(),
+                <span class="str">'failures'</span>: failures,
+                <span class="str">'action'</span>: <span class="str">'Investigate immediately. Failover may be required.'</span>
+            }, indent=<span class="num">2</span>)
+        )
+
+    <span class="kw">return</span> {<span class="str">'statusCode'</span>: <span class="num">200</span>, <span class="str">'results'</span>: results}</code><span class="code-label">Python</span></pre>
+    </div>
+
+    <div class="post-section" id="testing-dr">
+      <h2>Testing Your DR Plan</h2>
+
+      <div class="post-callout post-callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>A DR plan that hasn't been tested is not a DR plan. It is a collection of assumptions waiting to fail at the worst possible moment.</p>
+      </div>
+
+      <p>Testing must be regular, documented, and progressively more realistic. Here is a phased approach:</p>
+      <ul>
+        <li><strong>Tabletop exercises (monthly):</strong> Walk through the runbook with your team. Identify gaps in documentation, unclear ownership, and missing contact info. These cost nothing and surface problems quickly.</li>
+        <li><strong>Component failover tests (quarterly):</strong> Promote an RDS read replica, verify data integrity, switch a single service to the DR region. Test each component in isolation before testing the full stack.</li>
+        <li><strong>Full DR simulation (bi-annually):</strong> Simulate a complete regional outage. Route all traffic to the DR region and run production workloads for several hours. Measure actual RTO and RPO against your targets.</li>
+        <li><strong>Chaos engineering (ongoing):</strong> Use AWS Fault Injection Simulator to inject controlled failures: terminate instances, throttle API calls, introduce network latency. Build confidence that your systems degrade gracefully.</li>
+      </ul>
+
+      <h3>Automated Runbook Example</h3>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># DR Failover Runbook - Automated Steps</span>
+<span class="cm"># Run with: ./failover.sh --region us-west-2 --confirm</span>
+
+<span class="kw">set</span> -euo pipefail
+
+DR_REGION=<span class="str">"us-west-2"</span>
+ASG_NAME=<span class="str">"dr-app-server-asg"</span>
+DB_INSTANCE=<span class="str">"dr-replica-db"</span>
+HOSTED_ZONE=<span class="str">"Z1234567890"</span>
+
+echo <span class="str">"[1/4] Promoting RDS read replica..."</span>
+aws rds promote-read-replica \
+  --db-instance-identifier <span class="str">$DB_INSTANCE</span> \
+  --region <span class="str">$DR_REGION</span>
+
+echo <span class="str">"[2/4] Scaling up application tier..."</span>
+aws autoscaling update-auto-scaling-group \
+  --auto-scaling-group-name <span class="str">$ASG_NAME</span> \
+  --min-size <span class="num">4</span> \
+  --desired-capacity <span class="num">8</span> \
+  --max-size <span class="num">16</span> \
+  --region <span class="str">$DR_REGION</span>
+
+echo <span class="str">"[3/4] Waiting for instances to become healthy..."</span>
+aws autoscaling wait group-in-service \
+  --auto-scaling-group-name <span class="str">$ASG_NAME</span> \
+  --region <span class="str">$DR_REGION</span>
+
+echo <span class="str">"[4/4] Updating DNS failover weight..."</span>
+aws route53 change-resource-record-sets \
+  --hosted-zone-id <span class="str">$HOSTED_ZONE</span> \
+  --change-batch <span class="str">'{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"api.example.com","Type":"A","SetIdentifier":"secondary","Failover":"PRIMARY","TTL":60,"ResourceRecords":[{"Value":"198.51.100.20"}]}}]}'</span>
+
+echo <span class="str">"Failover complete. Verify at https://api.example.com/health"</span></code><span class="code-label">Shell</span></pre>
+    </div>
+
+    <div class="post-section" id="real-incidents">
+      <h2>Lessons from Real Incidents</h2>
+      <p>After managing DR for production systems across three organizations, these are the lessons that only come from real outages:</p>
+      <ul>
+        <li><strong>DNS caching will betray you.</strong> During a us-east-1 outage, our Route 53 failover worked perfectly, but some clients cached the old IP for 30+ minutes because we had a 300-second TTL. Always use a low TTL for failover records.</li>
+        <li><strong>Read replicas are not instant promotions.</strong> Promoting an RDS read replica can take 5-15 minutes. Factor this into your RTO calculations and consider Aurora Global Database for faster failover.</li>
+        <li><strong>Secrets and config drift silently.</strong> Your DR region may have stale API keys, expired certificates, or outdated environment variables. Include config synchronization in your replication strategy.</li>
+        <li><strong>IAM is global, but service quotas are regional.</strong> We once failed over and immediately hit EC2 instance limits in the DR region because nobody had requested quota increases. Check service quotas in your DR region proactively.</li>
+        <li><strong>People are the biggest bottleneck.</strong> During a 2 AM outage, the person with the failover runbook knowledge was unreachable. Automate everything possible and ensure at least three people can execute the plan independently.</li>
+      </ul>
+
+      <blockquote>
+        <p>The best DR strategy is the one your team has practiced until it becomes muscle memory. Cost and architecture matter, but human readiness determines whether you meet your RTO when it counts.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="ansible-zero-downtime.html" class="post-nav-link">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">Ansible Zero-Downtime Deployments</span>
+      </a>
+      <a href="docker-multi-stage-security.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">Docker Multi-Stage Builds &amp; Container Security</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

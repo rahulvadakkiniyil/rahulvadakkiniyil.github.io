@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top 10 Scripts Every DevOps Engineer Should Use Daily — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Guide</span>
+        <span class="post-date">Mar 14, 2026</span>
+        <span class="post-read-time">12 min read</span>
+      </div>
+      <h1 class="post-heading">Top 10 Scripts Every DevOps Engineer Should Use Daily</h1>
+      <p class="post-subtitle">Battle-tested Bash and Python scripts that save hours every day — from health checks and log analysis to automated cleanups and deployment helpers.</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#intro">Why Scripts Matter in DevOps</a></li>
+        <li><a href="#script-1">Server Health Check</a></li>
+        <li><a href="#script-2">Log Analyzer &amp; Error Extractor</a></li>
+        <li><a href="#script-3">Docker Cleanup</a></li>
+        <li><a href="#script-4">Kubernetes Pod Restart Monitor</a></li>
+        <li><a href="#script-5">AWS Resource Cost Reporter</a></li>
+        <li><a href="#script-6">SSL Certificate Expiry Checker</a></li>
+        <li><a href="#script-7">Automated Database Backup</a></li>
+        <li><a href="#script-8">Git Repository Stats</a></li>
+        <li><a href="#script-9">Service Port Checker</a></li>
+        <li><a href="#script-10">Disk Usage Alert</a></li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="intro">
+      <h2>Why Scripts Matter in DevOps</h2>
+      <p>As DevOps engineers, we deal with repetitive tasks every single day — checking server health, analyzing logs, cleaning up unused resources, monitoring certificates, and more. Writing small, reusable scripts for these tasks doesn't just save time — it eliminates human error and creates a consistent, auditable workflow.</p>
+      <p>Here are 10 scripts I use almost daily. Each one is designed to be practical, portable, and easy to extend. Drop them into your <code>~/bin</code> directory, make them executable, and you'll wonder how you ever lived without them.</p>
+    </div>
+
+    <div class="post-section" id="script-1">
+      <h2>1. Server Health Check</h2>
+      <p>This script gives you a quick snapshot of a server's vital signs — CPU, memory, disk, and uptime — in a single command. Perfect for morning checks or quick triage during incidents.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># server-health.sh — Quick server health overview</span>
+
+<span class="kw">echo</span> <span class="str">"=============================="</span>
+<span class="kw">echo</span> <span class="str">"  SERVER HEALTH CHECK"</span>
+<span class="kw">echo</span> <span class="str">"  Host: $(hostname)"</span>
+<span class="kw">echo</span> <span class="str">"  Date: $(date '+%Y-%m-%d %H:%M:%S')"</span>
+<span class="kw">echo</span> <span class="str">"=============================="</span>
+
+<span class="cm"># Uptime</span>
+<span class="kw">echo</span> -e <span class="str">"\n--- Uptime ---"</span>
+uptime
+
+<span class="cm"># CPU Load</span>
+<span class="kw">echo</span> -e <span class="str">"\n--- CPU Load (1/5/15 min) ---"</span>
+<span class="var">LOAD</span>=$(<span class="fn">cat</span> /proc/loadavg | <span class="fn">awk</span> <span class="str">'{print $1, $2, $3}'</span>)
+<span class="var">CORES</span>=$(<span class="fn">nproc</span>)
+<span class="kw">echo</span> <span class="str">"Load: $LOAD | Cores: $CORES"</span>
+
+<span class="cm"># Memory Usage</span>
+<span class="kw">echo</span> -e <span class="str">"\n--- Memory Usage ---"</span>
+<span class="fn">free</span> -h | <span class="fn">awk</span> <span class="str">'NR==2{printf "Used: %s / %s (%.1f%%)\n", $3, $2, $3/$2*100}'</span>
+
+<span class="cm"># Disk Usage</span>
+<span class="kw">echo</span> -e <span class="str">"\n--- Disk Usage ---"</span>
+<span class="fn">df</span> -h | <span class="fn">awk</span> <span class="str">'$5+0 > 0 {printf "%-20s %s used of %s (%s)\n", $6, $3, $2, $5}'</span>
+
+<span class="cm"># Top 5 processes by CPU</span>
+<span class="kw">echo</span> -e <span class="str">"\n--- Top 5 Processes (CPU) ---"</span>
+<span class="fn">ps</span> aux --sort=-%cpu | <span class="fn">head</span> -6
+
+<span class="kw">echo</span> -e <span class="str">"\n=============================="</span></code><span class="code-label">Bash</span></pre>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Add this to a cron job that runs every hour and pipes output to a log file. You'll have a lightweight health history without needing a full monitoring stack.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="script-2">
+      <h2>2. Log Analyzer &amp; Error Extractor</h2>
+      <p>Quickly scan through application or system logs and extract errors, warnings, and critical messages with timestamps. Saves you from manually scrolling through thousands of lines.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># log-analyzer.sh — Extract errors and warnings from logs</span>
+
+<span class="var">LOG_FILE</span>=<span class="str">"${1:-/var/log/syslog}"</span>
+<span class="var">LINES</span>=<span class="str">"${2:-50}"</span>
+
+<span class="kw">if</span> [[ ! -f <span class="str">"$LOG_FILE"</span> ]]; <span class="kw">then</span>
+  <span class="kw">echo</span> <span class="str">"Error: File '$LOG_FILE' not found"</span>
+  <span class="kw">exit</span> <span class="num">1</span>
+<span class="kw">fi</span>
+
+<span class="kw">echo</span> <span class="str">"Analyzing: $LOG_FILE"</span>
+<span class="kw">echo</span> <span class="str">"-----------------------------------"</span>
+
+<span class="cm"># Count by severity</span>
+<span class="kw">echo</span> <span class="str">"Error count:    $(grep -ci 'error' "$LOG_FILE")"</span>
+<span class="kw">echo</span> <span class="str">"Warning count:  $(grep -ci 'warn' "$LOG_FILE")"</span>
+<span class="kw">echo</span> <span class="str">"Critical count: $(grep -ci 'critical\|fatal' "$LOG_FILE")"</span>
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Last $LINES Errors ---"</span>
+<span class="fn">grep</span> -i <span class="str">'error\|critical\|fatal'</span> <span class="str">"$LOG_FILE"</span> | <span class="fn">tail</span> -n <span class="str">"$LINES"</span>
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Error Frequency (Top 10 patterns) ---"</span>
+<span class="fn">grep</span> -i <span class="str">'error'</span> <span class="str">"$LOG_FILE"</span> | \
+  <span class="fn">sed</span> <span class="str">'s/[0-9]\{1,\}//g'</span> | \
+  <span class="fn">sort</span> | <span class="fn">uniq</span> -c | <span class="fn">sort</span> -rn | <span class="fn">head</span> -10</code><span class="code-label">Bash</span></pre>
+    </div>
+
+    <div class="post-section" id="script-3">
+      <h2>3. Docker Cleanup</h2>
+      <p>Docker accumulates dangling images, stopped containers, and unused volumes fast. This script reclaims disk space safely and shows you exactly what it removed.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># docker-cleanup.sh — Remove unused Docker resources</span>
+
+<span class="kw">echo</span> <span class="str">"=== Docker Cleanup ==="</span>
+<span class="kw">echo</span> <span class="str">"Before cleanup:"</span>
+<span class="fn">docker</span> system df
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Removing stopped containers ---"</span>
+docker container prune -f
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Removing dangling images ---"</span>
+docker image prune -f
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Removing unused volumes ---"</span>
+docker volume prune -f
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Removing unused networks ---"</span>
+docker network prune -f
+
+<span class="kw">echo</span> -e <span class="str">"\nAfter cleanup:"</span>
+<span class="fn">docker</span> system df
+
+<span class="cm"># Optional: Remove images older than 30 days</span>
+<span class="cm"># docker image prune -a --filter "until=720h" -f</span>
+
+<span class="kw">echo</span> -e <span class="str">"\nCleanup complete!"</span></code><span class="code-label">Bash</span></pre>
+
+      <div class="post-callout post-callout-warn">
+        <div class="callout-title">Warning</div>
+        <p>Be careful with <code>docker volume prune</code> on production servers. It will remove all volumes not attached to a running container — including database volumes if the container is stopped.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="script-4">
+      <h2>4. Kubernetes Pod Restart Monitor</h2>
+      <p>Pods that keep restarting often indicate OOMKills, crashloops, or failed health checks. This script lists all pods with high restart counts across namespaces.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># k8s-restart-monitor.sh — Find pods with high restart counts</span>
+
+<span class="var">THRESHOLD</span>=<span class="str">"${1:-5}"</span>
+
+<span class="kw">echo</span> <span class="str">"Pods with restart count >= $THRESHOLD"</span>
+<span class="kw">echo</span> <span class="str">"============================================"</span>
+<span class="fn">printf</span> <span class="str">"%-40s %-20s %-10s %-10s\n"</span> <span class="str">"POD"</span> <span class="str">"NAMESPACE"</span> <span class="str">"RESTARTS"</span> <span class="str">"STATUS"</span>
+<span class="kw">echo</span> <span class="str">"--------------------------------------------"</span>
+
+kubectl get pods --all-namespaces -o json | \
+  jq -r <span class="str">'.items[] |
+    select(.status.containerStatuses != null) |
+    .status.containerStatuses[] as $cs |
+    select($cs.restartCount >= '$THRESHOLD') |
+    [.metadata.name, .metadata.namespace,
+     ($cs.restartCount | tostring), .status.phase] |
+    @tsv'</span> | \
+  <span class="fn">sort</span> -t$<span class="str">'\t'</span> -k3 -rn | \
+  <span class="kw">while</span> IFS=$<span class="str">'\t'</span> <span class="kw">read</span> pod ns restarts status; <span class="kw">do</span>
+    <span class="fn">printf</span> <span class="str">"%-40s %-20s %-10s %-10s\n"</span> <span class="str">"$pod"</span> <span class="str">"$ns"</span> <span class="str">"$restarts"</span> <span class="str">"$status"</span>
+  <span class="kw">done</span>
+
+<span class="kw">echo</span> -e <span class="str">"\n--- OOMKilled Pods ---"</span>
+kubectl get pods --all-namespaces -o json | \
+  jq -r <span class="str">'.items[] |
+    select(.status.containerStatuses != null) |
+    select(.status.containerStatuses[].lastState.terminated.reason == "OOMKilled") |
+    [.metadata.namespace, .metadata.name] | @tsv'</span></code><span class="code-label">Bash</span></pre>
+    </div>
+
+    <div class="post-section" id="script-5">
+      <h2>5. AWS Resource Cost Reporter</h2>
+      <p>Get a quick daily cost breakdown from AWS Cost Explorer without logging into the console. Great for keeping an eye on unexpected charges.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># aws-cost-report.sh — Daily AWS cost summary</span>
+
+<span class="var">START_DATE</span>=$(<span class="fn">date</span> -d <span class="str">"7 days ago"</span> +%Y-%m-%d)
+<span class="var">END_DATE</span>=$(<span class="fn">date</span> +%Y-%m-%d)
+
+<span class="kw">echo</span> <span class="str">"AWS Cost Report: $START_DATE to $END_DATE"</span>
+<span class="kw">echo</span> <span class="str">"========================================"</span>
+
+<span class="cm"># Total cost for the period</span>
+aws ce get-cost-and-usage \
+  --time-period Start=<span class="str">"$START_DATE"</span>,End=<span class="str">"$END_DATE"</span> \
+  --granularity DAILY \
+  --metrics <span class="str">"UnblendedCost"</span> \
+  --query <span class="str">'ResultsByTime[*].[TimePeriod.Start, Total.UnblendedCost.Amount]'</span> \
+  --output table
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Cost by Service (Top 10) ---"</span>
+aws ce get-cost-and-usage \
+  --time-period Start=<span class="str">"$START_DATE"</span>,End=<span class="str">"$END_DATE"</span> \
+  --granularity MONTHLY \
+  --metrics <span class="str">"UnblendedCost"</span> \
+  --group-by Type=DIMENSION,Key=SERVICE \
+  --query <span class="str">'ResultsByTime[0].Groups | sort_by(@, &Metrics.UnblendedCost.Amount) | reverse(@) | [:10].[Keys[0], Metrics.UnblendedCost.Amount]'</span> \
+  --output table
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Month-to-Date Total ---"</span>
+<span class="var">MTD_START</span>=$(<span class="fn">date</span> +%Y-%m-01)
+aws ce get-cost-and-usage \
+  --time-period Start=<span class="str">"$MTD_START"</span>,End=<span class="str">"$END_DATE"</span> \
+  --granularity MONTHLY \
+  --metrics <span class="str">"UnblendedCost"</span> \
+  --query <span class="str">'ResultsByTime[0].Total.UnblendedCost.Amount'</span> \
+  --output text</code><span class="code-label">Bash</span></pre>
+    </div>
+
+    <div class="post-section" id="script-6">
+      <h2>6. SSL Certificate Expiry Checker</h2>
+      <p>Expired SSL certificates cause outages that are embarrassing and preventable. This script checks multiple domains and warns you before certificates expire.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># ssl-check.sh — Check SSL certificate expiry for multiple domains</span>
+
+<span class="var">DOMAINS</span>=(<span class="str">"example.com"</span> <span class="str">"api.example.com"</span> <span class="str">"app.example.com"</span>)
+<span class="var">WARN_DAYS</span>=<span class="num">30</span>
+
+<span class="fn">printf</span> <span class="str">"%-30s %-15s %-12s %s\n"</span> <span class="str">"DOMAIN"</span> <span class="str">"EXPIRES"</span> <span class="str">"DAYS LEFT"</span> <span class="str">"STATUS"</span>
+<span class="kw">echo</span> <span class="str">"-----------------------------------------------------------------------"</span>
+
+<span class="kw">for</span> domain <span class="kw">in</span> <span class="str">"${DOMAINS[@]}"</span>; <span class="kw">do</span>
+  <span class="var">EXPIRY</span>=$(<span class="kw">echo</span> | openssl s_client -servername <span class="str">"$domain"</span> \
+    -connect <span class="str">"$domain:443"</span> 2>/dev/null | \
+    openssl x509 -noout -enddate 2>/dev/null | \
+    <span class="fn">cut</span> -d= -f2)
+
+  <span class="kw">if</span> [[ -z <span class="str">"$EXPIRY"</span> ]]; <span class="kw">then</span>
+    <span class="fn">printf</span> <span class="str">"%-30s %-15s %-12s %s\n"</span> <span class="str">"$domain"</span> <span class="str">"N/A"</span> <span class="str">"N/A"</span> <span class="str">"UNREACHABLE"</span>
+    <span class="kw">continue</span>
+  <span class="kw">fi</span>
+
+  <span class="var">EXPIRY_EPOCH</span>=$(<span class="fn">date</span> -d <span class="str">"$EXPIRY"</span> +%s)
+  <span class="var">NOW_EPOCH</span>=$(<span class="fn">date</span> +%s)
+  <span class="var">DAYS_LEFT</span>=$(( (EXPIRY_EPOCH - NOW_EPOCH) / 86400 ))
+  <span class="var">EXPIRY_SHORT</span>=$(<span class="fn">date</span> -d <span class="str">"$EXPIRY"</span> +%Y-%m-%d)
+
+  <span class="kw">if</span> [[ <span class="var">$DAYS_LEFT</span> -lt <span class="num">0</span> ]]; <span class="kw">then</span>
+    <span class="var">STATUS</span>=<span class="str">"EXPIRED"</span>
+  <span class="kw">elif</span> [[ <span class="var">$DAYS_LEFT</span> -lt <span class="var">$WARN_DAYS</span> ]]; <span class="kw">then</span>
+    <span class="var">STATUS</span>=<span class="str">"WARNING"</span>
+  <span class="kw">else</span>
+    <span class="var">STATUS</span>=<span class="str">"OK"</span>
+  <span class="kw">fi</span>
+
+  <span class="fn">printf</span> <span class="str">"%-30s %-15s %-12s %s\n"</span> <span class="str">"$domain"</span> <span class="str">"$EXPIRY_SHORT"</span> <span class="str">"$DAYS_LEFT"</span> <span class="str">"$STATUS"</span>
+<span class="kw">done</span></code><span class="code-label">Bash</span></pre>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Pipe the output to a Slack webhook for daily automated certificate reports. Add the domains to a config file instead of hardcoding them for easier maintenance.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="script-7">
+      <h2>7. Automated Database Backup</h2>
+      <p>A simple but reliable script to back up PostgreSQL or MySQL databases, compress them, and clean up old backups. Schedule it with cron for hands-free protection.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># db-backup.sh — Automated database backup with rotation</span>
+
+<span class="var">DB_HOST</span>=<span class="str">"localhost"</span>
+<span class="var">DB_USER</span>=<span class="str">"backup_user"</span>
+<span class="var">DB_NAME</span>=<span class="str">"myapp_production"</span>
+<span class="var">BACKUP_DIR</span>=<span class="str">"/backups/database"</span>
+<span class="var">RETENTION_DAYS</span>=<span class="num">7</span>
+<span class="var">TIMESTAMP</span>=$(<span class="fn">date</span> +%Y%m%d_%H%M%S)
+<span class="var">BACKUP_FILE</span>=<span class="str">"${BACKUP_DIR}/${DB_NAME}_${TIMESTAMP}.sql.gz"</span>
+
+<span class="cm"># Create backup directory</span>
+<span class="fn">mkdir</span> -p <span class="str">"$BACKUP_DIR"</span>
+
+<span class="kw">echo</span> <span class="str">"Starting backup: $DB_NAME"</span>
+
+<span class="cm"># PostgreSQL backup (switch to mysqldump for MySQL)</span>
+<span class="fn">pg_dump</span> -h <span class="str">"$DB_HOST"</span> -U <span class="str">"$DB_USER"</span> <span class="str">"$DB_NAME"</span> | \
+  <span class="fn">gzip</span> > <span class="str">"$BACKUP_FILE"</span>
+
+<span class="kw">if</span> [[ $? -eq <span class="num">0</span> ]]; <span class="kw">then</span>
+  <span class="var">SIZE</span>=$(<span class="fn">du</span> -sh <span class="str">"$BACKUP_FILE"</span> | <span class="fn">awk</span> <span class="str">'{print $1}'</span>)
+  <span class="kw">echo</span> <span class="str">"Backup successful: $BACKUP_FILE ($SIZE)"</span>
+<span class="kw">else</span>
+  <span class="kw">echo</span> <span class="str">"ERROR: Backup failed!"</span>
+  <span class="kw">exit</span> <span class="num">1</span>
+<span class="kw">fi</span>
+
+<span class="cm"># Cleanup old backups</span>
+<span class="kw">echo</span> <span class="str">"Removing backups older than $RETENTION_DAYS days..."</span>
+<span class="fn">find</span> <span class="str">"$BACKUP_DIR"</span> -name <span class="str">"*.sql.gz"</span> -mtime +<span class="var">$RETENTION_DAYS</span> -delete
+
+<span class="cm"># List remaining backups</span>
+<span class="kw">echo</span> -e <span class="str">"\nCurrent backups:"</span>
+<span class="fn">ls</span> -lh <span class="str">"$BACKUP_DIR"</span>/*.sql.gz 2>/dev/null</code><span class="code-label">Bash</span></pre>
+    </div>
+
+    <div class="post-section" id="script-8">
+      <h2>8. Git Repository Stats</h2>
+      <p>Get an instant overview of your repo — recent commits, contributors, branch status, and uncommitted changes. Useful during standups or when onboarding to a new project.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># git-stats.sh — Quick repo overview</span>
+
+<span class="kw">echo</span> <span class="str">"=== Git Repository Stats ==="</span>
+<span class="kw">echo</span> <span class="str">"Repo: $(basename $(git rev-parse --show-toplevel))"</span>
+<span class="kw">echo</span> <span class="str">"Branch: $(git branch --show-current)"</span>
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Last 5 Commits ---"</span>
+git log --oneline -5 --decorate
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Uncommitted Changes ---"</span>
+<span class="var">CHANGES</span>=$(git status --porcelain | <span class="fn">wc</span> -l)
+<span class="kw">echo</span> <span class="str">"Modified/Untracked files: $CHANGES"</span>
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Branch Summary ---"</span>
+<span class="kw">echo</span> <span class="str">"Local branches:  $(git branch | wc -l)"</span>
+<span class="kw">echo</span> <span class="str">"Remote branches: $(git branch -r | wc -l)"</span>
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Top 5 Contributors (All Time) ---"</span>
+git shortlog -sn --all | <span class="fn">head</span> -5
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Lines of Code ---"</span>
+git ls-files | <span class="fn">xargs</span> <span class="fn">wc</span> -l 2>/dev/null | <span class="fn">tail</span> -1
+
+<span class="kw">echo</span> -e <span class="str">"\n--- Ahead/Behind Remote ---"</span>
+git rev-list --left-right --count HEAD...@{upstream} 2>/dev/null | \
+  <span class="fn">awk</span> <span class="str">'{print "Ahead: "$1" | Behind: "$2}'</span> || \
+  <span class="kw">echo</span> <span class="str">"No upstream branch set"</span></code><span class="code-label">Bash</span></pre>
+    </div>
+
+    <div class="post-section" id="script-9">
+      <h2>9. Service Port Checker</h2>
+      <p>Quickly verify that all your critical services are listening on the expected ports. Essential after deployments or when debugging connectivity issues.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># port-check.sh — Verify services are listening on expected ports</span>
+
+<span class="kw">declare</span> -A <span class="var">SERVICES</span>=(
+  [<span class="str">"nginx"</span>]=<span class="str">"80"</span>
+  [<span class="str">"nginx-ssl"</span>]=<span class="str">"443"</span>
+  [<span class="str">"ssh"</span>]=<span class="str">"22"</span>
+  [<span class="str">"postgresql"</span>]=<span class="str">"5432"</span>
+  [<span class="str">"redis"</span>]=<span class="str">"6379"</span>
+  [<span class="str">"app-server"</span>]=<span class="str">"8080"</span>
+  [<span class="str">"prometheus"</span>]=<span class="str">"9090"</span>
+  [<span class="str">"grafana"</span>]=<span class="str">"3000"</span>
+)
+
+<span class="var">HOST</span>=<span class="str">"${1:-localhost}"</span>
+
+<span class="fn">printf</span> <span class="str">"%-20s %-10s %s\n"</span> <span class="str">"SERVICE"</span> <span class="str">"PORT"</span> <span class="str">"STATUS"</span>
+<span class="kw">echo</span> <span class="str">"------------------------------------------"</span>
+
+<span class="kw">for</span> service <span class="kw">in</span> <span class="str">"${!SERVICES[@]}"</span>; <span class="kw">do</span>
+  <span class="var">port</span>=<span class="str">"${SERVICES[$service]}"</span>
+
+  <span class="kw">if</span> timeout 2 bash -c <span class="str">"echo >/dev/tcp/$HOST/$port"</span> 2>/dev/null; <span class="kw">then</span>
+    <span class="var">STATUS</span>=<span class="str">"OPEN"</span>
+  <span class="kw">else</span>
+    <span class="var">STATUS</span>=<span class="str">"CLOSED"</span>
+  <span class="kw">fi</span>
+
+  <span class="fn">printf</span> <span class="str">"%-20s %-10s %s\n"</span> <span class="str">"$service"</span> <span class="str">"$port"</span> <span class="str">"$STATUS"</span>
+<span class="kw">done</span></code><span class="code-label">Bash</span></pre>
+    </div>
+
+    <div class="post-section" id="script-10">
+      <h2>10. Disk Usage Alert</h2>
+      <p>Monitor disk usage and send alerts when partitions cross a threshold. This is your last line of defense before a disk-full outage takes down your services.</p>
+      <pre><code><span class="cm">#!/bin/bash</span>
+<span class="cm"># disk-alert.sh — Alert when disk usage exceeds threshold</span>
+
+<span class="var">THRESHOLD</span>=<span class="str">"${1:-80}"</span>
+<span class="var">ALERT_FOUND</span>=<span class="num">0</span>
+
+<span class="kw">echo</span> <span class="str">"Checking disk usage (threshold: ${THRESHOLD}%)"</span>
+<span class="kw">echo</span> <span class="str">"============================================"</span>
+
+<span class="kw">while</span> IFS= <span class="kw">read</span> -r line; <span class="kw">do</span>
+  <span class="var">USAGE</span>=$(<span class="kw">echo</span> <span class="str">"$line"</span> | <span class="fn">awk</span> <span class="str">'{print $5}'</span> | <span class="fn">tr</span> -d <span class="str">'%'</span>)
+  <span class="var">MOUNT</span>=$(<span class="kw">echo</span> <span class="str">"$line"</span> | <span class="fn">awk</span> <span class="str">'{print $6}'</span>)
+  <span class="var">SIZE</span>=$(<span class="kw">echo</span> <span class="str">"$line"</span> | <span class="fn">awk</span> <span class="str">'{print $2}'</span>)
+  <span class="var">AVAIL</span>=$(<span class="kw">echo</span> <span class="str">"$line"</span> | <span class="fn">awk</span> <span class="str">'{print $4}'</span>)
+
+  <span class="kw">if</span> [[ <span class="var">$USAGE</span> -ge <span class="var">$THRESHOLD</span> ]]; <span class="kw">then</span>
+    <span class="kw">echo</span> <span class="str">"ALERT: $MOUNT is at ${USAGE}% (${AVAIL} free of ${SIZE})"</span>
+    <span class="var">ALERT_FOUND</span>=<span class="num">1</span>
+
+    <span class="cm"># Find largest files on this mount</span>
+    <span class="kw">echo</span> <span class="str">"  Top 5 largest files:"</span>
+    <span class="fn">find</span> <span class="str">"$MOUNT"</span> -xdev -type f -exec du -sh {} + 2>/dev/null | \
+      <span class="fn">sort</span> -rh | <span class="fn">head</span> -5 | <span class="fn">sed</span> <span class="str">'s/^/    /'</span>
+    <span class="kw">echo</span>
+  <span class="kw">fi</span>
+<span class="kw">done</span> < <(<span class="fn">df</span> -h | <span class="fn">tail</span> -n +2)
+
+<span class="kw">if</span> [[ <span class="var">$ALERT_FOUND</span> -eq <span class="num">0</span> ]]; <span class="kw">then</span>
+  <span class="kw">echo</span> <span class="str">"All partitions are below ${THRESHOLD}% usage."</span>
+<span class="kw">fi</span>
+
+<span class="cm"># Optional: Send Slack notification</span>
+<span class="cm"># if [[ $ALERT_FOUND -eq 1 ]]; then</span>
+<span class="cm">#   curl -X POST -H 'Content-type: application/json' \</span>
+<span class="cm">#     --data '{"text":"Disk usage alert on '$(hostname)'"}' \</span>
+<span class="cm">#     "$SLACK_WEBHOOK_URL"</span>
+<span class="cm"># fi</span></code><span class="code-label">Bash</span></pre>
+    </div>
+
+    <div class="post-section" id="conclusion">
+      <h2>Conclusion</h2>
+      <p>These 10 scripts cover the most common tasks a DevOps engineer faces daily. The key principles behind all of them are the same:</p>
+      <ul>
+        <li><strong>Automate the repetitive.</strong> If you do it more than twice, script it.</li>
+        <li><strong>Make output readable.</strong> Formatted tables and color-coded statuses make scripts usable by the entire team.</li>
+        <li><strong>Add safety checks.</strong> Always validate inputs, check if files exist, and handle errors gracefully.</li>
+        <li><strong>Keep them simple.</strong> A 50-line script that works is better than a 500-line framework nobody maintains.</li>
+        <li><strong>Version control everything.</strong> Put your scripts in a Git repo — they're infrastructure too.</li>
+      </ul>
+
+      <blockquote>
+        <p>The best DevOps engineers aren't the ones who work the hardest — they're the ones who automate themselves out of repetitive work so they can focus on what actually matters.</p>
+      </blockquote>
+
+      <p>Start with the scripts that match your daily pain points, customize them for your environment, and build up a personal toolkit that makes you more effective every day.</p>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="aws-secrets-csi-driver.html" class="post-nav-link">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">AWS Secrets &amp; Configuration Provider with Kubernetes Secrets Store CSI Driver</span>
+      </a>
+      <a href="gitops-argocd-github-actions.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">Building a GitOps Pipeline with ArgoCD &amp; GitHub Actions</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

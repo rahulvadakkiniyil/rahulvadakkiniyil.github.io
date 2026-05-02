@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Study: Full Observability Stack — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../blog.html">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Case Study</span>
+        <span class="post-date">Monitoring</span>
+        <span class="post-read-time">11 min read</span>
+      </div>
+      <h1 class="post-heading">Production Observability Stack for 200+ Microservices</h1>
+      <p class="post-subtitle">Building a unified observability platform with Prometheus, Grafana, Loki, and Alertmanager — covering metrics, logs, traces, and intelligent alerting at scale.</p>
+    </div>
+  </header>
+
+  <main class="post-content">
+    <div class="container">
+
+      <nav class="post-toc">
+        <h3>Table of Contents</h3>
+        <ul>
+          <li><a href="#overview">Project Overview</a></li>
+          <li><a href="#architecture">Architecture Design</a></li>
+          <li><a href="#prometheus">Prometheus Setup</a></li>
+          <li><a href="#grafana">Grafana Dashboards</a></li>
+          <li><a href="#loki">Log Aggregation with Loki</a></li>
+          <li><a href="#alerting">Alerting Pipeline</a></li>
+          <li><a href="#slo">SLO Tracking</a></li>
+          <li><a href="#results">Results &amp; Impact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Section 1: Project Overview -->
+      <section class="post-section" id="overview">
+        <h2>Project Overview</h2>
+        <p>Our platform had grown to over 200 microservices deployed across multiple Kubernetes clusters, yet there was no unified monitoring solution in place. Each team had cobbled together its own approach — some used basic log files, others relied on ad-hoc shell scripts, and a handful had standalone Prometheus instances with no cross-cluster visibility. The result was a landscape of blind spots where production incidents went undetected for far too long.</p>
+        <p>The mean time to resolution (MTTR) had climbed to 45+ minutes, largely because engineers spent the first 20 minutes just figuring out <em>where</em> the problem was. There was no correlation between metrics, logs, and traces. Alert fatigue was rampant — teams had either too many noisy alerts or, worse, none at all. On-call rotations were dreaded, and customer-facing SLAs were at risk.</p>
+
+        <div class="post-callout-info">
+          <strong>Business Drivers:</strong> The VP of Engineering mandated a single observability platform that every team could adopt within one quarter, with clearly defined SLOs and a centralized alerting pipeline that integrated with existing PagerDuty and Slack workflows.
+        </div>
+
+        <p>The project goals were clear: unify metrics collection across all clusters, implement structured log aggregation, introduce distributed tracing, build a library of standardized dashboards, and establish an intelligent alerting pipeline that reduced noise while catching real incidents faster. The target was to bring MTTR below 10 minutes and achieve 99.95% SLO across all customer-facing services.</p>
+      </section>
+
+      <!-- Section 2: Architecture Design -->
+      <section class="post-section" id="architecture">
+        <h2>Architecture Design</h2>
+        <p>The observability platform was built on three pillars, each handled by a purpose-built open-source tool, with Grafana serving as the unified visualization layer:</p>
+        <ul>
+          <li><strong>Metrics</strong> — Prometheus with Thanos sidecar for long-term storage and cross-cluster federation</li>
+          <li><strong>Logs</strong> — Grafana Loki with FluentBit as the log collector on every node</li>
+          <li><strong>Traces</strong> — Grafana Tempo with OpenTelemetry SDK instrumentation across services</li>
+          <li><strong>Dashboards &amp; Visualization</strong> — Grafana as the single pane of glass with provisioned data sources</li>
+          <li><strong>Alerting</strong> — Alertmanager with routing trees for PagerDuty, Slack, and email escalation</li>
+        </ul>
+
+        <div class="post-callout-tip">
+          <strong>Architecture Overview:</strong> Each Kubernetes cluster runs its own Prometheus, Loki, and Tempo instances. Thanos Query federates metrics from all clusters into a global view. Grafana connects to Thanos Query for metrics, Loki for logs, and Tempo for traces — enabling seamless correlation across all three pillars from a single dashboard.
+        </div>
+
+        <p>The architecture was designed with multi-tenancy in mind. Each team's namespace received its own set of ServiceMonitors, log labels, and trace service names, ensuring that dashboards and alerts could be scoped per team while still allowing platform-wide rollups for SRE leadership.</p>
+
+        <pre><code><span class="cm"># High-Level Architecture Flow</span>
+<span class="cm"># ┌─────────────┐  ┌─────────────┐  ┌─────────────┐</span>
+<span class="cm"># │  Cluster A  │  │  Cluster B  │  │  Cluster C  │</span>
+<span class="cm"># │ Prometheus  │  │ Prometheus  │  │ Prometheus  │</span>
+<span class="cm"># │ Loki        │  │ Loki        │  │ Loki        │</span>
+<span class="cm"># │ Tempo       │  │ Tempo       │  │ Tempo       │</span>
+<span class="cm"># └──────┬──────┘  └──────┬──────┘  └──────┬──────┘</span>
+<span class="cm">#        │               │               │</span>
+<span class="cm">#        └───────┬───────┴───────┬───────┘</span>
+<span class="cm">#                │               │</span>
+<span class="cm">#         ┌──────▼──────┐ ┌─────▼──────┐</span>
+<span class="cm">#         │ Thanos Query│ │ Loki GW    │</span>
+<span class="cm">#         └──────┬──────┘ └─────┬──────┘</span>
+<span class="cm">#                └───────┬──────┘</span>
+<span class="cm">#                   ┌────▼────┐</span>
+<span class="cm">#                   │ Grafana │</span>
+<span class="cm">#                   └─────────┘</span></code></pre>
+      </section>
+
+      <!-- Section 3: Prometheus Setup -->
+      <section class="post-section" id="prometheus">
+        <h2>Prometheus Setup</h2>
+        <p>Prometheus was deployed using the <code>kube-prometheus-stack</code> Helm chart, which bundles Prometheus Operator, Alertmanager, Grafana, and a comprehensive set of recording rules and dashboards for Kubernetes cluster monitoring out of the box. We customized the Helm values extensively to support our scale and multi-cluster requirements.</p>
+
+        <div class="code-label">kube-prometheus-stack Helm Values (values.yaml)</div>
+        <pre><code><span class="kw">prometheus</span>:
+  <span class="kw">prometheusSpec</span>:
+    <span class="kw">replicas</span>: <span class="num">2</span>
+    <span class="kw">retention</span>: <span class="str">15d</span>
+    <span class="kw">retentionSize</span>: <span class="str">45GB</span>
+    <span class="kw">resources</span>:
+      <span class="kw">requests</span>:
+        <span class="kw">cpu</span>: <span class="str">2000m</span>
+        <span class="kw">memory</span>: <span class="str">8Gi</span>
+      <span class="kw">limits</span>:
+        <span class="kw">cpu</span>: <span class="str">4000m</span>
+        <span class="kw">memory</span>: <span class="str">16Gi</span>
+    <span class="kw">storageSpec</span>:
+      <span class="kw">volumeClaimTemplate</span>:
+        <span class="kw">spec</span>:
+          <span class="kw">storageClassName</span>: <span class="str">gp3-encrypted</span>
+          <span class="kw">resources</span>:
+            <span class="kw">requests</span>:
+              <span class="kw">storage</span>: <span class="str">100Gi</span>
+    <span class="kw">serviceMonitorSelectorNilUsesHelmValues</span>: <span class="num">false</span>
+    <span class="kw">podMonitorSelectorNilUsesHelmValues</span>: <span class="num">false</span>
+    <span class="cm"># Thanos sidecar for cross-cluster federation</span>
+    <span class="kw">thanos</span>:
+      <span class="kw">objectStorageConfig</span>:
+        <span class="kw">secret</span>:
+          <span class="kw">type</span>: <span class="str">S3</span>
+          <span class="kw">name</span>: <span class="str">thanos-objstore-secret</span>
+          <span class="kw">key</span>: <span class="str">objstore.yml</span>
+
+<span class="kw">alertmanager</span>:
+  <span class="kw">alertmanagerSpec</span>:
+    <span class="kw">replicas</span>: <span class="num">3</span>
+    <span class="kw">retention</span>: <span class="str">120h</span>
+
+<span class="kw">grafana</span>:
+  <span class="kw">enabled</span>: <span class="num">true</span>
+  <span class="kw">replicas</span>: <span class="num">2</span>
+  <span class="kw">persistence</span>:
+    <span class="kw">enabled</span>: <span class="num">true</span>
+    <span class="kw">size</span>: <span class="str">10Gi</span></code></pre>
+
+        <p>Every service that needed monitoring defined a <code>ServiceMonitor</code> CRD, which instructed Prometheus Operator to automatically discover and scrape the service's metrics endpoint. We standardized the metrics path as <code>/metrics</code> and required every service to expose RED metrics (Rate, Errors, Duration) using a shared middleware library.</p>
+
+        <div class="code-label">ServiceMonitor CRD (servicemonitor.yaml)</div>
+        <pre><code><span class="kw">apiVersion</span>: <span class="str">monitoring.coreos.com/v1</span>
+<span class="kw">kind</span>: <span class="str">ServiceMonitor</span>
+<span class="kw">metadata</span>:
+  <span class="kw">name</span>: <span class="str">payment-service-monitor</span>
+  <span class="kw">namespace</span>: <span class="str">payments</span>
+  <span class="kw">labels</span>:
+    <span class="kw">team</span>: <span class="str">payments</span>
+    <span class="kw">release</span>: <span class="str">kube-prometheus-stack</span>
+<span class="kw">spec</span>:
+  <span class="kw">selector</span>:
+    <span class="kw">matchLabels</span>:
+      <span class="kw">app</span>: <span class="str">payment-service</span>
+  <span class="kw">endpoints</span>:
+    - <span class="kw">port</span>: <span class="str">http-metrics</span>
+      <span class="kw">path</span>: <span class="str">/metrics</span>
+      <span class="kw">interval</span>: <span class="str">15s</span>
+      <span class="kw">scrapeTimeout</span>: <span class="str">10s</span>
+  <span class="kw">namespaceSelector</span>:
+    <span class="kw">matchNames</span>:
+      - <span class="str">payments</span></code></pre>
+      </section>
+
+      <!-- Section 4: Grafana Dashboards -->
+      <section class="post-section" id="grafana">
+        <h2>Grafana Dashboards</h2>
+        <p>All dashboards were managed as code, provisioned through Kubernetes ConfigMaps that Grafana's sidecar container automatically picked up. This ensured dashboards were version-controlled, reproducible across environments, and immune to manual drift. We built a library of standardized dashboards covering cluster health, namespace resource usage, service-level SLO tracking, and per-service latency breakdowns.</p>
+
+        <div class="code-label">Grafana Dashboard Provisioning ConfigMap</div>
+        <pre><code><span class="kw">apiVersion</span>: <span class="str">v1</span>
+<span class="kw">kind</span>: <span class="str">ConfigMap</span>
+<span class="kw">metadata</span>:
+  <span class="kw">name</span>: <span class="str">grafana-dashboard-slo-overview</span>
+  <span class="kw">namespace</span>: <span class="str">monitoring</span>
+  <span class="kw">labels</span>:
+    <span class="kw">grafana_dashboard</span>: <span class="str">"1"</span>
+<span class="kw">data</span>:
+  <span class="kw">slo-overview.json</span>: <span class="str">|-</span>
+    {
+      <span class="str">"dashboard"</span>: {
+        <span class="str">"title"</span>: <span class="str">"SLO Overview - All Services"</span>,
+        <span class="str">"uid"</span>: <span class="str">"slo-overview-v1"</span>,
+        <span class="str">"panels"</span>: [
+          {
+            <span class="str">"title"</span>: <span class="str">"Availability SLO (30d rolling)"</span>,
+            <span class="str">"type"</span>: <span class="str">"gauge"</span>,
+            <span class="str">"targets"</span>: [{
+              <span class="str">"expr"</span>: <span class="str">"1 - (sum(rate(http_requests_total{code=~\"5..\"}[30d])) / sum(rate(http_requests_total[30d])))"</span>
+            }]
+          },
+          {
+            <span class="str">"title"</span>: <span class="str">"P99 Latency by Service"</span>,
+            <span class="str">"type"</span>: <span class="str">"timeseries"</span>,
+            <span class="str">"targets"</span>: [{
+              <span class="str">"expr"</span>: <span class="str">"histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service))"</span>
+            }]
+          }
+        ]
+      }
+    }</code></pre>
+
+        <p>Key dashboards included a Cluster Health overview (node CPU, memory, disk, and pod status), a Service Latency dashboard with RED metrics breakdown, an SLO burn rate tracker showing remaining error budgets, and a Cost Attribution dashboard that tied resource usage back to teams and services.</p>
+
+        <div class="post-callout-info">
+          <strong>Dashboard Standards:</strong> Every team was required to have at least three dashboards: a service overview (golden signals), a dependency health check (downstream latency and error rates), and a custom business metrics board. Templates were provided as Helm chart values.
+        </div>
+      </section>
+
+      <!-- Section 5: Log Aggregation with Loki -->
+      <section class="post-section" id="loki">
+        <h2>Log Aggregation with Loki</h2>
+        <p>Grafana Loki was chosen over Elasticsearch for log aggregation due to its significantly lower resource footprint. Loki indexes only metadata labels rather than full-text content, which reduced storage costs by approximately 60% compared to our previous ELK stack estimates. FluentBit ran as a DaemonSet on every node, collecting container logs and forwarding them to Loki with enriched Kubernetes metadata.</p>
+
+        <div class="code-label">FluentBit Configuration (fluent-bit.conf)</div>
+        <pre><code><span class="cm">[SERVICE]</span>
+    <span class="kw">Flush</span>        <span class="num">1</span>
+    <span class="kw">Log_Level</span>    <span class="str">info</span>
+    <span class="kw">Daemon</span>       <span class="str">off</span>
+    <span class="kw">Parsers_File</span> <span class="str">parsers.conf</span>
+
+<span class="cm">[INPUT]</span>
+    <span class="kw">Name</span>             <span class="str">tail</span>
+    <span class="kw">Path</span>             <span class="str">/var/log/containers/*.log</span>
+    <span class="kw">Parser</span>           <span class="str">docker</span>
+    <span class="kw">Tag</span>              <span class="str">kube.*</span>
+    <span class="kw">Mem_Buf_Limit</span>    <span class="str">5MB</span>
+    <span class="kw">Skip_Long_Lines</span>  <span class="str">On</span>
+    <span class="kw">Refresh_Interval</span> <span class="num">10</span>
+
+<span class="cm">[FILTER]</span>
+    <span class="kw">Name</span>                <span class="str">kubernetes</span>
+    <span class="kw">Match</span>               <span class="str">kube.*</span>
+    <span class="kw">Merge_Log</span>           <span class="str">On</span>
+    <span class="kw">Keep_Log</span>            <span class="str">Off</span>
+    <span class="kw">K8S-Logging.Parser</span>  <span class="str">On</span>
+    <span class="kw">K8S-Logging.Exclude</span> <span class="str">On</span>
+    <span class="kw">Labels</span>              <span class="str">On</span>
+    <span class="kw">Annotations</span>        <span class="str">Off</span>
+
+<span class="cm">[OUTPUT]</span>
+    <span class="kw">Name</span>        <span class="str">loki</span>
+    <span class="kw">Match</span>       <span class="str">kube.*</span>
+    <span class="kw">Host</span>        <span class="str">loki-gateway.monitoring.svc</span>
+    <span class="kw">Port</span>        <span class="num">3100</span>
+    <span class="kw">Labels</span>      <span class="str">job=fluentbit, cluster=prod-us-east-1</span>
+    <span class="kw">Label_Keys</span>  <span class="str">$kubernetes['namespace_name'],$kubernetes['pod_name'],$kubernetes['container_name']</span>
+    <span class="kw">Auto_Kubernetes_Labels</span> <span class="str">Off</span></code></pre>
+
+        <p>All services were required to emit structured JSON logs with standardized fields: <code>level</code>, <code>msg</code>, <code>timestamp</code>, <code>trace_id</code>, <code>service</code>, and <code>request_id</code>. The <code>trace_id</code> field enabled direct correlation between logs in Loki and traces in Tempo from within Grafana's Explore view.</p>
+
+        <div class="code-label">LogQL Query Examples</div>
+        <pre><code><span class="cm"># Find all errors in the payment service in the last hour</span>
+{<span class="kw">namespace</span>=<span class="str">"payments"</span>, <span class="kw">container</span>=<span class="str">"payment-service"</span>}
+  |= <span class="str">`"level":"error"`</span>
+  | <span class="fn">json</span>
+  | <span class="kw">line_format</span> <span class="str">"{{.timestamp}} [{{.level}}] {{.msg}}"</span>
+
+<span class="cm"># Count error rate per service over 5 minute windows</span>
+<span class="fn">sum</span> <span class="kw">by</span> (service) (
+  <span class="fn">count_over_time</span>(
+    {<span class="kw">cluster</span>=<span class="str">"prod-us-east-1"</span>}
+    |= <span class="str">`"level":"error"`</span>
+    | <span class="fn">json</span>
+    [<span class="num">5m</span>]
+  )
+)
+
+<span class="cm"># Trace correlation — find logs for a specific trace</span>
+{<span class="kw">namespace</span>=<span class="str">"payments"</span>}
+  | <span class="fn">json</span>
+  | <span class="kw">trace_id</span> = <span class="str">"abc123def456"</span></code></pre>
+
+        <div class="post-callout-warning">
+          <strong>Cardinality Warning:</strong> One of the biggest pitfalls with Loki is high-cardinality labels. We enforced a strict policy: only namespace, pod name, container name, and cluster were allowed as index labels. Any other filtering was done via LogQL's pipeline stages on the log content itself.
+        </div>
+      </section>
+
+      <!-- Section 6: Alerting Pipeline -->
+      <section class="post-section" id="alerting">
+        <h2>Alerting Pipeline</h2>
+        <p>Alertmanager was configured with a multi-tier routing tree that directed alerts to the right channel based on severity and owning team. Critical alerts (P1) triggered PagerDuty incidents immediately, high-severity alerts (P2) went to a dedicated Slack channel with a 5-minute group wait, and warnings (P3) were batched into daily digest emails. This tiered approach was central to reducing alert fatigue.</p>
+
+        <div class="code-label">Alertmanager Configuration (alertmanager.yml)</div>
+        <pre><code><span class="kw">global</span>:
+  <span class="kw">resolve_timeout</span>: <span class="str">5m</span>
+  <span class="kw">pagerduty_url</span>: <span class="str">"https://events.pagerduty.com/v2/enqueue"</span>
+  <span class="kw">slack_api_url</span>: <span class="str">"https://hooks.slack.com/services/T00/B00/XXXXX"</span>
+
+<span class="kw">route</span>:
+  <span class="kw">receiver</span>: <span class="str">default-slack</span>
+  <span class="kw">group_by</span>: [<span class="str">alertname</span>, <span class="str">namespace</span>, <span class="str">service</span>]
+  <span class="kw">group_wait</span>: <span class="str">30s</span>
+  <span class="kw">group_interval</span>: <span class="str">5m</span>
+  <span class="kw">repeat_interval</span>: <span class="str">4h</span>
+  <span class="kw">routes</span>:
+    - <span class="kw">match</span>:
+        <span class="kw">severity</span>: <span class="str">critical</span>
+      <span class="kw">receiver</span>: <span class="str">pagerduty-critical</span>
+      <span class="kw">group_wait</span>: <span class="str">10s</span>
+      <span class="kw">repeat_interval</span>: <span class="str">1h</span>
+    - <span class="kw">match</span>:
+        <span class="kw">severity</span>: <span class="str">warning</span>
+      <span class="kw">receiver</span>: <span class="str">slack-warnings</span>
+      <span class="kw">group_wait</span>: <span class="str">5m</span>
+      <span class="kw">repeat_interval</span>: <span class="str">12h</span>
+
+<span class="kw">receivers</span>:
+  - <span class="kw">name</span>: <span class="str">pagerduty-critical</span>
+    <span class="kw">pagerduty_configs</span>:
+      - <span class="kw">service_key_file</span>: <span class="str">/etc/alertmanager/secrets/pagerduty-key</span>
+        <span class="kw">severity</span>: <span class="str">"{{ .CommonLabels.severity }}"</span>
+        <span class="kw">description</span>: <span class="str">"{{ .CommonAnnotations.summary }}"</span>
+  - <span class="kw">name</span>: <span class="str">slack-warnings</span>
+    <span class="kw">slack_configs</span>:
+      - <span class="kw">channel</span>: <span class="str">"#alerts-warning"</span>
+        <span class="kw">title</span>: <span class="str">"[{{ .Status | toUpper }}] {{ .CommonLabels.alertname }}"</span>
+        <span class="kw">text</span>: <span class="str">"{{ .CommonAnnotations.description }}"</span>
+  - <span class="kw">name</span>: <span class="str">default-slack</span>
+    <span class="kw">slack_configs</span>:
+      - <span class="kw">channel</span>: <span class="str">"#alerts-general"</span></code></pre>
+
+        <div class="code-label">PrometheusRule for High Error Rate (prometheusrule.yaml)</div>
+        <pre><code><span class="kw">apiVersion</span>: <span class="str">monitoring.coreos.com/v1</span>
+<span class="kw">kind</span>: <span class="str">PrometheusRule</span>
+<span class="kw">metadata</span>:
+  <span class="kw">name</span>: <span class="str">service-high-error-rate</span>
+  <span class="kw">namespace</span>: <span class="str">monitoring</span>
+<span class="kw">spec</span>:
+  <span class="kw">groups</span>:
+    - <span class="kw">name</span>: <span class="str">service.error.rules</span>
+      <span class="kw">rules</span>:
+        - <span class="kw">alert</span>: <span class="str">HighErrorRate</span>
+          <span class="kw">expr</span>: |
+            <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>{<span class="kw">code</span>=~<span class="str">"5.."</span>}[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="str">service</span>, <span class="str">namespace</span>)
+            / <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="str">service</span>, <span class="str">namespace</span>)
+            > <span class="num">0.05</span>
+          <span class="kw">for</span>: <span class="str">5m</span>
+          <span class="kw">labels</span>:
+            <span class="kw">severity</span>: <span class="str">critical</span>
+          <span class="kw">annotations</span>:
+            <span class="kw">summary</span>: <span class="str">"High 5xx error rate on {{ $labels.service }}"</span>
+            <span class="kw">description</span>: <span class="str">"Service {{ $labels.service }} in {{ $labels.namespace }} has an error rate above 5% for the last 5 minutes (current: {{ $value | humanizePercentage }})."</span>
+            <span class="kw">runbook_url</span>: <span class="str">"https://runbooks.internal/high-error-rate"</span></code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Alert Fatigue Reduction:</strong> We introduced three key strategies — (1) inhibition rules that suppressed downstream alerts when an upstream dependency was already firing, (2) mandatory <code>for</code> durations of at least 5 minutes on all alerts to avoid flapping, and (3) weekly alert review meetings where noisy or unactionable alerts were pruned.
+        </div>
+      </section>
+
+      <!-- Section 7: SLO Tracking -->
+      <section class="post-section" id="slo">
+        <h2>SLO Tracking</h2>
+        <p>Each customer-facing service defined explicit SLIs (Service Level Indicators) and SLOs (Service Level Objectives). The two primary SLIs were availability (percentage of non-5xx responses) and latency (percentage of requests completing within a target threshold). SLOs were set per service based on business criticality — for example, the payment service had a 99.99% availability SLO while internal tooling services had 99.9%.</p>
+        <p>Error budgets were calculated on a 30-day rolling window. When a service consumed more than 50% of its error budget, a warning alert fired. At 80% consumption, the team was required to halt feature releases and focus on reliability. Burn rate alerting detected when error budgets were being consumed too quickly, enabling proactive intervention before an SLO breach.</p>
+
+        <div class="code-label">SLO Recording Rules (recording-rules.yaml)</div>
+        <pre><code><span class="kw">apiVersion</span>: <span class="str">monitoring.coreos.com/v1</span>
+<span class="kw">kind</span>: <span class="str">PrometheusRule</span>
+<span class="kw">metadata</span>:
+  <span class="kw">name</span>: <span class="str">slo-recording-rules</span>
+  <span class="kw">namespace</span>: <span class="str">monitoring</span>
+<span class="kw">spec</span>:
+  <span class="kw">groups</span>:
+    - <span class="kw">name</span>: <span class="str">slo.recording.rules</span>
+      <span class="kw">interval</span>: <span class="str">30s</span>
+      <span class="kw">rules</span>:
+        <span class="cm"># Availability SLI — ratio of successful requests</span>
+        - <span class="kw">record</span>: <span class="str">sli:availability:ratio_rate5m</span>
+          <span class="kw">expr</span>: |
+            <span class="num">1</span> - (
+              <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>{<span class="kw">code</span>=~<span class="str">"5.."</span>}[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+              / <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+            )
+
+        <span class="cm"># Latency SLI — ratio of requests under 300ms</span>
+        - <span class="kw">record</span>: <span class="str">sli:latency:ratio_rate5m</span>
+          <span class="kw">expr</span>: |
+            <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_request_duration_seconds_bucket</span>{<span class="kw">le</span>=<span class="str">"0.3"</span>}[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+            / <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_request_duration_seconds_count</span>[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+
+        <span class="cm"># Error budget remaining (30-day window)</span>
+        - <span class="kw">record</span>: <span class="str">slo:error_budget:remaining</span>
+          <span class="kw">expr</span>: |
+            <span class="num">1</span> - (
+              (<span class="num">1</span> - <span class="str">sli:availability:ratio_rate5m</span>)
+              / (<span class="num">1</span> - <span class="num">0.9995</span>)
+            )
+
+        <span class="cm"># Burn rate — fast burn (1h window, 14.4x budget)</span>
+        - <span class="kw">record</span>: <span class="str">slo:burn_rate:1h</span>
+          <span class="kw">expr</span>: |
+            (
+              <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>{<span class="kw">code</span>=~<span class="str">"5.."</span>}[<span class="num">1h</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+              / <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>[<span class="num">1h</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+            ) / (<span class="num">1</span> - <span class="num">0.9995</span>)
+
+        <span class="cm"># Burn rate — slow burn (6h window, 6x budget)</span>
+        - <span class="kw">record</span>: <span class="str">slo:burn_rate:6h</span>
+          <span class="kw">expr</span>: |
+            (
+              <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>{<span class="kw">code</span>=~<span class="str">"5.."</span>}[<span class="num">6h</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+              / <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="str">http_requests_total</span>[<span class="num">6h</span>])) <span class="kw">by</span> (<span class="str">service</span>)
+            ) / (<span class="num">1</span> - <span class="num">0.9995</span>)</code></pre>
+
+        <div class="post-callout-info">
+          <strong>Multi-Window Burn Rate:</strong> Following Google's SRE practices, we implemented multi-window burn rate alerting. A fast-burn alert fires when the 1-hour burn rate exceeds 14.4x AND the 5-minute burn rate also exceeds 14.4x. A slow-burn alert fires when the 6-hour burn rate exceeds 6x AND the 30-minute burn rate also exceeds 6x. This approach catches both sudden outages and slow degradations.
+        </div>
+      </section>
+
+      <!-- Section 8: Results & Impact -->
+      <section class="post-section" id="results">
+        <h2>Results &amp; Impact</h2>
+        <p>The unified observability stack was rolled out incrementally over 10 weeks, starting with the three highest-traffic services and expanding team by team. By the end of the rollout, all 200+ microservices across four Kubernetes clusters were fully instrumented. The results were transformative:</p>
+
+        <ul>
+          <li><strong>MTTR reduced from 45 minutes to 8 minutes</strong> — Correlated metrics, logs, and traces in a single Grafana session eliminated the time engineers previously spent switching tools and contexts during incidents.</li>
+          <li><strong>99.95% SLO achievement</strong> — All customer-facing services met or exceeded their SLO targets for three consecutive quarters, up from an inconsistent and unmeasured baseline.</li>
+          <li><strong>70% reduction in alert noise</strong> — Inhibition rules, mandatory <code>for</code> durations, and weekly alert reviews brought the actionable alert ratio from roughly 30% to over 90%.</li>
+          <li><strong>Single pane of glass for all teams</strong> — Grafana became the one place every engineer went during incidents. Standardized dashboards meant that on-call responders could investigate any service, even ones they had never worked on before.</li>
+          <li><strong>60% lower log storage costs</strong> — Migrating from the proposed Elasticsearch cluster to Loki's label-indexed architecture saved approximately $4,200/month in infrastructure costs.</li>
+          <li><strong>Proactive incident detection</strong> — Burn rate alerting caught three major degradations before customers noticed, preventing potential SLO breaches and protecting error budgets.</li>
+        </ul>
+
+        <div class="post-callout-tip">
+          <strong>Key Takeaway:</strong> The most impactful decision was not the choice of tools, but the investment in standardization. Requiring every service to expose RED metrics, emit structured JSON logs with trace IDs, and define explicit SLOs created a consistent observability contract that made the entire stack effective at scale.
+        </div>
+
+        <p>Looking ahead, the team is exploring Grafana's Adaptive Metrics to automatically identify and drop unused metric series, OpenTelemetry Collector as a unified telemetry pipeline replacing FluentBit and direct SDK instrumentation, and Grafana Machine Learning for anomaly detection on key business metrics. The observability stack has shifted from being a reactive firefighting tool to a proactive platform that continuously validates system health against business objectives.</p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

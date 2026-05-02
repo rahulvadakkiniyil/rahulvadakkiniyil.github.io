@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kubernetes Auto-Scaling: HPA, VPA &amp; Cluster Autoscaler — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Tutorial</span>
+        <span class="post-date">Mar 2, 2026</span>
+        <span class="post-read-time">10 min read</span>
+      </div>
+      <h1 class="post-heading">Kubernetes Auto-Scaling: HPA, VPA &amp; Cluster Autoscaler Explained</h1>
+      <p class="post-subtitle">A comprehensive guide to scaling workloads in Kubernetes. Learn when to use each autoscaler, how to configure them, and the production gotchas nobody tells you about.</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#why-scaling">Why Auto-Scaling Matters</a></li>
+        <li><a href="#hpa">Horizontal Pod Autoscaler (HPA)</a></li>
+        <li><a href="#vpa">Vertical Pod Autoscaler (VPA)</a></li>
+        <li><a href="#cluster">Cluster Autoscaler</a></li>
+        <li><a href="#combining">Combining All Three</a></li>
+        <li><a href="#gotchas">Production Gotchas</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="why-scaling">
+      <h2>Why Auto-Scaling Matters</h2>
+      <p>In a production Kubernetes environment, traffic patterns are rarely constant. You might see 10x spikes during peak hours, followed by near-zero activity at night. Without auto-scaling, you're either over-provisioning (wasting money) or under-provisioning (risking outages).</p>
+      <p>Kubernetes provides three complementary autoscaling mechanisms, each operating at a different level of the stack. Understanding when and how to use each one is critical for running cost-effective, reliable workloads.</p>
+    </div>
+
+    <div class="post-section" id="hpa">
+      <h2>Horizontal Pod Autoscaler (HPA)</h2>
+      <p>The HPA automatically adjusts the number of pod replicas based on observed metrics. It's the most commonly used autoscaler and works by periodically querying the metrics API (default: every 15 seconds) and comparing current values against your defined targets.</p>
+
+      <h3>How It Works</h3>
+      <p>The HPA controller uses a simple formula to calculate desired replicas:</p>
+      <pre><code><span class="cm">desiredReplicas = ceil(currentReplicas * (currentMetric / desiredMetric))</span></code></pre>
+      <p>For example, if you have 3 replicas running at 80% CPU and your target is 50%, the HPA would scale to <code>ceil(3 * 80/50) = 5</code> replicas.</p>
+
+      <h3>Basic CPU-Based HPA</h3>
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">autoscaling/v2</span>
+<span class="kw">kind:</span> <span class="str">HorizontalPodAutoscaler</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-server-hpa</span>
+  <span class="kw">namespace:</span> <span class="str">production</span>
+<span class="kw">spec:</span>
+  <span class="kw">scaleTargetRef:</span>
+    <span class="kw">apiVersion:</span> <span class="str">apps/v1</span>
+    <span class="kw">kind:</span> <span class="str">Deployment</span>
+    <span class="kw">name:</span> <span class="str">api-server</span>
+  <span class="kw">minReplicas:</span> <span class="num">3</span>
+  <span class="kw">maxReplicas:</span> <span class="num">20</span>
+  <span class="kw">metrics:</span>
+  - <span class="kw">type:</span> <span class="str">Resource</span>
+    <span class="kw">resource:</span>
+      <span class="kw">name:</span> <span class="str">cpu</span>
+      <span class="kw">target:</span>
+        <span class="kw">type:</span> <span class="str">Utilization</span>
+        <span class="kw">averageUtilization:</span> <span class="num">60</span>
+  - <span class="kw">type:</span> <span class="str">Resource</span>
+    <span class="kw">resource:</span>
+      <span class="kw">name:</span> <span class="str">memory</span>
+      <span class="kw">target:</span>
+        <span class="kw">type:</span> <span class="str">Utilization</span>
+        <span class="kw">averageUtilization:</span> <span class="num">70</span>
+  <span class="kw">behavior:</span>
+    <span class="kw">scaleDown:</span>
+      <span class="kw">stabilizationWindowSeconds:</span> <span class="num">300</span>
+      <span class="kw">policies:</span>
+      - <span class="kw">type:</span> <span class="str">Percent</span>
+        <span class="kw">value:</span> <span class="num">10</span>
+        <span class="kw">periodSeconds:</span> <span class="num">60</span>
+    <span class="kw">scaleUp:</span>
+      <span class="kw">stabilizationWindowSeconds:</span> <span class="num">30</span>
+      <span class="kw">policies:</span>
+      - <span class="kw">type:</span> <span class="str">Percent</span>
+        <span class="kw">value:</span> <span class="num">100</span>
+        <span class="kw">periodSeconds:</span> <span class="num">15</span></code><span class="code-label">YAML</span></pre>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Always set <code>behavior.scaleDown.stabilizationWindowSeconds</code> to at least 300 seconds. This prevents the HPA from thrashing during brief traffic dips, which can cause cascading failures as pods are killed and restarted.</p>
+      </div>
+
+      <h3>Custom Metrics with Prometheus</h3>
+      <p>CPU and memory are often poor indicators of actual load. For HTTP services, requests per second (RPS) is usually a better metric. Using the Prometheus Adapter, you can scale on any custom metric:</p>
+      <pre><code><span class="kw">metrics:</span>
+- <span class="kw">type:</span> <span class="str">Pods</span>
+  <span class="kw">pods:</span>
+    <span class="kw">metric:</span>
+      <span class="kw">name:</span> <span class="str">http_requests_per_second</span>
+    <span class="kw">target:</span>
+      <span class="kw">type:</span> <span class="str">AverageValue</span>
+      <span class="kw">averageValue:</span> <span class="str">"100"</span></code><span class="code-label">YAML</span></pre>
+    </div>
+
+    <div class="post-section" id="vpa">
+      <h2>Vertical Pod Autoscaler (VPA)</h2>
+      <p>While HPA scales horizontally (more pods), VPA scales vertically (bigger pods). It automatically adjusts CPU and memory requests and limits for your containers based on actual usage patterns. This is particularly useful for workloads that can't be horizontally scaled, like databases or stateful applications.</p>
+
+      <h3>VPA Modes</h3>
+      <ul>
+        <li><strong>Off</strong> — VPA only provides recommendations, no automatic changes</li>
+        <li><strong>Initial</strong> — VPA sets resources only at pod creation time</li>
+        <li><strong>Auto</strong> — VPA evicts and recreates pods with updated resources (use with caution)</li>
+      </ul>
+
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">autoscaling.k8s.io/v1</span>
+<span class="kw">kind:</span> <span class="str">VerticalPodAutoscaler</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-server-vpa</span>
+<span class="kw">spec:</span>
+  <span class="kw">targetRef:</span>
+    <span class="kw">apiVersion:</span> <span class="str">apps/v1</span>
+    <span class="kw">kind:</span> <span class="str">Deployment</span>
+    <span class="kw">name:</span> <span class="str">api-server</span>
+  <span class="kw">updatePolicy:</span>
+    <span class="kw">updateMode:</span> <span class="str">"Off"</span>  <span class="cm"># Start with recommendations only</span>
+  <span class="kw">resourcePolicy:</span>
+    <span class="kw">containerPolicies:</span>
+    - <span class="kw">containerName:</span> <span class="str">"*"</span>
+      <span class="kw">minAllowed:</span>
+        <span class="kw">cpu:</span> <span class="str">"100m"</span>
+        <span class="kw">memory:</span> <span class="str">"128Mi"</span>
+      <span class="kw">maxAllowed:</span>
+        <span class="kw">cpu:</span> <span class="str">"2"</span>
+        <span class="kw">memory:</span> <span class="str">"4Gi"</span></code><span class="code-label">YAML</span></pre>
+
+      <div class="post-callout post-callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>Never use VPA in <code>Auto</code> mode together with HPA on CPU or memory metrics. They will fight each other — HPA wants more pods while VPA wants bigger pods. Use VPA in <code>Off</code> mode to get recommendations, then apply them manually.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="cluster">
+      <h2>Cluster Autoscaler</h2>
+      <p>The Cluster Autoscaler operates at the infrastructure level. When pods can't be scheduled due to insufficient node resources, it provisions new nodes. When nodes are underutilized, it drains and removes them.</p>
+
+      <h3>How It Decides to Scale</h3>
+      <ul>
+        <li><strong>Scale Up:</strong> A pod is unschedulable because no node has enough resources. The autoscaler simulates adding a node from each node group and picks the best fit.</li>
+        <li><strong>Scale Down:</strong> A node's utilization drops below 50% (configurable) for 10 minutes. All pods on it can be rescheduled elsewhere. The node has no local storage or pods with restrictive PDBs.</li>
+      </ul>
+
+      <h3>EKS Cluster Autoscaler Configuration</h3>
+      <pre><code><span class="cm"># Install via Helm</span>
+helm install cluster-autoscaler autoscaler/cluster-autoscaler \
+  --namespace kube-system \
+  --set autoDiscovery.clusterName=<span class="str">my-production-cluster</span> \
+  --set awsRegion=<span class="str">us-east-1</span> \
+  --set extraArgs.balance-similar-node-groups=<span class="num">true</span> \
+  --set extraArgs.skip-nodes-with-local-storage=<span class="num">false</span> \
+  --set extraArgs.scale-down-delay-after-add=<span class="str">10m</span> \
+  --set extraArgs.scale-down-unneeded-time=<span class="str">10m</span></code><span class="code-label">Shell</span></pre>
+
+      <div class="post-callout post-callout-info">
+        <div class="callout-title">Note</div>
+        <p>Consider using <strong>Karpenter</strong> as a modern alternative to Cluster Autoscaler on AWS. Karpenter provisions right-sized nodes in seconds (vs minutes), supports spot instances natively, and doesn't require pre-defined node groups.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="combining">
+      <h2>Combining All Three</h2>
+      <p>The three autoscalers complement each other when configured correctly:</p>
+      <ul>
+        <li><strong>HPA</strong> handles traffic spikes by adding more pod replicas</li>
+        <li><strong>VPA</strong> (in Off/Initial mode) ensures each pod has the right resource requests</li>
+        <li><strong>Cluster Autoscaler</strong> provisions new nodes when HPA creates pods that can't be scheduled</li>
+      </ul>
+      <p>The scaling chain works like this: traffic increases → HPA creates new pods → pods are pending (no node capacity) → Cluster Autoscaler adds nodes → pods are scheduled → traffic is served.</p>
+
+      <h3>Recommended Setup</h3>
+      <pre><code><span class="cm"># 1. Use HPA with custom metrics for application scaling</span>
+<span class="cm"># 2. Use VPA in "Off" mode for resource recommendations</span>
+<span class="cm"># 3. Use Cluster Autoscaler for node-level scaling</span>
+<span class="cm"># 4. Set proper PodDisruptionBudgets</span>
+
+<span class="kw">apiVersion:</span> <span class="str">policy/v1</span>
+<span class="kw">kind:</span> <span class="str">PodDisruptionBudget</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-server-pdb</span>
+<span class="kw">spec:</span>
+  <span class="kw">minAvailable:</span> <span class="num">2</span>
+  <span class="kw">selector:</span>
+    <span class="kw">matchLabels:</span>
+      <span class="kw">app:</span> <span class="str">api-server</span></code><span class="code-label">YAML</span></pre>
+    </div>
+
+    <div class="post-section" id="gotchas">
+      <h2>Production Gotchas</h2>
+      <p>After running auto-scaling in production across multiple clusters, here are the hard-won lessons:</p>
+      <ul>
+        <li><strong>Always set resource requests.</strong> Without requests, HPA has nothing to calculate utilization against, and Cluster Autoscaler can't make scheduling decisions.</li>
+        <li><strong>Tune the stabilization window.</strong> The default scale-down window is too aggressive for most workloads. Set it to 5-10 minutes minimum.</li>
+        <li><strong>Watch for OOMKills.</strong> If VPA recommends higher memory but you don't apply it, your pods will get OOMKilled under load — right when you need them most.</li>
+        <li><strong>Pre-scale for known events.</strong> Auto-scaling reacts to load, it doesn't predict it. For known traffic spikes (product launches, marketing campaigns), pre-scale your replicas with a CronJob or scheduled scaling.</li>
+        <li><strong>Monitor scaling events.</strong> Set up alerts for HPA hitting maxReplicas and Cluster Autoscaler failing to provision nodes. These are early warning signs of capacity issues.</li>
+        <li><strong>Use Pod Topology Spread Constraints</strong> to ensure scaled pods are distributed across availability zones, not all packed onto one node.</li>
+      </ul>
+
+      <blockquote>
+        <p>Auto-scaling is not a set-it-and-forget-it feature. It requires continuous tuning based on your application's behavior. Start conservative, monitor closely, and adjust iteratively.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <div></div>
+      <a href="gitops-argocd-github-actions.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">Building a GitOps Pipeline with ArgoCD &amp; GitHub Actions</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

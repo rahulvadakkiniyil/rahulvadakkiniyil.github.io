@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS VPC Design Patterns for Multi-Tier Applications — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Infrastructure</span>
+        <span class="post-date">Dec 20, 2025</span>
+        <span class="post-read-time">6 min read</span>
+      </div>
+      <h1 class="post-heading">AWS VPC Design Patterns for Multi-Tier Applications</h1>
+      <p class="post-subtitle">Design resilient, secure, and cost-effective VPC architectures on AWS. Learn subnet strategies, NAT gateway patterns, Transit Gateway vs VPC Peering, and how to automate it all with Terraform.</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#fundamentals">VPC Fundamentals</a></li>
+        <li><a href="#subnets">Public vs Private Subnets</a></li>
+        <li><a href="#nat">NAT Gateway Patterns</a></li>
+        <li><a href="#multi-az">Multi-AZ Design</a></li>
+        <li><a href="#connectivity">VPC Peering vs Transit Gateway</a></li>
+        <li><a href="#security">Security Layers</a></li>
+        <li><a href="#terraform">Terraform Example</a></li>
+        <li><a href="#cost">Cost Optimization</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="fundamentals">
+      <h2>VPC Fundamentals</h2>
+      <p>An Amazon Virtual Private Cloud (VPC) is a logically isolated section of the AWS cloud where you launch resources in a virtual network that you define. Think of it as your own private data center inside AWS, complete with full control over IP addressing, subnets, routing, and network gateways.</p>
+      <p>Every VPC is defined by a <strong>CIDR block</strong> — a range of IP addresses expressed in Classless Inter-Domain Routing notation. For example, <code>10.0.0.0/16</code> gives you 65,536 IP addresses (10.0.0.0 through 10.0.255.255). Choosing the right CIDR is critical because you cannot change it after creation, and it must not overlap with other VPCs you plan to peer or connect via Transit Gateway.</p>
+      <p>VPCs are regional resources — they span all Availability Zones (AZs) in a region but do not cross region boundaries. Each AZ is a physically separate data center with independent power, cooling, and networking. By distributing resources across multiple AZs, you gain resilience against single-facility failures.</p>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Plan your CIDR blocks with future growth in mind. Use a <code>/16</code> for production VPCs (65K IPs) and <code>/20</code> for dev/staging (4K IPs). Maintain a central IP address allocation spreadsheet to prevent overlaps across accounts and regions.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="subnets">
+      <h2>Public vs Private Subnets</h2>
+      <p>The distinction between public and private subnets is the foundation of VPC security architecture. The difference comes down to routing — specifically, whether a subnet's route table has a route to an Internet Gateway.</p>
+      <ul>
+        <li><strong>Public subnets</strong> have a route to an Internet Gateway (IGW), allowing resources with public IPs to communicate directly with the internet. Use these for load balancers, bastion hosts, and NAT gateways.</li>
+        <li><strong>Private subnets</strong> have no direct internet route. Resources here can only reach the internet through a NAT gateway sitting in a public subnet. This is where your application servers, databases, and internal services should live.</li>
+      </ul>
+      <pre><code><span class="cm"># View route tables to distinguish public from private subnets</span>
+aws ec2 describe-route-tables \
+  --filters <span class="str">"Name=vpc-id,Values=vpc-0abc123def456"</span> \
+  --query <span class="str">"RouteTables[*].{ID:RouteTableId,Routes:Routes[*].{Dest:DestinationCidrBlock,Target:GatewayId}}"</span> \
+  --output table
+
+<span class="cm"># Public subnet route table will show:</span>
+<span class="cm">#   0.0.0.0/0 -> igw-xxxxxxxx (Internet Gateway)</span>
+<span class="cm"># Private subnet route table will show:</span>
+<span class="cm">#   0.0.0.0/0 -> nat-xxxxxxxx (NAT Gateway)</span></code><span class="code-label">Shell</span></pre>
+      <p>A common pattern for multi-tier applications is three subnet tiers: public (load balancers), private-app (application containers), and private-data (RDS, ElastiCache). Each tier gets its own set of subnets across all AZs and its own route table, enabling fine-grained network segmentation.</p>
+    </div>
+
+    <div class="post-section" id="nat">
+      <h2>NAT Gateway Patterns</h2>
+      <p>NAT (Network Address Translation) gateways allow private subnet resources to initiate outbound internet connections — for pulling container images, downloading patches, or calling external APIs — without exposing them to inbound traffic from the internet.</p>
+      <p>There are two common deployment patterns:</p>
+      <ul>
+        <li><strong>Single NAT Gateway:</strong> One NAT gateway in one AZ, used by all private subnets. Cost-effective but creates a single point of failure and cross-AZ data transfer charges. Suitable for development and staging environments.</li>
+        <li><strong>Per-AZ NAT Gateway:</strong> One NAT gateway per Availability Zone. Each private subnet routes through the NAT gateway in its own AZ. Higher cost but eliminates cross-AZ traffic charges and provides AZ-level fault isolation. Required for production workloads.</li>
+      </ul>
+
+      <div class="post-callout post-callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>NAT gateways are one of the most expensive networking components in AWS. At $0.045/hour plus $0.045/GB of data processed, a busy production environment can easily accumulate $500-1,000/month in NAT costs alone. Use VPC endpoints for AWS service traffic to reduce this significantly.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="multi-az">
+      <h2>Multi-AZ Design</h2>
+      <p>For production workloads, distributing resources across a minimum of three Availability Zones is the gold standard for high availability. Three AZs give you the ability to lose an entire AZ while still maintaining quorum for consensus-based systems (etcd, ZooKeeper, Consul) and sufficient capacity for your application tier.</p>
+      <p>The typical multi-AZ layout for a <code>/16</code> VPC looks like this:</p>
+      <pre><code><span class="cm"># VPC: 10.0.0.0/16 (65,536 IPs)</span>
+<span class="cm"># Spread across 3 AZs with public + private subnets</span>
+
+<span class="cm"># Public subnets (for ALB, NAT GW):</span>
+<span class="cm">#   10.0.0.0/24   -> us-east-1a  (256 IPs)</span>
+<span class="cm">#   10.0.1.0/24   -> us-east-1b  (256 IPs)</span>
+<span class="cm">#   10.0.2.0/24   -> us-east-1c  (256 IPs)</span>
+
+<span class="cm"># Private app subnets (for ECS/EKS workloads):</span>
+<span class="cm">#   10.0.10.0/22  -> us-east-1a  (1,024 IPs)</span>
+<span class="cm">#   10.0.14.0/22  -> us-east-1b  (1,024 IPs)</span>
+<span class="cm">#   10.0.18.0/22  -> us-east-1c  (1,024 IPs)</span>
+
+<span class="cm"># Private data subnets (for RDS, ElastiCache):</span>
+<span class="cm">#   10.0.100.0/24 -> us-east-1a  (256 IPs)</span>
+<span class="cm">#   10.0.101.0/24 -> us-east-1b  (256 IPs)</span>
+<span class="cm">#   10.0.102.0/24 -> us-east-1c  (256 IPs)</span></code><span class="code-label">Text</span></pre>
+      <p>Notice that private app subnets use <code>/22</code> blocks (1,024 IPs each) while public and data subnets use <code>/24</code> (256 IPs). Application subnets need more addresses because Kubernetes pods and ECS tasks each consume an IP address from the subnet via the AWS VPC CNI plugin.</p>
+    </div>
+
+    <div class="post-section" id="connectivity">
+      <h2>VPC Peering vs Transit Gateway</h2>
+      <p>As your AWS footprint grows, you will inevitably need to connect multiple VPCs — perhaps a shared-services VPC with a production VPC, or cross-account connectivity between teams. AWS provides two primary options, each with distinct trade-offs:</p>
+      <ul>
+        <li><strong>VPC Peering:</strong> A point-to-point connection between two VPCs. Simple, free (no hourly charge), and low-latency. But it does not support transitive routing — if VPC-A peers with VPC-B, and VPC-B peers with VPC-C, VPC-A cannot reach VPC-C through VPC-B. This means the number of peering connections grows quadratically: 10 VPCs require 45 peering connections for full mesh.</li>
+        <li><strong>Transit Gateway (TGW):</strong> A regional hub that connects VPCs, VPN, and Direct Connect in a hub-and-spoke model. Supports transitive routing, route tables, and cross-account sharing. Costs $0.05/hour plus $0.02/GB, but scales linearly — 100 VPCs need only 100 attachments instead of 4,950 peering connections.</li>
+      </ul>
+
+      <div class="post-callout post-callout-info">
+        <div class="callout-title">Note</div>
+        <p>Use VPC Peering when you have 2-3 VPCs with simple connectivity needs. Switch to Transit Gateway when you have 4+ VPCs, need centralized routing control, or require connectivity to on-premises networks. The operational simplicity of TGW pays for itself quickly at scale.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="security">
+      <h2>Security Layers</h2>
+      <p>AWS provides two complementary network security mechanisms. Using both in a defense-in-depth strategy is a best practice, even though Security Groups alone cover most use cases.</p>
+      <ul>
+        <li><strong>Security Groups</strong> are stateful firewalls attached to individual resources (EC2 instances, RDS, ALBs). Because they are stateful, if you allow inbound traffic on port 443, the response traffic is automatically allowed. Security Groups only support <em>allow</em> rules — there are no deny rules. They operate at the instance level.</li>
+        <li><strong>Network ACLs (NACLs)</strong> are stateless firewalls attached to subnets. They process rules in order (lowest number first) and support both allow and deny rules. Because they are stateless, you must explicitly allow both inbound and outbound traffic, including ephemeral port ranges for return traffic.</li>
+      </ul>
+      <pre><code><span class="cm"># Example: Block a specific IP range at the NACL level</span>
+aws ec2 create-network-acl-entry \
+  --network-acl-id <span class="str">acl-0abc123</span> \
+  --rule-number <span class="num">50</span> \
+  --protocol <span class="str">"-1"</span> \
+  --rule-action <span class="str">deny</span> \
+  --cidr-block <span class="str">"203.0.113.0/24"</span> \
+  --ingress</code><span class="code-label">Shell</span></pre>
+      <p>The practical approach: use Security Groups for all standard access control (they are easier to manage and more flexible). Use NACLs as a coarse-grained safety net — for example, blocking known malicious IP ranges or restricting traffic between subnet tiers as an extra layer of protection.</p>
+    </div>
+
+    <div class="post-section" id="terraform">
+      <h2>Terraform Example</h2>
+      <p>Here is a complete Terraform configuration that creates a production VPC with public and private subnets across three AZs, NAT gateways, and proper route tables:</p>
+      <pre><code><span class="kw">variable</span> <span class="str">"vpc_cidr"</span> {
+  <span class="kw">default</span> = <span class="str">"10.0.0.0/16"</span>
+}
+
+<span class="kw">variable</span> <span class="str">"azs"</span> {
+  <span class="kw">default</span> = [<span class="str">"us-east-1a"</span>, <span class="str">"us-east-1b"</span>, <span class="str">"us-east-1c"</span>]
+}
+
+<span class="kw">variable</span> <span class="str">"public_cidrs"</span> {
+  <span class="kw">default</span> = [<span class="str">"10.0.0.0/24"</span>, <span class="str">"10.0.1.0/24"</span>, <span class="str">"10.0.2.0/24"</span>]
+}
+
+<span class="kw">variable</span> <span class="str">"private_cidrs"</span> {
+  <span class="kw">default</span> = [<span class="str">"10.0.10.0/22"</span>, <span class="str">"10.0.14.0/22"</span>, <span class="str">"10.0.18.0/22"</span>]
+}
+
+<span class="cm"># ---- VPC ----</span>
+<span class="kw">resource</span> <span class="str">"aws_vpc"</span> <span class="str">"main"</span> {
+  <span class="kw">cidr_block</span>           = <span class="var">var.vpc_cidr</span>
+  <span class="kw">enable_dns_support</span>   = <span class="num">true</span>
+  <span class="kw">enable_dns_hostnames</span> = <span class="num">true</span>
+
+  <span class="kw">tags</span> = {
+    <span class="kw">Name</span> = <span class="str">"production-vpc"</span>
+  }
+}
+
+<span class="cm"># ---- Internet Gateway ----</span>
+<span class="kw">resource</span> <span class="str">"aws_internet_gateway"</span> <span class="str">"igw"</span> {
+  <span class="kw">vpc_id</span> = <span class="var">aws_vpc.main.id</span>
+  <span class="kw">tags</span>   = { <span class="kw">Name</span> = <span class="str">"production-igw"</span> }
+}
+
+<span class="cm"># ---- Public Subnets ----</span>
+<span class="kw">resource</span> <span class="str">"aws_subnet"</span> <span class="str">"public"</span> {
+  <span class="kw">count</span>                   = <span class="fn">length</span>(<span class="var">var.public_cidrs</span>)
+  <span class="kw">vpc_id</span>                  = <span class="var">aws_vpc.main.id</span>
+  <span class="kw">cidr_block</span>              = <span class="var">var.public_cidrs</span>[<span class="var">count.index</span>]
+  <span class="kw">availability_zone</span>       = <span class="var">var.azs</span>[<span class="var">count.index</span>]
+  <span class="kw">map_public_ip_on_launch</span> = <span class="num">true</span>
+
+  <span class="kw">tags</span> = {
+    <span class="kw">Name</span> = <span class="str">"public-${var.azs[count.index]}"</span>
+  }
+}
+
+<span class="cm"># ---- Private Subnets ----</span>
+<span class="kw">resource</span> <span class="str">"aws_subnet"</span> <span class="str">"private"</span> {
+  <span class="kw">count</span>             = <span class="fn">length</span>(<span class="var">var.private_cidrs</span>)
+  <span class="kw">vpc_id</span>            = <span class="var">aws_vpc.main.id</span>
+  <span class="kw">cidr_block</span>        = <span class="var">var.private_cidrs</span>[<span class="var">count.index</span>]
+  <span class="kw">availability_zone</span> = <span class="var">var.azs</span>[<span class="var">count.index</span>]
+
+  <span class="kw">tags</span> = {
+    <span class="kw">Name</span> = <span class="str">"private-${var.azs[count.index]}"</span>
+  }
+}
+
+<span class="cm"># ---- NAT Gateways (one per AZ) ----</span>
+<span class="kw">resource</span> <span class="str">"aws_eip"</span> <span class="str">"nat"</span> {
+  <span class="kw">count</span>  = <span class="fn">length</span>(<span class="var">var.azs</span>)
+  <span class="kw">domain</span> = <span class="str">"vpc"</span>
+  <span class="kw">tags</span>   = { <span class="kw">Name</span> = <span class="str">"nat-eip-${var.azs[count.index]}"</span> }
+}
+
+<span class="kw">resource</span> <span class="str">"aws_nat_gateway"</span> <span class="str">"nat"</span> {
+  <span class="kw">count</span>         = <span class="fn">length</span>(<span class="var">var.azs</span>)
+  <span class="kw">allocation_id</span> = <span class="var">aws_eip.nat</span>[<span class="var">count.index</span>].<span class="var">id</span>
+  <span class="kw">subnet_id</span>     = <span class="var">aws_subnet.public</span>[<span class="var">count.index</span>].<span class="var">id</span>
+  <span class="kw">tags</span>          = { <span class="kw">Name</span> = <span class="str">"nat-${var.azs[count.index]}"</span> }
+}
+
+<span class="cm"># ---- Route Tables ----</span>
+<span class="kw">resource</span> <span class="str">"aws_route_table"</span> <span class="str">"public"</span> {
+  <span class="kw">vpc_id</span> = <span class="var">aws_vpc.main.id</span>
+
+  <span class="kw">route</span> {
+    <span class="kw">cidr_block</span> = <span class="str">"0.0.0.0/0"</span>
+    <span class="kw">gateway_id</span> = <span class="var">aws_internet_gateway.igw.id</span>
+  }
+
+  <span class="kw">tags</span> = { <span class="kw">Name</span> = <span class="str">"public-rt"</span> }
+}
+
+<span class="kw">resource</span> <span class="str">"aws_route_table"</span> <span class="str">"private"</span> {
+  <span class="kw">count</span>  = <span class="fn">length</span>(<span class="var">var.azs</span>)
+  <span class="kw">vpc_id</span> = <span class="var">aws_vpc.main.id</span>
+
+  <span class="kw">route</span> {
+    <span class="kw">cidr_block</span>     = <span class="str">"0.0.0.0/0"</span>
+    <span class="kw">nat_gateway_id</span> = <span class="var">aws_nat_gateway.nat</span>[<span class="var">count.index</span>].<span class="var">id</span>
+  }
+
+  <span class="kw">tags</span> = { <span class="kw">Name</span> = <span class="str">"private-rt-${var.azs[count.index]}"</span> }
+}
+
+<span class="kw">resource</span> <span class="str">"aws_route_table_association"</span> <span class="str">"public"</span> {
+  <span class="kw">count</span>          = <span class="fn">length</span>(<span class="var">var.public_cidrs</span>)
+  <span class="kw">subnet_id</span>      = <span class="var">aws_subnet.public</span>[<span class="var">count.index</span>].<span class="var">id</span>
+  <span class="kw">route_table_id</span> = <span class="var">aws_route_table.public.id</span>
+}
+
+<span class="kw">resource</span> <span class="str">"aws_route_table_association"</span> <span class="str">"private"</span> {
+  <span class="kw">count</span>          = <span class="fn">length</span>(<span class="var">var.private_cidrs</span>)
+  <span class="kw">subnet_id</span>      = <span class="var">aws_subnet.private</span>[<span class="var">count.index</span>].<span class="var">id</span>
+  <span class="kw">route_table_id</span> = <span class="var">aws_route_table.private</span>[<span class="var">count.index</span>].<span class="var">id</span>
+}</code><span class="code-label">HCL</span></pre>
+    </div>
+
+    <div class="post-section" id="cost">
+      <h2>Cost Optimization</h2>
+      <p>VPC infrastructure can be surprisingly expensive if you are not paying attention. The resources themselves (VPCs, subnets, route tables) are free, but the networking components that make them useful are not. Here are the key cost levers:</p>
+      <ul>
+        <li><strong>NAT Gateway costs:</strong> At $0.045/hour ($32/month) per gateway plus $0.045/GB processed, three per-AZ NAT gateways cost $97/month before any data transfer. For dev environments, use a single NAT gateway or even a NAT instance (t3.micro) to save 80%.</li>
+        <li><strong>VPC Endpoints:</strong> Every API call to S3, DynamoDB, ECR, CloudWatch, and other AWS services from a private subnet goes through the NAT gateway by default. A Gateway endpoint (S3, DynamoDB) is free and routes traffic over the AWS backbone. Interface endpoints cost $0.01/hour per AZ but eliminate NAT data processing charges for high-volume services like ECR pulls.</li>
+        <li><strong>Cross-AZ data transfer:</strong> Traffic between AZs costs $0.01/GB in each direction ($0.02/GB round trip). In a chatty microservices architecture, this can add up. Consider placing tightly coupled services in the same AZ or using service mesh locality-aware routing.</li>
+        <li><strong>Transit Gateway data charges:</strong> At $0.02/GB, Transit Gateway adds a per-gigabyte tax on all inter-VPC traffic. For high-bandwidth connections between two specific VPCs, a direct VPC peering connection (free data transfer) may be more economical.</li>
+      </ul>
+      <pre><code><span class="cm"># Create a free Gateway endpoint for S3</span>
+<span class="kw">resource</span> <span class="str">"aws_vpc_endpoint"</span> <span class="str">"s3"</span> {
+  <span class="kw">vpc_id</span>       = <span class="var">aws_vpc.main.id</span>
+  <span class="kw">service_name</span> = <span class="str">"com.amazonaws.us-east-1.s3"</span>
+
+  <span class="kw">route_table_ids</span> = <span class="fn">concat</span>(
+    [<span class="var">aws_route_table.public.id</span>],
+    <span class="var">aws_route_table.private[*].id</span>
+  )
+
+  <span class="kw">tags</span> = { <span class="kw">Name</span> = <span class="str">"s3-gateway-endpoint"</span> }
+}
+
+<span class="cm"># Create an Interface endpoint for ECR (saves NAT costs for image pulls)</span>
+<span class="kw">resource</span> <span class="str">"aws_vpc_endpoint"</span> <span class="str">"ecr_api"</span> {
+  <span class="kw">vpc_id</span>              = <span class="var">aws_vpc.main.id</span>
+  <span class="kw">service_name</span>        = <span class="str">"com.amazonaws.us-east-1.ecr.api"</span>
+  <span class="kw">vpc_endpoint_type</span>   = <span class="str">"Interface"</span>
+  <span class="kw">private_dns_enabled</span> = <span class="num">true</span>
+  <span class="kw">subnet_ids</span>          = <span class="var">aws_subnet.private[*].id</span>
+
+  <span class="kw">tags</span> = { <span class="kw">Name</span> = <span class="str">"ecr-api-endpoint"</span> }
+}</code><span class="code-label">HCL</span></pre>
+
+      <blockquote>
+        <p>The best VPC design balances security, availability, and cost. Over-engineering with every possible endpoint and three NAT gateways in a dev environment wastes money. Under-engineering in production risks outages and security incidents. Know your environment's tier and design accordingly.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="prometheus-grafana-monitoring.html" class="post-nav-link prev">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">Prometheus &amp; Grafana: Building a Production Monitoring Stack</span>
+      </a>
+      <a href="jenkins-shared-libraries.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">Jenkins Shared Libraries</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

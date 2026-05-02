@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jenkins Shared Libraries: Standardizing Pipelines Across Teams — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">CI/CD</span>
+        <span class="post-date">Nov 15, 2025</span>
+        <span class="post-read-time">5 min read</span>
+      </div>
+      <h1 class="post-heading">Jenkins Shared Libraries: Standardizing Pipelines Across Teams</h1>
+      <p class="post-subtitle">How I built a shared library to enforce consistent pipeline stages across 20+ microservices</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#the-problem">The Problem: Duplicated Pipeline Logic</a></li>
+        <li><a href="#what-are-shared-libraries">What Are Shared Libraries?</a></li>
+        <li><a href="#first-shared-step">Writing Your First Shared Step</a></li>
+        <li><a href="#standardized-stages">Creating Standardized Stages</a></li>
+        <li><a href="#consuming">Consuming in a Jenkinsfile</a></li>
+        <li><a href="#testing">Testing the Library</a></li>
+        <li><a href="#results">Results &amp; Impact</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="the-problem">
+      <h2>The Problem: Duplicated Pipeline Logic</h2>
+      <p>When I joined the platform engineering team, we had over 20 microservices, each with its own Jenkinsfile. Every team had independently crafted their CI/CD pipelines, and the results were predictable: wildly inconsistent build stages, scattered deployment logic, and zero standardization. Some teams had security scanning, others didn't. Some ran integration tests, others skipped them entirely. Updating a common pattern — like switching Docker registries — meant opening pull requests against every single repository.</p>
+      <p>The maintenance burden was crushing. A simple change to our artifact publishing process required coordinating across six different teams. Onboarding a new microservice took days of copying and tweaking Jenkinsfile snippets from existing projects. We needed a single source of truth for our pipeline logic, and that's exactly what Jenkins Shared Libraries gave us.</p>
+      <p>The duplication wasn't just an inconvenience — it was a real operational risk. When a critical vulnerability was discovered in our container base images, it took nearly two weeks to update all pipelines to include the new scanning step. That timeline was unacceptable, and it became the catalyst for building a shared library.</p>
+    </div>
+
+    <div class="post-section" id="what-are-shared-libraries">
+      <h2>What Are Shared Libraries?</h2>
+      <p>Jenkins Shared Libraries are a mechanism for extracting reusable pipeline code into a standalone Git repository that can be loaded by any Jenkinsfile across your organization. Instead of duplicating Groovy code in every project, you define common steps, stages, and utilities in one place.</p>
+      <p>The library follows a specific directory structure:</p>
+      <pre><code><span class="fn">vars/</span>           <span class="cm">// Global variables and custom pipeline steps</span>
+  <span class="fn">buildApp.groovy</span>
+  <span class="fn">deployService.groovy</span>
+  <span class="fn">notifySlack.groovy</span>
+<span class="fn">src/</span>            <span class="cm">// Helper classes (standard Groovy/Java)</span>
+  <span class="fn">org/company/</span>
+    <span class="fn">Config.groovy</span>
+    <span class="fn">DockerUtils.groovy</span>
+<span class="fn">resources/</span>      <span class="cm">// Non-Groovy files (configs, templates)</span>
+  <span class="fn">deploy-template.yaml</span>
+  <span class="fn">sonar-config.properties</span></code><span class="code-label">Directory Structure</span></pre>
+      <p>The <code>vars/</code> directory is where most of the magic happens. Each <code>.groovy</code> file in this directory becomes a globally available step in your pipelines. The <code>src/</code> directory holds traditional Groovy classes for more complex logic, and <code>resources/</code> stores static files like configuration templates that can be loaded at runtime using the <code>libraryResource</code> step.</p>
+
+      <div class="post-callout post-callout-info">
+        <div class="callout-title">Note</div>
+        <p>Shared Libraries must be configured in Jenkins under <strong>Manage Jenkins &rarr; Configure System &rarr; Global Pipeline Libraries</strong>. You specify the library name, Git repository URL, and default branch. Libraries can also be configured at the folder level for team-specific customizations.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="first-shared-step">
+      <h2>Writing Your First Shared Step</h2>
+      <p>Let's start with a practical example. One of the most common duplicated patterns was building and pushing Docker images. Every team had slight variations of the same logic scattered across their Jenkinsfiles. Here's how we consolidated it into a shared step:</p>
+      <pre><code><span class="cm">// vars/buildApp.groovy</span>
+<span class="kw">def</span> <span class="fn">call</span>(Map config = [:]) {
+    <span class="kw">def</span> appName = config.<span class="fn">get</span>(<span class="str">'appName'</span>, env.JOB_BASE_NAME)
+    <span class="kw">def</span> registry = config.<span class="fn">get</span>(<span class="str">'registry'</span>, <span class="str">'registry.company.com'</span>)
+    <span class="kw">def</span> tag = config.<span class="fn">get</span>(<span class="str">'tag'</span>, env.BUILD_NUMBER)
+    <span class="kw">def</span> dockerfile = config.<span class="fn">get</span>(<span class="str">'dockerfile'</span>, <span class="str">'Dockerfile'</span>)
+
+    <span class="fn">stage</span>(<span class="str">'Build Docker Image'</span>) {
+        <span class="fn">steps</span> {
+            <span class="fn">sh</span> <span class="str">"""
+                docker build -t ${registry}/${appName}:${tag} \
+                    -f ${dockerfile} \
+                    --build-arg BUILD_NUMBER=${tag} .
+            """</span>
+        }
+    }
+
+    <span class="fn">stage</span>(<span class="str">'Push to Registry'</span>) {
+        <span class="fn">steps</span> {
+            <span class="fn">withCredentials</span>([<span class="fn">usernamePassword</span>(
+                credentialsId: <span class="str">'docker-registry-creds'</span>,
+                usernameVariable: <span class="str">'DOCKER_USER'</span>,
+                passwordVariable: <span class="str">'DOCKER_PASS'</span>
+            )]) {
+                <span class="fn">sh</span> <span class="str">"""
+                    echo \$DOCKER_PASS | docker login ${registry} -u \$DOCKER_USER --password-stdin
+                    docker push ${registry}/${appName}:${tag}
+                """</span>
+            }
+        }
+    }
+
+    <span class="kw">return</span> <span class="str">"${registry}/${appName}:${tag}"</span>
+}</code><span class="code-label">Groovy</span></pre>
+      <p>The <code>def call()</code> pattern is the key convention. When Jenkins encounters <code>buildApp(appName: 'my-service')</code> in a Jenkinsfile, it looks for <code>vars/buildApp.groovy</code> and invokes its <code>call</code> method. The Map parameter allows flexible configuration with sensible defaults, so teams only override what they need.</p>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Always provide default values for your shared step parameters. This keeps the consuming Jenkinsfile clean and reduces the barrier to adoption. Teams should be able to call <code>buildApp()</code> with zero arguments and get a working build for the common case.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="standardized-stages">
+      <h2>Creating Standardized Stages</h2>
+      <p>Individual steps are useful, but the real power comes from composing them into a full standardized pipeline template. We created a <code>standardPipeline</code> step that enforces a consistent set of stages across all services:</p>
+      <pre><code><span class="cm">// vars/standardPipeline.groovy</span>
+<span class="kw">def</span> <span class="fn">call</span>(Map config) {
+    <span class="fn">pipeline</span> {
+        agent { label config.<span class="fn">get</span>(<span class="str">'agent'</span>, <span class="str">'docker'</span>) }
+
+        <span class="fn">stages</span> {
+            <span class="fn">stage</span>(<span class="str">'Checkout'</span>) {
+                <span class="fn">steps</span> { <span class="fn">checkout</span> scm }
+            }
+
+            <span class="fn">stage</span>(<span class="str">'Build'</span>) {
+                <span class="fn">steps</span> {
+                    <span class="fn">buildApp</span>(
+                        appName: config.appName,
+                        registry: config.<span class="fn">get</span>(<span class="str">'registry'</span>)
+                    )
+                }
+            }
+
+            <span class="fn">stage</span>(<span class="str">'Unit Tests'</span>) {
+                <span class="fn">steps</span> {
+                    <span class="fn">sh</span> <span class="str">'./gradlew test'</span>
+                    <span class="fn">junit</span> <span class="str">'**/build/test-results/**/*.xml'</span>
+                }
+            }
+
+            <span class="fn">stage</span>(<span class="str">'Security Scan'</span>) {
+                <span class="fn">steps</span> {
+                    <span class="fn">sh</span> <span class="str">"trivy image ${config.appName}:${env.BUILD_NUMBER}"</span>
+                }
+            }
+
+            <span class="fn">stage</span>(<span class="str">'Deploy'</span>) {
+                when { branch <span class="str">'main'</span> }
+                <span class="fn">steps</span> {
+                    <span class="fn">deployService</span>(
+                        appName: config.appName,
+                        environment: <span class="str">'production'</span>,
+                        namespace: config.<span class="fn">get</span>(<span class="str">'namespace'</span>, <span class="str">'default'</span>)
+                    )
+                }
+            }
+        }
+
+        post {
+            success { <span class="fn">notifySlack</span>(status: <span class="str">'SUCCESS'</span>) }
+            failure { <span class="fn">notifySlack</span>(status: <span class="str">'FAILURE'</span>) }
+        }
+    }
+}</code><span class="code-label">Groovy</span></pre>
+      <p>This template enforces that every service goes through build, test, security scan, and deploy stages in the correct order. The security scan stage was the biggest win — before the shared library, only 4 out of 22 services had any form of container scanning. After rolling out the template, coverage hit 100% overnight.</p>
+    </div>
+
+    <div class="post-section" id="consuming">
+      <h2>Consuming in a Jenkinsfile</h2>
+      <p>With the shared library in place, individual service Jenkinsfiles become remarkably simple. The <code>@Library</code> annotation loads the library, and teams only need to specify their service-specific configuration:</p>
+      <pre><code><span class="cm">// Jenkinsfile for my-payment-service</span>
+<span class="kw">@Library</span>(<span class="str">'platform-pipeline-lib'</span>) _
+
+<span class="fn">standardPipeline</span>(
+    appName: <span class="str">'payment-service'</span>,
+    registry: <span class="str">'registry.company.com/payments'</span>,
+    namespace: <span class="str">'payments'</span>,
+    agent: <span class="str">'docker-large'</span>
+)</code><span class="code-label">Jenkinsfile</span></pre>
+      <p>That's it. Five lines replace what used to be a 120-line Jenkinsfile. The underscore after the <code>@Library</code> annotation is required — it imports the library into the script scope. Teams can still add custom stages by wrapping the <code>standardPipeline</code> call or by using individual steps like <code>buildApp()</code> and <code>deployService()</code> directly for more control.</p>
+      <p>For teams that need to deviate slightly from the standard, we support overriding specific stages while still benefiting from the shared infrastructure:</p>
+      <pre><code><span class="kw">@Library</span>(<span class="str">'platform-pipeline-lib@v2.3.0'</span>) _
+
+<span class="cm">// Pin to a specific version for stability</span>
+<span class="fn">standardPipeline</span>(
+    appName: <span class="str">'auth-service'</span>,
+    skipSecurityScan: <span class="kw">false</span>,
+    customTestCommand: <span class="str">'./gradlew integrationTest'</span>,
+    deployTargets: [<span class="str">'staging'</span>, <span class="str">'production'</span>]
+)</code><span class="code-label">Jenkinsfile</span></pre>
+
+      <div class="post-callout post-callout-info">
+        <div class="callout-title">Note</div>
+        <p>Version-pinning your library with <code>@Library('lib-name@v2.3.0')</code> is strongly recommended for production services. This prevents unexpected breakages when the shared library is updated. Teams can upgrade on their own schedule after testing.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="testing">
+      <h2>Testing the Library</h2>
+      <p>A shared library used by 20+ services is critical infrastructure — it must be tested. We use the <strong>JenkinsPipelineUnit</strong> framework to write unit tests for our shared steps without needing a running Jenkins instance:</p>
+      <pre><code><span class="cm">// test/groovy/BuildAppTest.groovy</span>
+<span class="kw">import</span> com.lesfurets.jenkins.unit.BasePipelineTest
+<span class="kw">import</span> org.junit.Before
+<span class="kw">import</span> org.junit.Test
+<span class="kw">import static</span> org.junit.Assert.*
+
+<span class="kw">class</span> <span class="fn">BuildAppTest</span> <span class="kw">extends</span> BasePipelineTest {
+
+    <span class="kw">@Before</span>
+    <span class="kw">void</span> <span class="fn">setUp</span>() {
+        <span class="kw">super</span>.<span class="fn">setUp</span>()
+        binding.<span class="fn">setVariable</span>(<span class="str">'env'</span>, [
+            JOB_BASE_NAME: <span class="str">'test-app'</span>,
+            BUILD_NUMBER: <span class="str">'42'</span>
+        ])
+        <span class="fn">helper</span>.<span class="fn">registerAllowedMethod</span>(<span class="str">'sh'</span>, [String], { cmd ->
+            <span class="cm">// Mock shell commands</span>
+        })
+    }
+
+    <span class="kw">@Test</span>
+    <span class="kw">void</span> <span class="fn">testBuildAppWithDefaults</span>() {
+        <span class="kw">def</span> script = <span class="fn">loadScript</span>(<span class="str">'vars/buildApp.groovy'</span>)
+        <span class="kw">def</span> result = script.<span class="fn">call</span>([:])
+
+        <span class="fn">assertEquals</span>(<span class="str">'registry.company.com/test-app:42'</span>, result)
+        <span class="fn">assertJobStatusSuccess</span>()
+    }
+
+    <span class="kw">@Test</span>
+    <span class="kw">void</span> <span class="fn">testBuildAppWithCustomRegistry</span>() {
+        <span class="kw">def</span> script = <span class="fn">loadScript</span>(<span class="str">'vars/buildApp.groovy'</span>)
+        <span class="kw">def</span> result = script.<span class="fn">call</span>(registry: <span class="str">'custom.registry.io'</span>)
+
+        <span class="fn">assertEquals</span>(<span class="str">'custom.registry.io/test-app:42'</span>, result)
+    }
+}</code><span class="code-label">Groovy</span></pre>
+      <p>We also run the library's own CI pipeline that executes all unit tests on every commit. The test suite catches regressions before they reach any consuming service. Combined with semantic versioning, this gives teams confidence that library updates won't break their builds.</p>
+    </div>
+
+    <div class="post-section" id="results">
+      <h2>Results &amp; Impact</h2>
+      <p>After rolling out the shared library across all 22 microservices, the results exceeded our expectations:</p>
+      <ul>
+        <li><strong>80% reduction in pipeline code.</strong> The average Jenkinsfile shrank from 120 lines to under 10 lines. Less code means fewer bugs and less maintenance.</li>
+        <li><strong>Faster onboarding.</strong> New microservices go from repository creation to full CI/CD in under 30 minutes. Previously, it took 2-3 days of pipeline setup and debugging.</li>
+        <li><strong>100% security scan coverage.</strong> Every service now runs Trivy container scanning and SonarQube code analysis — enforced by the template, not by team discipline.</li>
+        <li><strong>Single-point updates.</strong> Changing the Docker registry, updating the deployment strategy, or adding a new compliance step requires one PR to the shared library instead of 22 separate changes.</li>
+        <li><strong>Consistent observability.</strong> All pipelines now report build metrics to Prometheus and send notifications to Slack using the same format, making it easy to build dashboards and track build health across the organization.</li>
+      </ul>
+      <blockquote>
+        <p>The shared library transformed our CI/CD from a collection of snowflake pipelines into a standardized, maintainable platform. The investment in building and testing it paid for itself within the first month.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="aws-vpc-design-patterns.html" class="post-nav-link prev">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">AWS VPC Design Patterns</span>
+      </a>
+      <a href="ansible-zero-downtime.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">Ansible Playbooks</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

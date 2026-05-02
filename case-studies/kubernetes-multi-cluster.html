@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Study: Kubernetes Multi-Cluster Platform — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html" class="active">Projects</a></li>
+        <li><a href="../blog.html">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Case Study</span>
+        <span class="post-date">Infrastructure</span>
+        <span class="post-read-time">12 min read</span>
+      </div>
+      <h1 class="post-heading">Kubernetes Multi-Cluster Platform on AWS EKS</h1>
+      <p class="post-subtitle">How I designed and deployed a multi-region Kubernetes platform serving 150+ microservices across two AWS regions with Istio service mesh, automated failover, and centralized observability.</p>
+    </div>
+  </header>
+
+  <article class="post-content">
+    <div class="container">
+
+      <div class="post-toc post-section">
+        <h2>Table of Contents</h2>
+        <ol>
+          <li><a href="#overview">Project Overview</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#terraform">Cluster Bootstrap with Terraform</a></li>
+          <li><a href="#istio">Service Mesh with Istio</a></li>
+          <li><a href="#observability">Centralized Logging &amp; Monitoring</a></li>
+          <li><a href="#namespaces">Namespace Strategy &amp; Resource Quotas</a></li>
+          <li><a href="#failover">Automated Failover</a></li>
+          <li><a href="#results">Results &amp; Impact</a></li>
+        </ol>
+      </div>
+
+      <!-- Section 1: Project Overview -->
+      <div class="post-section" id="overview">
+        <h2>Project Overview</h2>
+        <p>Our organization operated a monolithic deployment model where all services ran in a single AWS region. After two major outages in Q3 caused by region-level AWS issues, leadership mandated a multi-region strategy. The goals were clear: eliminate single points of failure, meet data residency requirements for our expanding European customer base, and reduce the blast radius of any single deployment gone wrong.</p>
+        <p>The platform needed to support 150+ microservices owned by 18 engineering teams, handle 45,000 requests per second at peak, and provide seamless failover with less than 30 seconds of downtime during a regional incident. I led the infrastructure design and implementation from proof-of-concept through production rollout over a six-month engagement.</p>
+
+        <div class="post-callout-info">
+          <strong>Key Constraints:</strong> The migration had to be zero-downtime. Teams could not be blocked during the transition. All existing CI/CD pipelines had to work with the new multi-cluster topology without requiring application code changes.
+        </div>
+
+        <p>The previous single-cluster setup had several pain points beyond availability: cluster upgrades required extended maintenance windows, namespace sprawl made resource accounting difficult, and the lack of service mesh meant no mTLS between services. This project addressed all of these concerns simultaneously.</p>
+      </div>
+
+      <!-- Section 2: Architecture -->
+      <div class="post-section" id="architecture">
+        <h2>Architecture</h2>
+        <p>The platform runs two AWS EKS clusters across <strong>us-east-1</strong> (primary) and <strong>us-west-2</strong> (secondary). Each cluster mirrors the other in terms of installed operators, namespace structure, and deployed workloads, but they operate independently for day-to-day traffic.</p>
+
+        <h3>Cluster Topology</h3>
+        <p>Each cluster runs Kubernetes 1.29 on EKS with three distinct managed node groups:</p>
+        <ul>
+          <li><strong>System Node Group</strong> — 3x <code>m6i.xlarge</code> instances reserved for cluster-critical components: CoreDNS, Istio control plane, monitoring agents, and ingress controllers. These nodes carry a taint <code>node-role=system:NoSchedule</code> to prevent workload pods from landing here.</li>
+          <li><strong>Workload Node Group</strong> — 6-20x <code>m6i.2xlarge</code> On-Demand instances for production workloads requiring guaranteed capacity. Karpenter handles scaling within defined limits.</li>
+          <li><strong>Spot Node Group</strong> — 0-30x mixed instance types (<code>m6i.2xlarge</code>, <code>m5.2xlarge</code>, <code>r6i.2xlarge</code>) for non-critical workloads, batch jobs, and development namespaces. This group alone delivered a 40% cost reduction compared to running everything on-demand.</li>
+        </ul>
+
+        <h3>Networking</h3>
+        <p>Cross-region connectivity uses <strong>AWS Transit Gateway</strong> with inter-region peering. Each cluster's VPC uses non-overlapping CIDR ranges (<code>10.10.0.0/16</code> for us-east-1, <code>10.20.0.0/16</code> for us-west-2) to enable direct pod-to-pod communication across regions. The Amazon VPC CNI plugin runs in custom networking mode to conserve IP addresses and to place pods in dedicated subnets separate from the node ENIs.</p>
+
+        <div class="post-callout-tip">
+          <strong>Design Decision:</strong> We chose Transit Gateway over VPC Peering because it gave us centralized route management and the ability to add future regions without exponential peering connections. The marginal cost increase was negligible at our traffic volume.
+        </div>
+      </div>
+
+      <!-- Section 3: Terraform -->
+      <div class="post-section" id="terraform">
+        <h2>Cluster Bootstrap with Terraform</h2>
+        <p>All infrastructure is defined in Terraform with a modular structure. Each region has its own state file stored in S3 with DynamoDB locking. The EKS module wraps the official <code>terraform-aws-modules/eks</code> module with our organizational defaults baked in.</p>
+
+        <div class="code-label">modules/eks-cluster/main.tf</div>
+        <pre><code><span class="kw">module</span> <span class="str">"eks"</span> {
+  <span class="fn">source</span>  = <span class="str">"terraform-aws-modules/eks/aws"</span>
+  <span class="fn">version</span> = <span class="str">"~> 20.0"</span>
+
+  <span class="fn">cluster_name</span>    = <span class="str">"platform-${var.region_alias}"</span>
+  <span class="fn">cluster_version</span> = <span class="str">"1.29"</span>
+  <span class="fn">vpc_id</span>          = var.vpc_id
+  <span class="fn">subnet_ids</span>      = var.private_subnet_ids
+
+  <span class="fn">cluster_endpoint_public_access</span>  = <span class="num">false</span>
+  <span class="fn">cluster_endpoint_private_access</span> = <span class="num">true</span>
+
+  <span class="fn">cluster_addons</span> = {
+    <span class="fn">coredns</span>    = { <span class="fn">most_recent</span> = <span class="num">true</span> }
+    <span class="fn">kube-proxy</span> = { <span class="fn">most_recent</span> = <span class="num">true</span> }
+    <span class="fn">vpc-cni</span>    = {
+      <span class="fn">most_recent</span>    = <span class="num">true</span>
+      <span class="fn">configuration_values</span> = <span class="fn">jsonencode</span>({
+        <span class="fn">env</span> = {
+          <span class="fn">AWS_VPC_K8S_CNI_CUSTOM_NETWORK_CFG</span> = <span class="str">"true"</span>
+          <span class="fn">ENI_CONFIG_LABEL_DEF</span>              = <span class="str">"topology.kubernetes.io/zone"</span>
+        }
+      })
+    }
+  }
+
+  <span class="fn">eks_managed_node_groups</span> = {
+    <span class="fn">system</span> = {
+      <span class="fn">instance_types</span> = [<span class="str">"m6i.xlarge"</span>]
+      <span class="fn">min_size</span>       = <span class="num">3</span>
+      <span class="fn">max_size</span>       = <span class="num">3</span>
+      <span class="fn">desired_size</span>   = <span class="num">3</span>
+      <span class="fn">labels</span>         = { <span class="str">"node-role"</span> = <span class="str">"system"</span> }
+      <span class="fn">taints</span> = [{
+        <span class="fn">key</span>    = <span class="str">"node-role"</span>
+        <span class="fn">value</span>  = <span class="str">"system"</span>
+        <span class="fn">effect</span> = <span class="str">"NO_SCHEDULE"</span>
+      }]
+    }
+
+    <span class="fn">workload</span> = {
+      <span class="fn">instance_types</span> = [<span class="str">"m6i.2xlarge"</span>]
+      <span class="fn">min_size</span>       = <span class="num">6</span>
+      <span class="fn">max_size</span>       = <span class="num">20</span>
+      <span class="fn">desired_size</span>   = <span class="num">8</span>
+      <span class="fn">labels</span>         = { <span class="str">"node-role"</span> = <span class="str">"workload"</span> }
+    }
+
+    <span class="fn">spot</span> = {
+      <span class="fn">instance_types</span> = [<span class="str">"m6i.2xlarge"</span>, <span class="str">"m5.2xlarge"</span>, <span class="str">"r6i.2xlarge"</span>]
+      <span class="fn">capacity_type</span>  = <span class="str">"SPOT"</span>
+      <span class="fn">min_size</span>       = <span class="num">0</span>
+      <span class="fn">max_size</span>       = <span class="num">30</span>
+      <span class="fn">desired_size</span>   = <span class="num">5</span>
+      <span class="fn">labels</span>         = { <span class="str">"node-role"</span> = <span class="str">"spot"</span> }
+      <span class="fn">taints</span> = [{
+        <span class="fn">key</span>    = <span class="str">"capacity"</span>
+        <span class="fn">value</span>  = <span class="str">"spot"</span>
+        <span class="fn">effect</span> = <span class="str">"NO_SCHEDULE"</span>
+      }]
+    }
+  }
+}</code></pre>
+
+        <h3>IRSA (IAM Roles for Service Accounts)</h3>
+        <p>Every workload that needs AWS API access uses IRSA instead of node-level IAM roles. This follows the principle of least privilege and eliminates the risk of one pod assuming permissions meant for another.</p>
+
+        <div class="code-label">modules/irsa/main.tf</div>
+        <pre><code><span class="kw">module</span> <span class="str">"irsa_fluentbit"</span> {
+  <span class="fn">source</span>  = <span class="str">"terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"</span>
+  <span class="fn">version</span> = <span class="str">"~> 5.0"</span>
+
+  <span class="fn">role_name</span> = <span class="str">"fluentbit-${var.cluster_name}"</span>
+
+  <span class="fn">oidc_providers</span> = {
+    <span class="fn">main</span> = {
+      <span class="fn">provider_arn</span>               = var.oidc_provider_arn
+      <span class="fn">namespace_service_accounts</span> = [<span class="str">"logging:fluent-bit"</span>]
+    }
+  }
+
+  <span class="fn">role_policy_arns</span> = {
+    <span class="fn">cloudwatch</span> = <span class="str">"arn:aws:iam::policy/CloudWatchLogsFullAccess"</span>
+    <span class="fn">s3_logs</span>    = aws_iam_policy.fluentbit_s3.arn
+  }
+}</code></pre>
+      </div>
+
+      <!-- Section 4: Istio Service Mesh -->
+      <div class="post-section" id="istio">
+        <h2>Service Mesh with Istio</h2>
+        <p>We deployed Istio 1.21 in a <strong>primary-remote</strong> model. The us-east-1 cluster hosts the primary Istio control plane (istiod), while us-west-2 runs a remote configuration that connects back to the primary's control plane over the Transit Gateway link. This model simplifies certificate management and policy distribution while still allowing each cluster to handle its own data plane traffic independently.</p>
+
+        <div class="post-callout-warning">
+          <strong>Lesson Learned:</strong> In our initial rollout, we attempted a multi-primary Istio setup. The operational overhead of managing two independent certificate authorities and synchronizing authorization policies across both control planes was significant. Switching to primary-remote cut our Istio-related incident tickets by 60%.
+        </div>
+
+        <h3>Cross-Cluster Service Discovery</h3>
+        <p>Istio's multi-cluster service discovery allows a pod in us-east-1 to transparently call a service in us-west-2 using the same Kubernetes service name. We configure this by creating remote secrets that grant each cluster read access to the other's API server.</p>
+
+        <h3>Istio Gateway &amp; Traffic Routing</h3>
+
+        <div class="code-label">istio/gateway.yaml</div>
+        <pre><code><span class="kw">apiVersion:</span> networking.istio.io/v1beta1
+<span class="kw">kind:</span> Gateway
+<span class="kw">metadata:</span>
+  <span class="fn">name:</span> platform-gateway
+  <span class="fn">namespace:</span> istio-system
+<span class="kw">spec:</span>
+  <span class="fn">selector:</span>
+    <span class="fn">istio:</span> ingressgateway
+  <span class="fn">servers:</span>
+    - <span class="fn">port:</span>
+        <span class="fn">number:</span> <span class="num">443</span>
+        <span class="fn">name:</span> https
+        <span class="fn">protocol:</span> HTTPS
+      <span class="fn">tls:</span>
+        <span class="fn">mode:</span> SIMPLE
+        <span class="fn">credentialName:</span> platform-tls-cert
+      <span class="fn">hosts:</span>
+        - <span class="str">"*.platform.internal.company.com"</span>
+    - <span class="fn">port:</span>
+        <span class="fn">number:</span> <span class="num">80</span>
+        <span class="fn">name:</span> http
+        <span class="fn">protocol:</span> HTTP
+      <span class="fn">tls:</span>
+        <span class="fn">httpsRedirect:</span> <span class="num">true</span>
+      <span class="fn">hosts:</span>
+        - <span class="str">"*.platform.internal.company.com"</span></code></pre>
+
+        <div class="code-label">istio/virtualservice-api.yaml</div>
+        <pre><code><span class="kw">apiVersion:</span> networking.istio.io/v1beta1
+<span class="kw">kind:</span> VirtualService
+<span class="kw">metadata:</span>
+  <span class="fn">name:</span> api-gateway-vs
+  <span class="fn">namespace:</span> production
+<span class="kw">spec:</span>
+  <span class="fn">hosts:</span>
+    - <span class="str">"api.platform.internal.company.com"</span>
+  <span class="fn">gateways:</span>
+    - istio-system/platform-gateway
+  <span class="fn">http:</span>
+    - <span class="fn">match:</span>
+        - <span class="fn">uri:</span>
+            <span class="fn">prefix:</span> <span class="str">"/v2/"</span>
+      <span class="fn">route:</span>
+        - <span class="fn">destination:</span>
+            <span class="fn">host:</span> api-gateway.production.svc.cluster.local
+            <span class="fn">port:</span>
+              <span class="fn">number:</span> <span class="num">8080</span>
+            <span class="fn">subset:</span> stable
+          <span class="fn">weight:</span> <span class="num">90</span>
+        - <span class="fn">destination:</span>
+            <span class="fn">host:</span> api-gateway.production.svc.cluster.local
+            <span class="fn">port:</span>
+              <span class="fn">number:</span> <span class="num">8080</span>
+            <span class="fn">subset:</span> canary
+          <span class="fn">weight:</span> <span class="num">10</span>
+      <span class="fn">retries:</span>
+        <span class="fn">attempts:</span> <span class="num">3</span>
+        <span class="fn">perTryTimeout:</span> 2s
+        <span class="fn">retryOn:</span> 5xx,reset,connect-failure</code></pre>
+
+        <div class="code-label">istio/destination-rule.yaml</div>
+        <pre><code><span class="kw">apiVersion:</span> networking.istio.io/v1beta1
+<span class="kw">kind:</span> DestinationRule
+<span class="kw">metadata:</span>
+  <span class="fn">name:</span> api-gateway-dr
+  <span class="fn">namespace:</span> production
+<span class="kw">spec:</span>
+  <span class="fn">host:</span> api-gateway.production.svc.cluster.local
+  <span class="fn">trafficPolicy:</span>
+    <span class="fn">connectionPool:</span>
+      <span class="fn">tcp:</span>
+        <span class="fn">maxConnections:</span> <span class="num">1000</span>
+      <span class="fn">http:</span>
+        <span class="fn">h2UpgradePolicy:</span> UPGRADE
+        <span class="fn">maxRequestsPerConnection:</span> <span class="num">100</span>
+    <span class="fn">outlierDetection:</span>
+      <span class="fn">consecutive5xxErrors:</span> <span class="num">5</span>
+      <span class="fn">interval:</span> 30s
+      <span class="fn">baseEjectionTime:</span> 60s
+      <span class="fn">maxEjectionPercent:</span> <span class="num">50</span>
+    <span class="fn">tls:</span>
+      <span class="fn">mode:</span> ISTIO_MUTUAL
+  <span class="fn">subsets:</span>
+    - <span class="fn">name:</span> stable
+      <span class="fn">labels:</span>
+        <span class="fn">version:</span> stable
+    - <span class="fn">name:</span> canary
+      <span class="fn">labels:</span>
+        <span class="fn">version:</span> canary</code></pre>
+
+        <p>The <code>ISTIO_MUTUAL</code> TLS mode enforces mTLS for all inter-service communication. Combined with Istio's PeerAuthentication policy set to <code>STRICT</code> across the mesh, this ensures that no plaintext traffic flows between any two services, even within the same namespace.</p>
+      </div>
+
+      <!-- Section 5: Observability -->
+      <div class="post-section" id="observability">
+        <h2>Centralized Logging &amp; Monitoring</h2>
+        <p>Observability across two clusters is non-negotiable. We built a centralized stack where both clusters ship telemetry to a shared observability plane hosted in us-east-1.</p>
+
+        <h3>Logging with Fluent Bit</h3>
+        <p>Each cluster runs Fluent Bit as a DaemonSet that collects container logs, enriches them with Kubernetes metadata (namespace, pod, labels), and ships them to a centralized Grafana Loki instance backed by S3. We chose Loki over Elasticsearch for its dramatically lower resource footprint and native label-based querying that maps well to Kubernetes concepts.</p>
+
+        <div class="code-label">logging/fluent-bit-values.yaml</div>
+        <pre><code><span class="kw">config:</span>
+  <span class="fn">inputs:</span> |
+    [INPUT]
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*.log
+        Parser            cri
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+        Refresh_Interval  5
+
+  <span class="fn">filters:</span> |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Keep_Log            Off
+        K8S-Logging.Parser  On
+        Labels              On
+        Annotations         Off
+
+    [FILTER]
+        Name    modify
+        Match   kube.*
+        Add     cluster_name <span class="str">platform-${CLUSTER_REGION}</span>
+        Add     environment  production
+
+  <span class="fn">outputs:</span> |
+    [OUTPUT]
+        Name         loki
+        Match        kube.*
+        Host         loki.observability.svc.cluster.local
+        Port         3100
+        Labels       job=fluentbit, cluster=${CLUSTER_REGION}
+        Auto_Kubernetes_Labels On</code></pre>
+
+        <h3>Metrics with Prometheus Federation</h3>
+        <p>Each cluster runs its own Prometheus instance that scrapes local targets. A central Thanos deployment in us-east-1 provides a global query view by federating metrics from both clusters through Thanos Sidecar running alongside each Prometheus. Long-term storage goes to an S3 bucket with lifecycle policies for cost management.</p>
+
+        <div class="post-callout-info">
+          <strong>Dashboard Strategy:</strong> We maintain 12 standard Grafana dashboards provisioned via ConfigMaps: cluster health, node utilization, namespace resource consumption, Istio mesh traffic, pod restart rates, and per-team cost allocation. Every dashboard includes a cluster selector dropdown so engineers can compare behavior across regions.
+        </div>
+      </div>
+
+      <!-- Section 6: Namespace Strategy -->
+      <div class="post-section" id="namespaces">
+        <h2>Namespace Strategy &amp; Resource Quotas</h2>
+        <p>Multi-tenancy is enforced at the namespace level. Each team owns one or more namespaces, and all namespaces are created through Terraform with mandatory ResourceQuota and LimitRange objects attached. No team can create namespaces ad-hoc.</p>
+
+        <h3>Namespace Structure</h3>
+        <p>We follow a naming convention of <code>{team}-{environment}</code>. For example, <code>payments-production</code>, <code>payments-staging</code>, <code>search-production</code>. Platform-level namespaces like <code>istio-system</code>, <code>logging</code>, and <code>monitoring</code> are managed exclusively by the platform team.</p>
+
+        <div class="code-label">namespaces/resource-quota.yaml</div>
+        <pre><code><span class="kw">apiVersion:</span> v1
+<span class="kw">kind:</span> ResourceQuota
+<span class="kw">metadata:</span>
+  <span class="fn">name:</span> team-quota
+  <span class="fn">namespace:</span> payments-production
+<span class="kw">spec:</span>
+  <span class="fn">hard:</span>
+    <span class="fn">requests.cpu:</span> <span class="str">"20"</span>
+    <span class="fn">requests.memory:</span> <span class="str">"40Gi"</span>
+    <span class="fn">limits.cpu:</span> <span class="str">"40"</span>
+    <span class="fn">limits.memory:</span> <span class="str">"80Gi"</span>
+    <span class="fn">pods:</span> <span class="str">"100"</span>
+    <span class="fn">services:</span> <span class="str">"30"</span>
+    <span class="fn">persistentvolumeclaims:</span> <span class="str">"20"</span>
+    <span class="fn">secrets:</span> <span class="str">"50"</span>
+    <span class="fn">configmaps:</span> <span class="str">"50"</span></code></pre>
+
+        <div class="code-label">namespaces/limit-range.yaml</div>
+        <pre><code><span class="kw">apiVersion:</span> v1
+<span class="kw">kind:</span> LimitRange
+<span class="kw">metadata:</span>
+  <span class="fn">name:</span> default-limits
+  <span class="fn">namespace:</span> payments-production
+<span class="kw">spec:</span>
+  <span class="fn">limits:</span>
+    - <span class="fn">type:</span> Container
+      <span class="fn">default:</span>
+        <span class="fn">cpu:</span> <span class="str">"500m"</span>
+        <span class="fn">memory:</span> <span class="str">"512Mi"</span>
+      <span class="fn">defaultRequest:</span>
+        <span class="fn">cpu:</span> <span class="str">"100m"</span>
+        <span class="fn">memory:</span> <span class="str">"128Mi"</span>
+      <span class="fn">max:</span>
+        <span class="fn">cpu:</span> <span class="str">"4"</span>
+        <span class="fn">memory:</span> <span class="str">"8Gi"</span>
+      <span class="fn">min:</span>
+        <span class="fn">cpu:</span> <span class="str">"50m"</span>
+        <span class="fn">memory:</span> <span class="str">"64Mi"</span>
+    - <span class="fn">type:</span> Pod
+      <span class="fn">max:</span>
+        <span class="fn">cpu:</span> <span class="str">"8"</span>
+        <span class="fn">memory:</span> <span class="str">"16Gi"</span></code></pre>
+
+        <p>The LimitRange ensures that even if a developer forgets to set resource requests in their pod spec, sensible defaults are applied. The hard caps prevent any single container from consuming excessive resources and impacting neighbors in the same node.</p>
+      </div>
+
+      <!-- Section 7: Automated Failover -->
+      <div class="post-section" id="failover">
+        <h2>Automated Failover</h2>
+        <p>Failover is the cornerstone of the multi-cluster value proposition. We use a combination of Route 53 health checks, DNS-based failover, and ArgoCD for deployment consistency to achieve sub-30-second failover times.</p>
+
+        <h3>Route 53 Health Checks</h3>
+        <p>Each cluster exposes a <code>/healthz</code> endpoint through its NLB. Route 53 health checks poll these endpoints every 10 seconds from multiple AWS edge locations. The DNS records use a failover routing policy where us-east-1 is the primary and us-west-2 is the secondary.</p>
+
+        <div class="code-label">terraform/route53-failover.tf</div>
+        <pre><code><span class="kw">resource</span> <span class="str">"aws_route53_health_check"</span> <span class="str">"east_cluster"</span> {
+  <span class="fn">fqdn</span>              = <span class="str">"ingress-east.platform.company.com"</span>
+  <span class="fn">port</span>              = <span class="num">443</span>
+  <span class="fn">type</span>              = <span class="str">"HTTPS"</span>
+  <span class="fn">resource_path</span>     = <span class="str">"/healthz"</span>
+  <span class="fn">failure_threshold</span> = <span class="str">"3"</span>
+  <span class="fn">request_interval</span>  = <span class="str">"10"</span>
+
+  <span class="fn">tags</span> = {
+    <span class="fn">Name</span> = <span class="str">"platform-east-health"</span>
+  }
+}
+
+<span class="kw">resource</span> <span class="str">"aws_route53_record"</span> <span class="str">"primary"</span> {
+  <span class="fn">zone_id</span> = var.hosted_zone_id
+  <span class="fn">name</span>    = <span class="str">"api.platform.company.com"</span>
+  <span class="fn">type</span>    = <span class="str">"A"</span>
+
+  <span class="fn">failover_routing_policy</span> {
+    <span class="fn">type</span> = <span class="str">"PRIMARY"</span>
+  }
+
+  <span class="fn">alias</span> {
+    <span class="fn">name</span>                   = module.eks_east.nlb_dns_name
+    <span class="fn">zone_id</span>                = module.eks_east.nlb_zone_id
+    <span class="fn">evaluate_target_health</span> = <span class="num">true</span>
+  }
+
+  <span class="fn">set_identifier</span>  = <span class="str">"primary"</span>
+  <span class="fn">health_check_id</span> = aws_route53_health_check.east_cluster.id
+}
+
+<span class="kw">resource</span> <span class="str">"aws_route53_record"</span> <span class="str">"secondary"</span> {
+  <span class="fn">zone_id</span> = var.hosted_zone_id
+  <span class="fn">name</span>    = <span class="str">"api.platform.company.com"</span>
+  <span class="fn">type</span>    = <span class="str">"A"</span>
+
+  <span class="fn">failover_routing_policy</span> {
+    <span class="fn">type</span> = <span class="str">"SECONDARY"</span>
+  }
+
+  <span class="fn">alias</span> {
+    <span class="fn">name</span>                   = module.eks_west.nlb_dns_name
+    <span class="fn">zone_id</span>                = module.eks_west.nlb_zone_id
+    <span class="fn">evaluate_target_health</span> = <span class="num">true</span>
+  }
+
+  <span class="fn">set_identifier</span> = <span class="str">"secondary"</span>
+}</code></pre>
+
+        <h3>ArgoCD App-of-Apps</h3>
+        <p>Both clusters are registered as targets in a single ArgoCD instance. We use the app-of-apps pattern where a root Application resource generates child Application resources for every microservice. Each child app targets both clusters, ensuring that any manifest change committed to Git is automatically synced to both regions within minutes.</p>
+
+        <div class="code-label">argocd/app-of-apps.yaml</div>
+        <pre><code><span class="kw">apiVersion:</span> argoproj.io/v1alpha1
+<span class="kw">kind:</span> ApplicationSet
+<span class="kw">metadata:</span>
+  <span class="fn">name:</span> platform-services
+  <span class="fn">namespace:</span> argocd
+<span class="kw">spec:</span>
+  <span class="fn">generators:</span>
+    - <span class="fn">matrix:</span>
+        <span class="fn">generators:</span>
+          - <span class="fn">git:</span>
+              <span class="fn">repoURL:</span> <span class="str">https://github.com/company/platform-manifests.git</span>
+              <span class="fn">revision:</span> main
+              <span class="fn">directories:</span>
+                - <span class="fn">path:</span> <span class="str">"services/*"</span>
+          - <span class="fn">list:</span>
+              <span class="fn">elements:</span>
+                - <span class="fn">cluster:</span> platform-east
+                  <span class="fn">url:</span> <span class="str">https://eks-east.company.internal</span>
+                - <span class="fn">cluster:</span> platform-west
+                  <span class="fn">url:</span> <span class="str">https://eks-west.company.internal</span>
+  <span class="fn">template:</span>
+    <span class="fn">metadata:</span>
+      <span class="fn">name:</span> <span class="str">"{{path.basename}}-{{cluster}}"</span>
+    <span class="fn">spec:</span>
+      <span class="fn">project:</span> default
+      <span class="fn">source:</span>
+        <span class="fn">repoURL:</span> <span class="str">https://github.com/company/platform-manifests.git</span>
+        <span class="fn">targetRevision:</span> main
+        <span class="fn">path:</span> <span class="str">"{{path}}"</span>
+      <span class="fn">destination:</span>
+        <span class="fn">server:</span> <span class="str">"{{url}}"</span>
+        <span class="fn">namespace:</span> production
+      <span class="fn">syncPolicy:</span>
+        <span class="fn">automated:</span>
+          <span class="fn">prune:</span> <span class="num">true</span>
+          <span class="fn">selfHeal:</span> <span class="num">true</span>
+        <span class="fn">syncOptions:</span>
+          - CreateNamespace=true
+          - PruneLast=true</code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Failover Test Protocol:</strong> We run monthly chaos engineering exercises where we simulate a full regional failure by scaling down all workload nodes in us-east-1 to zero. The platform consistently recovers traffic to us-west-2 within 22-28 seconds, well under our 30-second SLA.
+        </div>
+      </div>
+
+      <!-- Section 8: Results -->
+      <div class="post-section" id="results">
+        <h2>Results &amp; Impact</h2>
+        <p>After six months of design, implementation, and gradual migration, the multi-cluster platform went fully live. Here are the measurable outcomes:</p>
+
+        <ul>
+          <li><strong>99.99% uptime</strong> achieved over the first 12 months of operation, up from 99.9% on the single-cluster setup. The additional nine translates to roughly 52 fewer minutes of downtime per year.</li>
+          <li><strong>40% infrastructure cost reduction</strong> by running non-critical and batch workloads on Spot instances. The diversified instance type pool across three families ensures that Spot interruptions are rare and well-handled by Karpenter's consolidation logic.</li>
+          <li><strong>Sub-30-second failover</strong> consistently measured during monthly chaos drills. DNS TTL is set to 15 seconds, and Route 53 health checks detect failures within 10 seconds, making the theoretical minimum around 25 seconds.</li>
+          <li><strong>150+ microservices</strong> migrated to the platform without application code changes. Teams only needed to update their Helm chart values to include node affinity rules and resource requests.</li>
+          <li><strong>18 teams onboarded</strong> with self-service namespace provisioning through Terraform modules. Average onboarding time for a new team dropped from 2 weeks to under 1 day.</li>
+          <li><strong>Zero-downtime cluster upgrades</strong> became possible by draining one cluster at a time. Kubernetes version upgrades that previously required 4-hour maintenance windows now happen transparently during business hours.</li>
+        </ul>
+
+        <div class="post-callout-info">
+          <strong>What I Would Do Differently:</strong> If starting fresh, I would evaluate Cilium as the CNI and service mesh replacement for both VPC CNI and Istio. Cilium's eBPF-based approach eliminates sidecar overhead and provides native multi-cluster connectivity through ClusterMesh, which would reduce the operational surface area significantly. I would also adopt Crossplane earlier for managing AWS resources declaratively from within Kubernetes rather than maintaining a separate Terraform workflow.
+        </div>
+
+        <p>This project demonstrated that a well-designed multi-cluster Kubernetes platform is not just about redundancy. It is an enabler for faster, safer deployments, better resource utilization, and a foundation that scales with the organization. The investment in automation and GitOps from day one meant that the platform essentially runs itself, with the team shifting focus from operational firefighting to building internal developer tooling on top of the platform.</p>
+      </div>
+
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

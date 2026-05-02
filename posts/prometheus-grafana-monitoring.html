@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prometheus &amp; Grafana: Building a Production Monitoring Stack — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Tutorial</span>
+        <span class="post-date">Jan 12, 2026</span>
+        <span class="post-read-time">12 min read</span>
+      </div>
+      <h1 class="post-heading">Prometheus &amp; Grafana: Building a Production Monitoring Stack</h1>
+      <p class="post-subtitle">From scrape configs to alerting pipelines, learn how to deploy a complete observability stack on Kubernetes with Prometheus, Grafana, Alertmanager, and Loki.</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#observability">Why Observability Matters</a></li>
+        <li><a href="#architecture">Prometheus Architecture</a></li>
+        <li><a href="#helm-deploy">Deploying with Helm on K8s</a></li>
+        <li><a href="#promql">Writing PromQL Queries</a></li>
+        <li><a href="#grafana">Grafana Dashboards</a></li>
+        <li><a href="#alertmanager">Alertmanager Rules</a></li>
+        <li><a href="#loki">Adding Loki for Logs</a></li>
+        <li><a href="#best-practices">Best Practices</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="observability">
+      <h2>Why Observability Matters</h2>
+      <p>Modern distributed systems are inherently complex. A single user request might traverse a load balancer, API gateway, three microservices, a message queue, and two databases before returning a response. When something goes wrong — and it will — you need to understand what happened, where, and why. This is where observability comes in.</p>
+      <p>Observability rests on three pillars, each providing a different lens into system behavior:</p>
+      <ul>
+        <li><strong>Metrics:</strong> Numeric measurements collected over time. CPU usage, request latency, error rates, queue depth. Metrics tell you <em>what</em> is happening and are ideal for alerting and dashboards.</li>
+        <li><strong>Logs:</strong> Discrete events with context. Application errors, access logs, audit trails. Logs tell you <em>why</em> something happened and are essential for debugging specific incidents.</li>
+        <li><strong>Traces:</strong> End-to-end request paths through distributed systems. Traces tell you <em>where</em> time is being spent and which service in the chain is causing latency.</li>
+      </ul>
+      <p>Prometheus and Grafana together form the backbone of the metrics pillar, with Loki extending the stack to cover logs. This guide walks through building a production-ready monitoring stack that covers metrics, alerting, and log aggregation.</p>
+    </div>
+
+    <div class="post-section" id="architecture">
+      <h2>Prometheus Architecture</h2>
+      <p>Prometheus uses a <strong>pull-based model</strong>: instead of applications pushing metrics to a central server, Prometheus periodically scrapes HTTP endpoints exposed by your applications. This architectural choice has important implications for reliability — Prometheus doesn't depend on the network or a message queue to receive data.</p>
+      <p>The core components of the Prometheus ecosystem are:</p>
+      <ul>
+        <li><strong>Prometheus Server:</strong> Scrapes targets, stores time-series data in its local TSDB (Time Series Database), and evaluates alert rules.</li>
+        <li><strong>Exporters:</strong> Processes that expose metrics in Prometheus format. Node Exporter for hardware metrics, kube-state-metrics for Kubernetes object states, and many application-specific exporters.</li>
+        <li><strong>Alertmanager:</strong> Receives alerts from Prometheus, deduplicates, groups, and routes them to notification channels (Slack, PagerDuty, email).</li>
+        <li><strong>Pushgateway:</strong> Allows short-lived batch jobs to push metrics, since they may not live long enough to be scraped.</li>
+      </ul>
+      <p>Scrape targets are configured in <code>prometheus.yml</code>. In Kubernetes, service discovery automatically finds pods with the right annotations:</p>
+      <pre><code><span class="kw">scrape_configs:</span>
+  - <span class="kw">job_name:</span> <span class="str">"kubernetes-pods"</span>
+    <span class="kw">kubernetes_sd_configs:</span>
+      - <span class="kw">role:</span> <span class="str">pod</span>
+    <span class="kw">relabel_configs:</span>
+      - <span class="kw">source_labels:</span> [<span class="var">__meta_kubernetes_pod_annotation_prometheus_io_scrape</span>]
+        <span class="kw">action:</span> <span class="str">keep</span>
+        <span class="kw">regex:</span> <span class="str">true</span>
+      - <span class="kw">source_labels:</span> [<span class="var">__meta_kubernetes_pod_annotation_prometheus_io_path</span>]
+        <span class="kw">action:</span> <span class="str">replace</span>
+        <span class="kw">target_label:</span> <span class="var">__metrics_path__</span>
+        <span class="kw">regex:</span> <span class="str">(.+)</span></code><span class="code-label">YAML</span></pre>
+    </div>
+
+    <div class="post-section" id="helm-deploy">
+      <h2>Deploying with Helm on K8s</h2>
+      <p>The kube-prometheus-stack Helm chart is the fastest way to deploy a complete monitoring stack on Kubernetes. It bundles Prometheus, Grafana, Alertmanager, node-exporter, and kube-state-metrics with sensible defaults and pre-built dashboards.</p>
+      <pre><code><span class="cm"># Add the Helm repository</span>
+helm repo add prometheus-community \
+  https://prometheus-community.github.io/helm-charts
+helm repo update
+
+<span class="cm"># Install the full stack</span>
+helm install monitoring prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --create-namespace \
+  --set prometheus.prometheusSpec.retention=<span class="str">30d</span> \
+  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage=<span class="str">100Gi</span> \
+  --set grafana.adminPassword=<span class="str">changeme</span> \
+  -f values-override.yaml</code><span class="code-label">Shell</span></pre>
+      <p>For production deployments, create a <code>values-override.yaml</code> to customize resource limits, persistence, and ingress:</p>
+      <pre><code><span class="kw">prometheus:</span>
+  <span class="kw">prometheusSpec:</span>
+    <span class="kw">resources:</span>
+      <span class="kw">requests:</span>
+        <span class="kw">cpu:</span> <span class="str">"1"</span>
+        <span class="kw">memory:</span> <span class="str">"4Gi"</span>
+      <span class="kw">limits:</span>
+        <span class="kw">cpu:</span> <span class="str">"2"</span>
+        <span class="kw">memory:</span> <span class="str">"8Gi"</span>
+    <span class="kw">retention:</span> <span class="str">30d</span>
+    <span class="kw">replicas:</span> <span class="num">2</span>
+    <span class="kw">shards:</span> <span class="num">1</span>
+<span class="kw">grafana:</span>
+  <span class="kw">persistence:</span>
+    <span class="kw">enabled:</span> <span class="num">true</span>
+    <span class="kw">size:</span> <span class="str">10Gi</span>
+  <span class="kw">ingress:</span>
+    <span class="kw">enabled:</span> <span class="num">true</span>
+    <span class="kw">hosts:</span>
+      - <span class="str">grafana.internal.example.com</span>
+<span class="kw">alertmanager:</span>
+  <span class="kw">alertmanagerSpec:</span>
+    <span class="kw">replicas:</span> <span class="num">3</span></code><span class="code-label">YAML</span></pre>
+
+      <div class="post-callout post-callout-info">
+        <div class="callout-title">Note</div>
+        <p>Running multiple Prometheus replicas with the same configuration provides high availability but <em>not</em> data deduplication. Each replica independently scrapes all targets. For a truly scalable setup, consider Thanos or Cortex as a long-term storage backend.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="promql">
+      <h2>Writing PromQL Queries</h2>
+      <p>PromQL (Prometheus Query Language) is the power behind Prometheus. It lets you slice, aggregate, and transform time-series data in real time. Mastering a handful of functions will cover 90% of your monitoring needs.</p>
+
+      <h3>CPU Usage Per Pod</h3>
+      <pre><code><span class="cm"># CPU usage rate over the last 5 minutes, by pod</span>
+<span class="fn">sum</span>(<span class="fn">rate</span>(<span class="var">container_cpu_usage_seconds_total</span>{
+  <span class="kw">namespace</span>=<span class="str">"production"</span>,
+  <span class="kw">container</span>!=<span class="str">""</span>
+}[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="var">pod</span>)</code><span class="code-label">PromQL</span></pre>
+
+      <h3>HTTP Error Rate</h3>
+      <pre><code><span class="cm"># Percentage of 5xx responses over total requests</span>
+<span class="fn">sum</span>(<span class="fn">rate</span>(<span class="var">http_requests_total</span>{
+  <span class="kw">status</span>=~<span class="str">"5.."</span>
+}[<span class="num">5m</span>])) / <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="var">http_requests_total</span>[<span class="num">5m</span>])) * <span class="num">100</span></code><span class="code-label">PromQL</span></pre>
+
+      <h3>Request Latency (p99)</h3>
+      <pre><code><span class="cm"># 99th percentile latency from histogram</span>
+<span class="fn">histogram_quantile</span>(<span class="num">0.99</span>,
+  <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="var">http_request_duration_seconds_bucket</span>{
+    <span class="kw">job</span>=<span class="str">"api-server"</span>
+  }[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="var">le</span>)
+)</code><span class="code-label">PromQL</span></pre>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Always use <code>rate()</code> or <code>irate()</code> on counters, never raw values. Counters only go up and reset to zero on restart. <code>rate()</code> handles resets automatically and gives you a per-second average, which is what you actually want for dashboards and alerts.</p>
+      </div>
+
+      <h3>Memory Saturation</h3>
+      <pre><code><span class="cm"># Percentage of memory used vs. requested</span>
+<span class="fn">sum</span>(<span class="var">container_memory_working_set_bytes</span>{
+  <span class="kw">namespace</span>=<span class="str">"production"</span>,
+  <span class="kw">container</span>!=<span class="str">""</span>
+}) <span class="kw">by</span> (<span class="var">pod</span>) /
+<span class="fn">sum</span>(<span class="var">kube_pod_container_resource_requests</span>{
+  <span class="kw">namespace</span>=<span class="str">"production"</span>,
+  <span class="kw">resource</span>=<span class="str">"memory"</span>
+}) <span class="kw">by</span> (<span class="var">pod</span>) * <span class="num">100</span></code><span class="code-label">PromQL</span></pre>
+    </div>
+
+    <div class="post-section" id="grafana">
+      <h2>Grafana Dashboards</h2>
+      <p>Grafana turns PromQL queries into actionable visual dashboards. While you can build dashboards in the UI, defining them as JSON models enables version control and automated provisioning through ConfigMaps or the Grafana API.</p>
+      <p>A panel JSON snippet for an HTTP error rate graph:</p>
+      <pre><code>{
+  <span class="str">"title"</span>: <span class="str">"HTTP Error Rate (5xx)"</span>,
+  <span class="str">"type"</span>: <span class="str">"timeseries"</span>,
+  <span class="str">"datasource"</span>: {
+    <span class="str">"type"</span>: <span class="str">"prometheus"</span>,
+    <span class="str">"uid"</span>: <span class="str">"prometheus-ds"</span>
+  },
+  <span class="str">"targets"</span>: [
+    {
+      <span class="str">"expr"</span>: <span class="str">"sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service)"</span>,
+      <span class="str">"legendFormat"</span>: <span class="str">"{{service}}"</span>
+    }
+  ],
+  <span class="str">"fieldConfig"</span>: {
+    <span class="str">"defaults"</span>: {
+      <span class="str">"unit"</span>: <span class="str">"reqps"</span>,
+      <span class="str">"thresholds"</span>: {
+        <span class="str">"steps"</span>: [
+          { <span class="str">"value"</span>: <span class="num">0</span>, <span class="str">"color"</span>: <span class="str">"green"</span> },
+          { <span class="str">"value"</span>: <span class="num">1</span>, <span class="str">"color"</span>: <span class="str">"yellow"</span> },
+          { <span class="str">"value"</span>: <span class="num">5</span>, <span class="str">"color"</span>: <span class="str">"red"</span> }
+        ]
+      }
+    }
+  }
+}</code><span class="code-label">JSON</span></pre>
+      <p>Organize your dashboards by concern: one for cluster health (node CPU, memory, disk), one per application (request rate, latency, errors), and one for infrastructure (load balancers, databases, queues). The RED method (Rate, Errors, Duration) and USE method (Utilization, Saturation, Errors) provide proven frameworks for deciding which metrics to display.</p>
+    </div>
+
+    <div class="post-section" id="alertmanager">
+      <h2>Alertmanager Rules</h2>
+      <p>Monitoring without alerting is just expensive logging. Prometheus evaluates alert rules at regular intervals and fires alerts to Alertmanager when conditions are met. Alertmanager then handles deduplication, grouping, silencing, and routing to notification channels.</p>
+      <pre><code><span class="kw">groups:</span>
+  - <span class="kw">name:</span> <span class="str">sla-alerts</span>
+    <span class="kw">rules:</span>
+      - <span class="kw">alert:</span> <span class="str">HighErrorRate</span>
+        <span class="kw">expr:</span> >-
+          <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="var">http_requests_total</span>{<span class="kw">status</span>=~<span class="str">"5.."</span>}[<span class="num">5m</span>]))
+          / <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="var">http_requests_total</span>[<span class="num">5m</span>])) > <span class="num">0.001</span>
+        <span class="kw">for:</span> <span class="str">5m</span>
+        <span class="kw">labels:</span>
+          <span class="kw">severity:</span> <span class="str">critical</span>
+        <span class="kw">annotations:</span>
+          <span class="kw">summary:</span> <span class="str">"Error rate exceeds 0.1% SLA threshold"</span>
+          <span class="kw">description:</span> <span class="str">"Error rate is {{ $value | humanizePercentage }} over the last 5 minutes. 99.9% uptime SLA is at risk."</span>
+
+      - <span class="kw">alert:</span> <span class="str">HighLatencyP99</span>
+        <span class="kw">expr:</span> >-
+          <span class="fn">histogram_quantile</span>(<span class="num">0.99</span>,
+            <span class="fn">sum</span>(<span class="fn">rate</span>(<span class="var">http_request_duration_seconds_bucket</span>[<span class="num">5m</span>])) <span class="kw">by</span> (<span class="var">le</span>)
+          ) > <span class="num">2.0</span>
+        <span class="kw">for:</span> <span class="str">10m</span>
+        <span class="kw">labels:</span>
+          <span class="kw">severity:</span> <span class="str">warning</span>
+        <span class="kw">annotations:</span>
+          <span class="kw">summary:</span> <span class="str">"P99 latency exceeds 2 seconds"</span>
+          <span class="kw">description:</span> <span class="str">"99th percentile request latency is {{ $value }}s."</span>
+
+      - <span class="kw">alert:</span> <span class="str">PodCrashLooping</span>
+        <span class="kw">expr:</span> >-
+          <span class="fn">rate</span>(<span class="var">kube_pod_container_status_restarts_total</span>[<span class="num">15m</span>]) * <span class="num">60</span> * <span class="num">15</span> > <span class="num">0</span>
+        <span class="kw">for:</span> <span class="str">5m</span>
+        <span class="kw">labels:</span>
+          <span class="kw">severity:</span> <span class="str">warning</span>
+        <span class="kw">annotations:</span>
+          <span class="kw">summary:</span> <span class="str">"Pod {{ $labels.pod }} is crash looping"</span></code><span class="code-label">YAML</span></pre>
+
+      <div class="post-callout post-callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>Avoid alert fatigue by setting appropriate <code>for</code> durations. A 5xx spike lasting 10 seconds during a deployment is normal. An alert should only fire when the condition persists long enough to indicate a real problem — usually 5 to 15 minutes for non-critical alerts.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="loki">
+      <h2>Adding Loki for Logs</h2>
+      <p>Grafana Loki completes the observability picture by providing log aggregation that integrates natively with Grafana. Unlike Elasticsearch, Loki indexes only metadata (labels) rather than full log content, making it significantly cheaper to operate at scale.</p>
+      <pre><code><span class="cm"># Install Loki stack alongside existing monitoring</span>
+helm install loki grafana/loki-stack \
+  --namespace monitoring \
+  --set promtail.enabled=<span class="num">true</span> \
+  --set loki.persistence.enabled=<span class="num">true</span> \
+  --set loki.persistence.size=<span class="str">50Gi</span></code><span class="code-label">Shell</span></pre>
+      <p>Promtail runs as a DaemonSet, tailing container logs from each node and shipping them to Loki with Kubernetes labels attached. In Grafana, you can query logs with LogQL, which shares syntax patterns with PromQL:</p>
+      <pre><code><span class="cm"># Find error logs from the api-server in production</span>
+{<span class="kw">namespace</span>=<span class="str">"production"</span>, <span class="kw">app</span>=<span class="str">"api-server"</span>} |= <span class="str">"error"</span> | <span class="fn">json</span> | <span class="var">level</span>=<span class="str">"error"</span>
+
+<span class="cm"># Count log lines per severity over time</span>
+<span class="fn">sum</span> <span class="kw">by</span> (<span class="var">level</span>) (<span class="fn">rate</span>({<span class="kw">namespace</span>=<span class="str">"production"</span>} | <span class="fn">json</span> | <span class="var">level</span>!=<span class="str">""</span> [<span class="num">5m</span>]))</code><span class="code-label">LogQL</span></pre>
+      <p>The power of running Loki alongside Prometheus in Grafana is <strong>correlated debugging</strong>: you can click on a spike in an error rate graph and instantly see the corresponding log lines, without switching tools or manually matching timestamps.</p>
+    </div>
+
+    <div class="post-section" id="best-practices">
+      <h2>Best Practices</h2>
+      <p>Running a monitoring stack in production is itself a production system that requires careful attention. Here are the practices that keep monitoring reliable at scale:</p>
+      <ul>
+        <li><strong>Set retention policies.</strong> Prometheus is not a long-term storage solution. Keep 15-30 days of high-resolution data locally. For longer retention, use Thanos or Cortex to downsample and store in object storage (S3/GCS).</li>
+        <li><strong>Use recording rules.</strong> Pre-compute expensive queries as recording rules. Instead of calculating <code>rate(http_requests_total[5m])</code> every time a dashboard loads, record it as a new metric that Prometheus evaluates once per interval.</li>
+        <li><strong>Implement federation</strong> for multi-cluster setups. A central Prometheus scrapes aggregated metrics from per-cluster Prometheus instances, giving you a global view without overwhelming a single server.</li>
+        <li><strong>Label cardinality matters.</strong> Every unique combination of labels creates a new time series. A label with 10,000 unique values (like user IDs) will explode your storage and query times. Keep cardinality under control.</li>
+        <li><strong>Monitor the monitors.</strong> Set up external health checks (e.g., Uptime Robot or Blackbox Exporter) to alert you if Prometheus itself goes down. Dead monitoring is worse than no monitoring — it gives false confidence.</li>
+        <li><strong>Use Grafana provisioning.</strong> Store dashboards as JSON in Git and provision them via ConfigMaps or the Grafana API. Never rely on manual dashboard creation — it leads to drift and makes disaster recovery painful.</li>
+        <li><strong>Separate concerns.</strong> Run Alertmanager with multiple replicas for HA. Route critical alerts (SLA violations) to PagerDuty, warnings to Slack, and informational alerts to email. Never send everything to the same channel.</li>
+      </ul>
+
+      <blockquote>
+        <p>The goal of monitoring is not to collect data — it is to reduce the time between an incident occurring and an engineer understanding its root cause. Every dashboard, alert, and log pipeline should serve that goal.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="terraform-reusable-modules.html" class="post-nav-link prev">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">Terraform Modules: Writing Reusable Infrastructure</span>
+      </a>
+      <a href="aws-vpc-design-patterns.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">AWS VPC Design Patterns for Multi-Tier Applications</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

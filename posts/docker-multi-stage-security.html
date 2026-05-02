@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker Multi-Stage Builds &amp; Container Security Best Practices — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Tutorial</span>
+        <span class="post-date">Aug 22, 2025</span>
+        <span class="post-read-time">11 min read</span>
+      </div>
+      <h1 class="post-heading">Docker Multi-Stage Builds &amp; Container Security Best Practices</h1>
+      <p class="post-subtitle">Optimizing images and implementing security scanning in your CI/CD pipeline to ship smaller, safer containers to production.</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#why-it-matters">Why Image Size &amp; Security Matter</a></li>
+        <li><a href="#docker-layers">Understanding Docker Layers</a></li>
+        <li><a href="#multi-stage">Multi-Stage Builds</a></li>
+        <li><a href="#base-images">Base Image Comparison</a></li>
+        <li><a href="#trivy-scanning">Vulnerability Scanning with Trivy</a></li>
+        <li><a href="#least-privilege">Least-Privilege Containers</a></li>
+        <li><a href="#content-trust">Docker Content Trust</a></li>
+        <li><a href="#cicd-integration">CI/CD Integration</a></li>
+        <li><a href="#security-checklist">Security Checklist</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="why-it-matters">
+      <h2>Why Image Size &amp; Security Matter</h2>
+      <p>Every unnecessary package in your container image is a potential attack vector. A typical Node.js application built on <code>node:18</code> (Debian-based) ships with over 400 known vulnerabilities in the base image alone, including compilers, shell utilities, and system libraries your application never uses. An attacker who gains code execution in your container has all of these tools at their disposal.</p>
+      <p>Beyond security, image size directly impacts your infrastructure costs and deployment speed. A 1.2 GB image takes significantly longer to pull than a 45 MB image, which matters during autoscaling events when new nodes need to pull images quickly. Larger images also consume more registry storage and increase bandwidth costs across multi-region deployments.</p>
+      <p>The good news: Docker multi-stage builds, minimal base images, and automated scanning can reduce image size by 90% and eliminate the vast majority of vulnerabilities with minimal effort.</p>
+    </div>
+
+    <div class="post-section" id="docker-layers">
+      <h2>Understanding Docker Layers</h2>
+      <p>Every instruction in a Dockerfile creates a new layer. Layers are cached and reused, which means the order of your instructions directly impacts build speed. The key principle: put things that change least frequently at the top, and things that change most frequently at the bottom.</p>
+
+      <pre><code><span class="cm"># Bad: COPY before dependency install busts cache on every code change</span>
+<span class="kw">FROM</span> node:<span class="num">18</span>-alpine
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> . .
+<span class="kw">RUN</span> npm ci
+<span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"server.js"</span>]
+
+<span class="cm"># Good: Dependencies cached separately from application code</span>
+<span class="kw">FROM</span> node:<span class="num">18</span>-alpine
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> package.json package-lock.json ./
+<span class="kw">RUN</span> npm ci --production
+<span class="kw">COPY</span> . .
+<span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"server.js"</span>]</code><span class="code-label">Dockerfile</span></pre>
+
+      <p>In the optimized version, the <code>npm ci</code> layer is cached as long as <code>package.json</code> and <code>package-lock.json</code> don't change. Only the final <code>COPY . .</code> layer is rebuilt when application code changes, saving minutes on every build.</p>
+    </div>
+
+    <div class="post-section" id="multi-stage">
+      <h2>Multi-Stage Builds</h2>
+      <p>Multi-stage builds let you use multiple <code>FROM</code> statements in a single Dockerfile. Each stage can use a different base image, and you selectively copy only the artifacts you need into the final stage. This means build tools, compilers, and dev dependencies never make it into the production image.</p>
+
+      <pre><code><span class="cm"># ============================================</span>
+<span class="cm"># Stage 1: Dependencies</span>
+<span class="cm"># ============================================</span>
+<span class="kw">FROM</span> node:<span class="num">18</span>-alpine <span class="kw">AS</span> deps
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> package.json package-lock.json ./
+<span class="kw">RUN</span> npm ci --production --ignore-scripts \
+    && npm cache clean --force
+
+<span class="cm"># ============================================</span>
+<span class="cm"># Stage 2: Build</span>
+<span class="cm"># ============================================</span>
+<span class="kw">FROM</span> node:<span class="num">18</span>-alpine <span class="kw">AS</span> build
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> package.json package-lock.json ./
+<span class="kw">RUN</span> npm ci
+<span class="kw">COPY</span> tsconfig.json ./
+<span class="kw">COPY</span> src/ ./src/
+<span class="kw">RUN</span> npm run build \
+    && npm prune --production
+
+<span class="cm"># ============================================</span>
+<span class="cm"># Stage 3: Production (distroless)</span>
+<span class="cm"># ============================================</span>
+<span class="kw">FROM</span> gcr.io/distroless/nodejs18-debian12 <span class="kw">AS</span> production
+
+<span class="cm"># Labels for traceability</span>
+<span class="kw">LABEL</span> org.opencontainers.image.source=<span class="str">"https://github.com/example/app"</span>
+<span class="kw">LABEL</span> org.opencontainers.image.description=<span class="str">"Production API server"</span>
+
+<span class="kw">WORKDIR</span> /app
+
+<span class="cm"># Copy only production dependencies and compiled output</span>
+<span class="kw">COPY</span> --from=deps /app/node_modules ./node_modules
+<span class="kw">COPY</span> --from=build /app/dist ./dist
+<span class="kw">COPY</span> --from=build /app/package.json ./
+
+<span class="cm"># Distroless images run as nonroot (uid 65534) by default</span>
+<span class="kw">USER</span> nonroot
+
+<span class="kw">EXPOSE</span> <span class="num">3000</span>
+<span class="kw">CMD</span> [<span class="str">"dist/server.js"</span>]</code><span class="code-label">Dockerfile</span></pre>
+
+      <p>This three-stage approach produces a final image that contains only the Node.js runtime, production dependencies, and compiled JavaScript. No npm, no shell, no package manager, no build tools. The result is typically 40-80 MB instead of 1+ GB.</p>
+    </div>
+
+    <div class="post-section" id="base-images">
+      <h2>Base Image Comparison</h2>
+      <p>Choosing the right base image is one of the highest-impact decisions for both size and security. Here is a comparison for a typical Node.js application:</p>
+
+      <ul>
+        <li><strong>node:18 (Debian)</strong> — Size: ~910 MB. Vulnerabilities: 400+. Includes full OS, shell, compilers, system utilities. Best for: development only.</li>
+        <li><strong>node:18-alpine</strong> — Size: ~175 MB. Vulnerabilities: 10-30. Minimal Alpine Linux with musl libc. Best for: build stages or when shell access is needed.</li>
+        <li><strong>gcr.io/distroless/nodejs18</strong> — Size: ~130 MB. Vulnerabilities: 0-5. No shell, no package manager, no OS utilities. Best for: production workloads.</li>
+        <li><strong>scratch</strong> — Size: 0 MB (base). Vulnerabilities: 0. Completely empty. Best for: statically compiled Go/Rust binaries that need no runtime.</li>
+      </ul>
+
+      <p>For Go applications, multi-stage builds with <code>scratch</code> produce images as small as 5-15 MB:</p>
+
+      <pre><code><span class="cm"># Go multi-stage with scratch base</span>
+<span class="kw">FROM</span> golang:<span class="num">1.22</span>-alpine <span class="kw">AS</span> build
+<span class="kw">WORKDIR</span> /src
+<span class="kw">COPY</span> go.mod go.sum ./
+<span class="kw">RUN</span> go mod download
+<span class="kw">COPY</span> . .
+<span class="kw">RUN</span> CGO_ENABLED=<span class="num">0</span> GOOS=linux go build -ldflags=<span class="str">"-s -w"</span> -o /app/server ./cmd/server
+
+<span class="kw">FROM</span> scratch
+<span class="kw">COPY</span> --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+<span class="kw">COPY</span> --from=build /app/server /server
+<span class="kw">USER</span> <span class="num">65534</span>
+<span class="kw">ENTRYPOINT</span> [<span class="str">"/server"</span>]</code><span class="code-label">Dockerfile</span></pre>
+    </div>
+
+    <div class="post-section" id="trivy-scanning">
+      <h2>Vulnerability Scanning with Trivy</h2>
+      <p>Trivy is an open-source vulnerability scanner that detects CVEs in OS packages, language-specific dependencies, and misconfigurations. It is fast, easy to integrate, and supports Docker images, filesystem paths, and Git repositories.</p>
+
+      <pre><code><span class="cm"># Scan a local image</span>
+trivy image myapp:latest
+
+<span class="cm"># Scan with severity filter</span>
+trivy image --severity HIGH,CRITICAL myapp:latest
+
+<span class="cm"># Output as JSON for CI/CD processing</span>
+trivy image --format json --output results.json myapp:latest
+
+<span class="cm"># Fail if CRITICAL vulnerabilities found (exit code 1)</span>
+trivy image --exit-code <span class="num">1</span> --severity CRITICAL myapp:latest
+
+<span class="cm"># Scan with ignore file for accepted risks</span>
+trivy image --ignorefile .trivyignore myapp:latest</code><span class="code-label">Shell</span></pre>
+
+      <p>Trivy output shows each vulnerability with its CVE ID, severity, installed version, and fixed version. Always prioritize CRITICAL and HIGH vulnerabilities that have a fix available. For vulnerabilities with no fix, document the accepted risk in your <code>.trivyignore</code> file with an expiration date.</p>
+    </div>
+
+    <div class="post-section" id="least-privilege">
+      <h2>Least-Privilege Containers</h2>
+      <p>Running containers as root is the most common and most dangerous misconfiguration. If an attacker exploits your application, they get root access inside the container, which can potentially lead to container escape on unpatched kernels.</p>
+
+      <pre><code><span class="cm"># Create a non-root user and switch to it</span>
+<span class="kw">FROM</span> node:<span class="num">18</span>-alpine
+<span class="kw">RUN</span> addgroup -g <span class="num">1001</span> -S appgroup \
+    && adduser -u <span class="num">1001</span> -S appuser -G appgroup
+
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> --chown=appuser:appgroup . .
+<span class="kw">RUN</span> npm ci --production
+
+<span class="cm"># Switch to non-root user</span>
+<span class="kw">USER</span> appuser
+
+<span class="kw">EXPOSE</span> <span class="num">3000</span>
+<span class="kw">CMD</span> [<span class="str">"node"</span>, <span class="str">"server.js"</span>]</code><span class="code-label">Dockerfile</span></pre>
+
+      <p>Beyond the USER directive, enforce additional restrictions at the runtime level:</p>
+
+      <pre><code><span class="cm"># Run with read-only root filesystem and drop all capabilities</span>
+docker run \
+  --read-only \
+  --tmpfs /tmp:noexec,nosuid,size=64m \
+  --cap-drop ALL \
+  --security-opt no-new-privileges:true \
+  --user <span class="num">1001</span>:<span class="num">1001</span> \
+  myapp:latest</code><span class="code-label">Shell</span></pre>
+
+      <p>In Kubernetes, use a SecurityContext to enforce these constraints declaratively:</p>
+
+      <pre><code><span class="kw">securityContext:</span>
+  <span class="kw">runAsNonRoot:</span> <span class="num">true</span>
+  <span class="kw">runAsUser:</span> <span class="num">1001</span>
+  <span class="kw">readOnlyRootFilesystem:</span> <span class="num">true</span>
+  <span class="kw">allowPrivilegeEscalation:</span> <span class="num">false</span>
+  <span class="kw">capabilities:</span>
+    <span class="kw">drop:</span>
+      - <span class="str">ALL</span></code><span class="code-label">YAML</span></pre>
+    </div>
+
+    <div class="post-section" id="content-trust">
+      <h2>Docker Content Trust</h2>
+      <p>Docker Content Trust (DCT) uses digital signatures to verify the integrity and publisher of images. When enabled, Docker will only pull images that have been signed by a trusted publisher, preventing man-in-the-middle attacks and tampered images.</p>
+
+      <pre><code><span class="cm"># Enable Docker Content Trust</span>
+export DOCKER_CONTENT_TRUST=<span class="num">1</span>
+
+<span class="cm"># Push a signed image (generates signing keys on first use)</span>
+docker push myregistry.com/myapp:v1.2.3
+
+<span class="cm"># Pull will now verify signatures automatically</span>
+docker pull myregistry.com/myapp:v1.2.3
+
+<span class="cm"># Delegate signing to CI/CD with a repository key</span>
+docker trust key load --name ci-signer ci-private-key.pem
+docker trust signer add --key ci-signer.pub ci-signer myregistry.com/myapp</code><span class="code-label">Shell</span></pre>
+
+      <p>For production registries, combine DCT with image admission controllers in Kubernetes (like OPA Gatekeeper or Kyverno) to reject unsigned or untrusted images at the cluster level.</p>
+    </div>
+
+    <div class="post-section" id="cicd-integration">
+      <h2>CI/CD Integration</h2>
+      <p>Automating security scanning in your CI/CD pipeline catches vulnerabilities before they reach production. Here is a complete GitHub Actions workflow that builds, scans, and conditionally pushes images:</p>
+
+      <pre><code><span class="kw">name:</span> <span class="str">Build and Scan Container</span>
+
+<span class="kw">on:</span>
+  <span class="kw">push:</span>
+    <span class="kw">branches:</span> [<span class="str">main</span>]
+  <span class="kw">pull_request:</span>
+    <span class="kw">branches:</span> [<span class="str">main</span>]
+
+<span class="kw">jobs:</span>
+  <span class="kw">build-scan-push:</span>
+    <span class="kw">runs-on:</span> <span class="str">ubuntu-latest</span>
+    <span class="kw">permissions:</span>
+      <span class="kw">contents:</span> <span class="str">read</span>
+      <span class="kw">security-events:</span> <span class="str">write</span>
+
+    <span class="kw">steps:</span>
+      - <span class="kw">name:</span> <span class="str">Checkout code</span>
+        <span class="kw">uses:</span> <span class="str">actions/checkout@v4</span>
+
+      - <span class="kw">name:</span> <span class="str">Set up Docker Buildx</span>
+        <span class="kw">uses:</span> <span class="str">docker/setup-buildx-action@v3</span>
+
+      - <span class="kw">name:</span> <span class="str">Build image</span>
+        <span class="kw">uses:</span> <span class="str">docker/build-push-action@v5</span>
+        <span class="kw">with:</span>
+          <span class="kw">context:</span> <span class="str">.</span>
+          <span class="kw">push:</span> <span class="num">false</span>
+          <span class="kw">load:</span> <span class="num">true</span>
+          <span class="kw">tags:</span> <span class="str">myapp:${{ github.sha }}</span>
+          <span class="kw">cache-from:</span> <span class="str">type=gha</span>
+          <span class="kw">cache-to:</span> <span class="str">type=gha,mode=max</span>
+
+      - <span class="kw">name:</span> <span class="str">Run Trivy vulnerability scanner</span>
+        <span class="kw">uses:</span> <span class="str">aquasecurity/trivy-action@master</span>
+        <span class="kw">with:</span>
+          <span class="kw">image-ref:</span> <span class="str">myapp:${{ github.sha }}</span>
+          <span class="kw">format:</span> <span class="str">sarif</span>
+          <span class="kw">output:</span> <span class="str">trivy-results.sarif</span>
+          <span class="kw">severity:</span> <span class="str">CRITICAL,HIGH</span>
+          <span class="kw">exit-code:</span> <span class="str">'1'</span>  <span class="cm"># Fail on CRITICAL</span>
+
+      - <span class="kw">name:</span> <span class="str">Upload scan results to GitHub Security</span>
+        <span class="kw">uses:</span> <span class="str">github/codeql-action/upload-sarif@v3</span>
+        <span class="kw">if:</span> <span class="str">always()</span>
+        <span class="kw">with:</span>
+          <span class="kw">sarif_file:</span> <span class="str">trivy-results.sarif</span>
+
+      - <span class="kw">name:</span> <span class="str">Push to registry</span>
+        <span class="kw">if:</span> <span class="str">github.ref == 'refs/heads/main'</span>
+        <span class="kw">uses:</span> <span class="str">docker/build-push-action@v5</span>
+        <span class="kw">with:</span>
+          <span class="kw">context:</span> <span class="str">.</span>
+          <span class="kw">push:</span> <span class="num">true</span>
+          <span class="kw">tags:</span> <span class="str">myregistry.com/myapp:${{ github.sha }}</span></code><span class="code-label">YAML</span></pre>
+
+      <p>The key detail is <code>exit-code: '1'</code> — this causes the pipeline to fail if CRITICAL vulnerabilities are found, preventing insecure images from being pushed to the registry.</p>
+    </div>
+
+    <div class="post-section" id="security-checklist">
+      <h2>Security Checklist</h2>
+      <p>Use this checklist for every container you ship to production:</p>
+      <ul>
+        <li><strong>Use multi-stage builds</strong> to exclude build tools, compilers, and dev dependencies from the final image.</li>
+        <li><strong>Choose minimal base images</strong> — prefer distroless or alpine over full Debian/Ubuntu images.</li>
+        <li><strong>Run as non-root</strong> — always include a <code>USER</code> directive and set <code>runAsNonRoot: true</code> in Kubernetes.</li>
+        <li><strong>Use read-only root filesystem</strong> — mount writable tmpfs only where absolutely needed.</li>
+        <li><strong>Drop all capabilities</strong> — use <code>cap-drop ALL</code> and add back only what is strictly required.</li>
+        <li><strong>Scan images in CI/CD</strong> — run Trivy or Grype on every build and fail on CRITICAL vulnerabilities.</li>
+        <li><strong>Pin image versions</strong> — never use <code>:latest</code> in production. Use SHA digests for maximum reproducibility.</li>
+        <li><strong>Sign your images</strong> — enable Docker Content Trust and use admission controllers to reject unsigned images.</li>
+        <li><strong>Keep images up to date</strong> — rebuild base images weekly to pick up OS-level security patches.</li>
+        <li><strong>Limit network exposure</strong> — use Kubernetes NetworkPolicies to restrict container-to-container communication to only what is necessary.</li>
+      </ul>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Add a <code>.dockerignore</code> file to your project root. Without it, <code>COPY . .</code> sends your entire directory to the Docker daemon — including <code>.git</code>, <code>node_modules</code>, secrets files, and test fixtures. A good <code>.dockerignore</code> typically mirrors your <code>.gitignore</code> plus <code>.git/</code>, <code>Dockerfile</code>, <code>docker-compose.yml</code>, and any CI config.</p>
+      </div>
+
+      <blockquote>
+        <p>Container security is not a single tool or technique — it is a mindset applied across every layer, from the base image you choose to the Kubernetes policies that govern runtime behavior. Start with the basics, automate enforcement, and improve iteratively.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="disaster-recovery-aws.html" class="post-nav-link">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">Disaster Recovery on AWS: RTO &amp; RPO Strategies</span>
+      </a>
+      <div></div>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

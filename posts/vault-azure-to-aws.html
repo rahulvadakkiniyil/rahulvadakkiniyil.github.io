@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transferring HashiCorp Vault Secrets: Azure VM to AWS — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Tutorial</span>
+        <span class="post-date">Mar 8, 2026</span>
+        <span class="post-read-time">12 min read</span>
+      </div>
+      <h1 class="post-heading">Transferring HashiCorp Vault Secrets from Azure VM to AWS</h1>
+      <p class="post-subtitle">A step-by-step guide to migrating secrets between two HashiCorp Vault instances across cloud providers — from an Azure VM to an AWS EC2 instance — with zero downtime and full audit trail.</p>
+    </div>
+  </header>
+
+  <article class="post-content">
+    <div class="container">
+
+      <!-- Table of Contents -->
+      <div class="post-toc post-section">
+        <h2>Table of Contents</h2>
+        <ol>
+          <li><a href="#why-migrate">Why Migrate Vault Secrets Cross-Cloud</a></li>
+          <li><a href="#prerequisites">Prerequisites</a></li>
+          <li><a href="#architecture-overview">Architecture Overview</a></li>
+          <li><a href="#method-cli">Method 1: CLI-Based Export/Import</a></li>
+          <li><a href="#method-script">Method 2: Automated Bash Script</a></li>
+          <li><a href="#method-transit">Method 3: Using Vault's Transit &amp; Replication</a></li>
+          <li><a href="#auth-methods">Handling Auth Methods</a></li>
+          <li><a href="#policies">Handling Policies</a></li>
+          <li><a href="#validation">Validation &amp; Verification</a></li>
+          <li><a href="#security-best-practices">Security Best Practices</a></li>
+        </ol>
+      </div>
+
+      <!-- Section 1: Why Migrate -->
+      <div class="post-section" id="why-migrate">
+        <h2>1. Why Migrate Vault Secrets Cross-Cloud</h2>
+        <p>There are several common scenarios where organizations need to transfer their entire secrets estate from one cloud to another. Understanding your reason helps determine which migration method is appropriate and how much effort to invest in automation.</p>
+
+        <h3>Common Scenarios</h3>
+        <ul>
+          <li><strong>Full Cloud Migration</strong> — Your company is moving its entire infrastructure from Azure to AWS. Every workload, database, and supporting service (including secrets management) must follow. The Vault on your Azure VM is the source of truth, and you need an identical copy running on EC2.</li>
+          <li><strong>Multi-Cloud Strategy</strong> — You are adopting a multi-cloud architecture where workloads in AWS need local access to secrets without cross-cloud API latency. Both Vault instances will coexist, with periodic synchronization.</li>
+          <li><strong>Disaster Recovery</strong> — The AWS Vault serves as a warm standby. If the Azure region goes down, your applications failover to AWS and need immediate access to the same secrets, policies, and auth configurations.</li>
+          <li><strong>Cost Optimization</strong> — Reserved instance pricing, data transfer costs, or licensing changes make AWS more economical. You need to migrate without losing any secrets or version history.</li>
+        </ul>
+
+        <h3>Key Challenges</h3>
+        <p>Cross-cloud secret migration introduces risks that do not exist in a single-provider environment:</p>
+        <ul>
+          <li><strong>Network Security</strong> — Secrets must never travel over the public internet in plaintext. You need VPN tunnels, VPC peering, or at minimum TLS-encrypted API calls with certificate pinning.</li>
+          <li><strong>Encryption in Transit</strong> — Even with TLS, consider double-encrypting the payload using Vault's transit secrets engine. If a TLS termination proxy is misconfigured, your secrets remain protected.</li>
+          <li><strong>Secret Versioning</strong> — KV v2 secrets carry version metadata, creation timestamps, and custom metadata. Decide early whether you need the full version history or only the latest version on the destination.</li>
+          <li><strong>Audit Compliance</strong> — Regulatory frameworks like SOC 2, HIPAA, and PCI-DSS require a complete audit trail for secret access. Enable audit devices on both Vaults before the migration begins so every read and write is logged.</li>
+        </ul>
+
+        <div class="post-callout-info">
+          <strong>Note:</strong> This guide covers both HashiCorp Vault OSS and Enterprise editions. Enterprise-specific features like performance replication and DR replication are called out explicitly in Method 3.
+        </div>
+      </div>
+
+      <!-- Section 2: Prerequisites -->
+      <div class="post-section" id="prerequisites">
+        <h2>2. Prerequisites</h2>
+        <p>Before you begin the migration, verify that every item on this checklist is in place. Missing a prerequisite mid-migration can leave secrets in an inconsistent state.</p>
+
+        <ul>
+          <li><strong>Source Vault (Azure VM)</strong> — A running, initialized, and unsealed HashiCorp Vault instance on an Azure Virtual Machine. Record the address as <code>VAULT_ADDR</code> (e.g., <code>https://azure-vault.example.com:8200</code>).</li>
+          <li><strong>Destination Vault (AWS EC2)</strong> — A running, initialized, and unsealed HashiCorp Vault instance on an AWS EC2 instance. Record the address (e.g., <code>https://aws-vault.example.com:8200</code>). Ensure the KV v2 secrets engine is enabled at the same mount path as the source.</li>
+          <li><strong>Vault CLI (v1.15+)</strong> — Installed on your workstation or a bastion host that can reach both Vault instances over the network.</li>
+          <li><strong>Authentication Tokens</strong> — Root or admin-level tokens for both Vaults. Ideally, create purpose-built tokens with a short TTL and scoped policies (read-only on source, write-only on destination).</li>
+          <li><strong>Network Connectivity</strong> — A secure network path between your workstation and both Vault endpoints. Options include Azure VPN Gateway to AWS Site-to-Site VPN, AWS Transit Gateway, or public endpoints with TLS and IP allowlisting.</li>
+          <li><strong>jq (v1.6+)</strong> — The command-line JSON processor, used to parse Vault API responses and extract secret data.</li>
+          <li><strong>Audit Logging Enabled</strong> — On both Vault instances, to capture a tamper-evident log of every operation performed during the migration.</li>
+        </ul>
+
+        <div class="code-label">Verify Vault CLI and jq are installed</div>
+<pre><code><span class="fn">vault</span> <span class="var">version</span>
+<span class="cm"># Vault v1.15.4 (or later)</span>
+
+<span class="fn">jq</span> <span class="var">--version</span>
+<span class="cm"># jq-1.7</span></code></pre>
+
+        <div class="code-label">Enable audit logging on both Vault instances</div>
+<pre><code><span class="cm"># On the source Vault (Azure VM)</span>
+<span class="fn">vault</span> audit enable file <span class="var">file_path</span>=<span class="str">/var/log/vault/audit-source.log</span>
+
+<span class="cm"># On the destination Vault (AWS EC2)</span>
+<span class="fn">vault</span> audit enable file <span class="var">file_path</span>=<span class="str">/var/log/vault/audit-dest.log</span></code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Tip:</strong> Test connectivity from your workstation to both Vaults before proceeding: <code>vault status -address=https://azure-vault.example.com:8200</code> and <code>vault status -address=https://aws-vault.example.com:8200</code>. Both should return <code>Sealed: false</code>.
+        </div>
+      </div>
+
+      <!-- Section 3: Architecture Overview -->
+      <div class="post-section" id="architecture-overview">
+        <h2>3. Architecture Overview</h2>
+        <p>Regardless of the method you choose, the migration follows a three-stage pipeline: export from source, secure transfer, and import to destination. Your workstation (or a bastion host) acts as the orchestrator.</p>
+
+        <div class="code-label">High-level migration architecture</div>
+<pre><code><span class="cm">┌──────────────────────────┐                      ┌──────────────────────────┐</span>
+<span class="cm">│    Azure VM              │    TLS / VPN         │    AWS EC2               │</span>
+<span class="cm">│    ┌──────────────────┐  │  ────────────────►    │  ┌──────────────────┐    │</span>
+<span class="cm">│    │  HashiCorp Vault │  │  vault kv get/put     │  │  HashiCorp Vault │    │</span>
+<span class="cm">│    │  (Source)        │  │  or HTTP API          │  │  (Destination)   │    │</span>
+<span class="cm">│    │                  │  │                       │  │                  │    │</span>
+<span class="cm">│    │  KV v2 Secrets   │  │                       │  │  KV v2 Secrets   │    │</span>
+<span class="cm">│    │  Policies        │  │                       │  │  Policies        │    │</span>
+<span class="cm">│    │  Auth Methods    │  │                       │  │  Auth Methods    │    │</span>
+<span class="cm">│    └──────────────────┘  │                       │  └──────────────────┘    │</span>
+<span class="cm">└──────────────────────────┘                       └──────────────────────────┘</span>
+<span class="cm">              ▲                                                 ▲</span>
+<span class="cm">              │              ┌─────────────────┐                │</span>
+<span class="cm">              └──────────────│   Bastion Host   │────────────────┘</span>
+<span class="cm">                             │   / Workstation  │</span>
+<span class="cm">                             │   (Vault CLI)    │</span>
+<span class="cm">                             └─────────────────┘</span></code></pre>
+
+        <h3>Two Approaches</h3>
+        <p>This guide covers three methods, each suited to a different scale and set of constraints:</p>
+        <ul>
+          <li><strong>Method 1 — Manual CLI Export/Import:</strong> Best for small secret stores (fewer than 50 paths). You run <code>vault kv get</code> and <code>vault kv put</code> commands one at a time. Transparent, easy to audit, but tedious at scale.</li>
+          <li><strong>Method 2 — Automated Bash Script:</strong> Best for medium to large stores. A script recursively discovers every secret path, exports each one to JSON, and imports it to the destination with full logging.</li>
+          <li><strong>Method 3 — Transit Engine &amp; Enterprise Replication:</strong> Best for Enterprise customers who need real-time sync, or OSS users who want encrypted-at-rest staging files during the transfer.</li>
+        </ul>
+
+        <div class="post-callout-info">
+          <strong>Important:</strong> All three methods transfer only the latest version of each secret by default. If you need full version history, you must iterate over each version number using the KV v2 API endpoint <code>/v1/secret/data/:path?version=N</code>.
+        </div>
+      </div>
+
+      <!-- Section 4: Method 1 - CLI-Based Export/Import -->
+      <div class="post-section" id="method-cli">
+        <h2>4. Method 1: CLI-Based Export/Import</h2>
+        <p>This is the most straightforward approach. You manually list secrets on the source Vault, export each one as JSON, and write it to the destination Vault. It is ideal for small migrations or when you want to inspect each secret before importing.</p>
+
+        <h3>Step 1: Set environment variables</h3>
+        <div class="code-label">Define source and destination Vault addresses and tokens</div>
+<pre><code><span class="cm"># Source Vault (Azure VM)</span>
+<span class="kw">export</span> <span class="var">SOURCE_VAULT_ADDR</span>=<span class="str">"https://azure-vault.example.com:8200"</span>
+<span class="kw">export</span> <span class="var">SOURCE_VAULT_TOKEN</span>=<span class="str">"hvs.CAESIJz...azure-token"</span>
+
+<span class="cm"># Destination Vault (AWS EC2)</span>
+<span class="kw">export</span> <span class="var">DEST_VAULT_ADDR</span>=<span class="str">"https://aws-vault.example.com:8200"</span>
+<span class="kw">export</span> <span class="var">DEST_VAULT_TOKEN</span>=<span class="str">"hvs.CAESIKx...aws-token"</span></code></pre>
+
+        <h3>Step 2: List all secret paths on the source</h3>
+        <div class="code-label">List top-level keys under the secret/ mount</div>
+<pre><code><span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv list <span class="str">-format=json</span> secret/
+
+<span class="cm"># Example output:</span>
+<span class="cm"># [</span>
+<span class="cm">#   "app/",</span>
+<span class="cm">#   "database/",</span>
+<span class="cm">#   "api-keys",</span>
+<span class="cm">#   "tls-certs/"</span>
+<span class="cm"># ]</span></code></pre>
+
+        <p>Paths ending with <code>/</code> are directories. You will need to list them recursively to discover leaf secrets within.</p>
+
+        <h3>Step 3: Export a single secret to JSON</h3>
+        <div class="code-label">Read a secret and extract only the data payload</div>
+<pre><code><span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv get <span class="str">-format=json</span> secret/database/postgres \
+  | <span class="fn">jq</span> <span class="str">'.data.data'</span> > <span class="str">/tmp/secret-database-postgres.json</span>
+
+<span class="cm"># Inspect the exported data</span>
+<span class="fn">cat</span> /tmp/secret-database-postgres.json
+<span class="cm"># {</span>
+<span class="cm">#   "username": "db_admin",</span>
+<span class="cm">#   "password": "s3cur3-P@ssw0rd!",</span>
+<span class="cm">#   "host": "postgres.internal.azure.com",</span>
+<span class="cm">#   "port": "5432"</span>
+<span class="cm"># }</span></code></pre>
+
+        <h3>Step 4: Import the secret to the destination</h3>
+        <div class="code-label">Write the JSON payload to the same path on the AWS Vault</div>
+<pre><code><span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv put secret/database/postgres <span class="str">@/tmp/secret-database-postgres.json</span>
+
+<span class="cm"># Verify the write succeeded</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv get secret/database/postgres</code></pre>
+
+        <div class="post-callout-warning">
+          <strong>Warning:</strong> The file <code>/tmp/secret-database-postgres.json</code> contains plaintext secrets. Delete it immediately after import using <code>shred -u /tmp/secret-database-postgres.json</code>. Never leave plaintext secret files on disk.
+        </div>
+
+        <h3>Step 5: Repeat for every secret path</h3>
+        <p>For each key returned by <code>vault kv list</code>, repeat the export and import steps. If a key ends with <code>/</code>, list it to discover nested secrets. This works for small stores, but becomes impractical beyond a few dozen secrets — that is where Method 2 comes in.</p>
+      </div>
+
+      <!-- Section 5: Method 2 - Automated Bash Script -->
+      <div class="post-section" id="method-script">
+        <h2>5. Method 2: Automated Bash Script</h2>
+        <p>For larger secret stores, manual export/import is tedious and error-prone. The following script automates the full process: it recursively walks every path in the source KV store, exports each secret, and writes it to the destination Vault. Every operation is logged with a timestamp for auditability.</p>
+
+        <div class="code-label">vault-migrate.sh — Complete migration script</div>
+<pre><code><span class="cm">#!/usr/bin/env bash</span>
+<span class="cm"># ──────────────────────────────────────────────────────────────</span>
+<span class="cm"># vault-migrate.sh</span>
+<span class="cm"># Recursively migrate all KV v2 secrets from source to destination Vault</span>
+<span class="cm"># Usage: chmod +x vault-migrate.sh && ./vault-migrate.sh</span>
+<span class="cm"># ──────────────────────────────────────────────────────────────</span>
+
+<span class="kw">set</span> -euo pipefail
+
+<span class="cm"># ── Configuration ─────────────────────────────────────────────</span>
+<span class="var">SOURCE_VAULT_ADDR</span>=<span class="str">"https://azure-vault.example.com:8200"</span>
+<span class="var">SOURCE_VAULT_TOKEN</span>=<span class="str">"hvs.CAESIJz...azure-token"</span>
+<span class="var">DEST_VAULT_ADDR</span>=<span class="str">"https://aws-vault.example.com:8200"</span>
+<span class="var">DEST_VAULT_TOKEN</span>=<span class="str">"hvs.CAESIKx...aws-token"</span>
+<span class="var">KV_MOUNT</span>=<span class="str">"secret"</span>
+<span class="var">LOG_FILE</span>=<span class="str">"vault-migration-$(date +%Y%m%d-%H%M%S).log"</span>
+
+<span class="cm"># Counters</span>
+<span class="var">SUCCESS_COUNT</span>=0
+<span class="var">FAIL_COUNT</span>=0
+<span class="var">SKIP_COUNT</span>=0
+
+<span class="cm"># ── Logging helper ────────────────────────────────────────────</span>
+<span class="fn">log</span>() {
+  <span class="kw">local</span> <span class="var">msg</span>=<span class="str">"[$(date '+%Y-%m-%d %H:%M:%S')] $1"</span>
+  <span class="fn">echo</span> <span class="str">"$msg"</span> | <span class="fn">tee</span> -a <span class="str">"$LOG_FILE"</span>
+}
+
+<span class="cm"># ── Recursive migration function ──────────────────────────────</span>
+<span class="fn">migrate_path</span>() {
+  <span class="kw">local</span> <span class="var">path</span>=<span class="str">"$1"</span>
+
+  <span class="cm"># List all keys at the current path on the source Vault</span>
+  <span class="kw">local</span> <span class="var">keys</span>
+  <span class="var">keys</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="str">"$SOURCE_VAULT_ADDR"</span> \
+    <span class="fn">VAULT_TOKEN</span>=<span class="str">"$SOURCE_VAULT_TOKEN"</span> \
+    <span class="fn">vault</span> kv list -format=json <span class="str">"${KV_MOUNT}/${path}"</span> 2>/dev/null) || {
+    <span class="fn">log</span> <span class="str">"WARN: Could not list path: ${KV_MOUNT}/${path} — skipping"</span>
+    (( <span class="var">SKIP_COUNT</span>++ )) || true
+    <span class="kw">return</span>
+  }
+
+  <span class="cm"># Iterate over each key returned</span>
+  <span class="kw">for</span> <span class="var">key</span> <span class="kw">in</span> $(<span class="fn">echo</span> <span class="str">"$keys"</span> | <span class="fn">jq</span> -r <span class="str">'.[]'</span>); <span class="kw">do</span>
+    <span class="kw">if</span> [[ <span class="str">"$key"</span> == */ ]]; <span class="kw">then</span>
+      <span class="cm"># Key is a directory — recurse into it</span>
+      <span class="fn">log</span> <span class="str">"Entering directory: ${KV_MOUNT}/${path}${key}"</span>
+      <span class="fn">migrate_path</span> <span class="str">"${path}${key}"</span>
+    <span class="kw">else</span>
+      <span class="cm"># Key is a leaf secret — export from source, import to destination</span>
+      <span class="kw">local</span> <span class="var">full_path</span>=<span class="str">"${KV_MOUNT}/${path}${key}"</span>
+      <span class="fn">log</span> <span class="str">"Migrating secret: $full_path"</span>
+
+      <span class="cm"># Read secret data from source Vault</span>
+      <span class="kw">local</span> <span class="var">secret_data</span>
+      <span class="var">secret_data</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="str">"$SOURCE_VAULT_ADDR"</span> \
+        <span class="fn">VAULT_TOKEN</span>=<span class="str">"$SOURCE_VAULT_TOKEN"</span> \
+        <span class="fn">vault</span> kv get -format=json <span class="str">"$full_path"</span> \
+        | <span class="fn">jq</span> -c <span class="str">'.data.data'</span>) || {
+        <span class="fn">log</span> <span class="str">"  ERROR: Failed to read $full_path from source"</span>
+        (( <span class="var">FAIL_COUNT</span>++ )) || true
+        <span class="kw">continue</span>
+      }
+
+      <span class="cm"># Write secret data to destination Vault</span>
+      <span class="fn">echo</span> <span class="str">"$secret_data"</span> | \
+        <span class="fn">VAULT_ADDR</span>=<span class="str">"$DEST_VAULT_ADDR"</span> \
+        <span class="fn">VAULT_TOKEN</span>=<span class="str">"$DEST_VAULT_TOKEN"</span> \
+        <span class="fn">vault</span> kv put <span class="str">"$full_path"</span> - &>/dev/null && {
+        <span class="fn">log</span> <span class="str">"  OK: $full_path migrated successfully"</span>
+        (( <span class="var">SUCCESS_COUNT</span>++ )) || true
+      } || {
+        <span class="fn">log</span> <span class="str">"  ERROR: Failed to write $full_path to destination"</span>
+        (( <span class="var">FAIL_COUNT</span>++ )) || true
+      }
+    <span class="kw">fi</span>
+  <span class="kw">done</span>
+}
+
+<span class="cm"># ── Main execution ────────────────────────────────────────────</span>
+<span class="fn">log</span> <span class="str">"============================================="</span>
+<span class="fn">log</span> <span class="str">"  Vault Secret Migration — Starting"</span>
+<span class="fn">log</span> <span class="str">"============================================="</span>
+<span class="fn">log</span> <span class="str">"Source:      $SOURCE_VAULT_ADDR"</span>
+<span class="fn">log</span> <span class="str">"Destination: $DEST_VAULT_ADDR"</span>
+<span class="fn">log</span> <span class="str">"KV Mount:    $KV_MOUNT"</span>
+<span class="fn">log</span> <span class="str">""</span>
+
+<span class="cm"># Verify connectivity to both Vault instances</span>
+<span class="fn">VAULT_ADDR</span>=<span class="str">"$SOURCE_VAULT_ADDR"</span> <span class="fn">VAULT_TOKEN</span>=<span class="str">"$SOURCE_VAULT_TOKEN"</span> \
+  <span class="fn">vault</span> status &>/dev/null || {
+  <span class="fn">log</span> <span class="str">"FATAL: Cannot reach source Vault at $SOURCE_VAULT_ADDR"</span>
+  <span class="kw">exit</span> 1
+}
+
+<span class="fn">VAULT_ADDR</span>=<span class="str">"$DEST_VAULT_ADDR"</span> <span class="fn">VAULT_TOKEN</span>=<span class="str">"$DEST_VAULT_TOKEN"</span> \
+  <span class="fn">vault</span> status &>/dev/null || {
+  <span class="fn">log</span> <span class="str">"FATAL: Cannot reach destination Vault at $DEST_VAULT_ADDR"</span>
+  <span class="kw">exit</span> 1
+}
+
+<span class="fn">log</span> <span class="str">"Connectivity verified. Beginning migration..."</span>
+<span class="fn">log</span> <span class="str">""</span>
+
+<span class="cm"># Start recursive migration from the root of the KV mount</span>
+<span class="fn">migrate_path</span> <span class="str">""</span>
+
+<span class="cm"># Print summary</span>
+<span class="fn">log</span> <span class="str">""</span>
+<span class="fn">log</span> <span class="str">"============================================="</span>
+<span class="fn">log</span> <span class="str">"  Migration Complete"</span>
+<span class="fn">log</span> <span class="str">"============================================="</span>
+<span class="fn">log</span> <span class="str">"Secrets migrated successfully: $SUCCESS_COUNT"</span>
+<span class="fn">log</span> <span class="str">"Secrets failed:               $FAIL_COUNT"</span>
+<span class="fn">log</span> <span class="str">"Paths skipped:                $SKIP_COUNT"</span>
+<span class="fn">log</span> <span class="str">"Full log available at:        $LOG_FILE"</span></code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Tip:</strong> Run this script from a bastion host that has network access to both Vault instances. The timestamped log file provides a complete audit trail. Pipe it through <code>tee</code> to watch progress in real time while also saving to disk.
+        </div>
+
+        <div class="post-callout-warning">
+          <strong>Warning:</strong> This script stores secret data in shell variables temporarily. Ensure the bastion host has encrypted swap and restricted access. Clear your shell history after the migration: <code>history -c && history -w</code>.
+        </div>
+      </div>
+
+      <!-- Section 6: Method 3 - Transit & Replication -->
+      <div class="post-section" id="method-transit">
+        <h2>6. Method 3: Using Vault's Transit &amp; Replication</h2>
+        <p>For organizations with stricter security requirements or Vault Enterprise licenses, there are more robust options than shell scripts.</p>
+
+        <h3>Enterprise: Performance and DR Replication</h3>
+        <p>Vault Enterprise includes built-in replication that synchronizes data between a primary and one or more secondary clusters automatically. This is the gold standard for cross-cloud secret migration.</p>
+        <ul>
+          <li><strong>Performance Replication</strong> — Secondaries serve read requests locally, reducing latency. Writes are forwarded to the primary. Ideal for multi-cloud active/active setups.</li>
+          <li><strong>DR Replication</strong> — The secondary is a hot standby that mirrors the primary. It cannot serve requests until promoted. Ideal for disaster recovery.</li>
+        </ul>
+
+        <div class="code-label">Enable DR replication (Enterprise only)</div>
+<pre><code><span class="cm"># On the source Vault (Azure VM) — enable as DR primary</span>
+<span class="fn">vault</span> write -f sys/replication/dr/primary/enable
+
+<span class="cm"># Generate a secondary activation token</span>
+<span class="fn">vault</span> write -format=json \
+  sys/replication/dr/primary/secondary-token \
+  <span class="var">id</span>=<span class="str">"aws-ec2-dr"</span> | <span class="fn">jq</span> -r <span class="str">'.wrap_info.token'</span>
+<span class="cm"># Save this wrapping token securely</span>
+
+<span class="cm"># On the destination Vault (AWS EC2) — activate as DR secondary</span>
+<span class="fn">vault</span> write sys/replication/dr/secondary/enable \
+  <span class="var">token</span>=<span class="str">"&lt;wrapping-token-from-primary&gt;"</span></code></pre>
+
+        <h3>OSS: Transit Secrets Engine for Encrypted Transfer</h3>
+        <p>If you are using Vault OSS and need to stage exported secrets on disk (for example, on an intermediate jump box), you can encrypt them using the transit secrets engine. This ensures that even if the staging files are compromised, the secrets remain protected.</p>
+
+        <div class="code-label">Enable and configure the transit engine on the source</div>
+<pre><code><span class="cm"># Enable the transit secrets engine on the source Vault</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> secrets enable transit
+
+<span class="cm"># Create a dedicated encryption key for the migration</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> write -f transit/keys/migration-key \
+  <span class="var">type</span>=<span class="str">"aes256-gcm96"</span></code></pre>
+
+        <div class="code-label">Export, encrypt, then decrypt and import</div>
+<pre><code><span class="cm"># Step 1: Read secret from source and base64-encode it</span>
+<span class="var">SECRET_JSON</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv get -format=json secret/database/postgres \
+  | <span class="fn">jq</span> -c <span class="str">'.data.data'</span>)
+
+<span class="var">B64_ENCODED</span>=$(<span class="fn">echo</span> -n <span class="str">"$SECRET_JSON"</span> | <span class="fn">base64</span>)
+
+<span class="cm"># Step 2: Encrypt with transit engine</span>
+<span class="var">CIPHERTEXT</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> write -format=json transit/encrypt/migration-key \
+  <span class="var">plaintext</span>=<span class="str">"$B64_ENCODED"</span> \
+  | <span class="fn">jq</span> -r <span class="str">'.data.ciphertext'</span>)
+
+<span class="cm"># Step 3: Store the ciphertext — safe to write to disk</span>
+<span class="fn">echo</span> <span class="str">"$CIPHERTEXT"</span> > /tmp/secret-postgres-encrypted.dat
+
+<span class="cm"># Step 4: Decrypt using the transit engine</span>
+<span class="var">PLAINTEXT</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> write -format=json transit/decrypt/migration-key \
+  <span class="var">ciphertext</span>=<span class="str">"$(cat /tmp/secret-postgres-encrypted.dat)"</span> \
+  | <span class="fn">jq</span> -r <span class="str">'.data.plaintext'</span> | <span class="fn">base64</span> -d)
+
+<span class="cm"># Step 5: Write the decrypted secret to the destination Vault</span>
+<span class="fn">echo</span> <span class="str">"$PLAINTEXT"</span> | \
+  <span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv put secret/database/postgres -
+
+<span class="cm"># Step 6: Securely remove the encrypted staging file</span>
+<span class="fn">shred</span> -u /tmp/secret-postgres-encrypted.dat</code></pre>
+
+        <div class="post-callout-info">
+          <strong>When to use Transit:</strong> Use this method when secrets must be staged on an intermediate host (like a jump box) before being pushed to the destination. The ciphertext file is useless without access to the transit key, providing defense in depth beyond TLS.
+        </div>
+      </div>
+
+      <!-- Section 7: Handling Auth Methods -->
+      <div class="post-section" id="auth-methods">
+        <h2>7. Handling Auth Methods</h2>
+        <p>Secrets are only half the story. Your applications authenticate to Vault using auth methods such as AppRole, Token-based auth, and Kubernetes auth. These configurations must be recreated on the destination Vault so that applications can authenticate after the migration.</p>
+
+        <h3>Migrating AppRole Auth</h3>
+        <div class="code-label">List and export AppRole roles from the source Vault</div>
+<pre><code><span class="cm"># List all AppRole roles on the source</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> list -format=json auth/approle/role \
+  | <span class="fn">jq</span> -r <span class="str">'.[]'</span>
+
+<span class="cm"># Export a specific role's configuration</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> read -format=json auth/approle/role/web-app \
+  | <span class="fn">jq</span> <span class="str">'.data'</span> > /tmp/approle-web-app.json
+
+<span class="cm"># View the exported configuration</span>
+<span class="fn">cat</span> /tmp/approle-web-app.json
+<span class="cm"># {</span>
+<span class="cm">#   "token_ttl": 3600,</span>
+<span class="cm">#   "token_max_ttl": 14400,</span>
+<span class="cm">#   "token_policies": ["web-app-policy"],</span>
+<span class="cm">#   "secret_id_ttl": 86400,</span>
+<span class="cm">#   "secret_id_num_uses": 0</span>
+<span class="cm"># }</span></code></pre>
+
+        <div class="code-label">Recreate the AppRole on the destination Vault</div>
+<pre><code><span class="cm"># Enable AppRole auth method on the destination</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> auth enable approle
+
+<span class="cm"># Recreate the role with the same configuration</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> write auth/approle/role/web-app \
+  <span class="var">token_ttl</span>=<span class="str">"1h"</span> \
+  <span class="var">token_max_ttl</span>=<span class="str">"4h"</span> \
+  <span class="var">token_policies</span>=<span class="str">"web-app-policy"</span> \
+  <span class="var">secret_id_ttl</span>=<span class="str">"24h"</span> \
+  <span class="var">secret_id_num_uses</span>=<span class="str">"0"</span></code></pre>
+
+        <h3>Migrating Token Auth Configuration</h3>
+        <div class="code-label">Recreate token roles on the destination</div>
+<pre><code><span class="cm"># Export token role from source</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> read -format=json auth/token/roles/ci-runner \
+  | <span class="fn">jq</span> <span class="str">'.data'</span> > /tmp/token-role-ci-runner.json
+
+<span class="cm"># Create the same token role on the destination</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> write auth/token/roles/ci-runner \
+  <span class="var">allowed_policies</span>=<span class="str">"ci-read-only"</span> \
+  <span class="var">orphan</span>=<span class="str">"true"</span> \
+  <span class="var">token_period</span>=<span class="str">"768h"</span> \
+  <span class="var">renewable</span>=<span class="str">"true"</span></code></pre>
+
+        <h3>Migrating Kubernetes Auth</h3>
+        <div class="code-label">Configure Kubernetes auth for AWS EKS on the destination</div>
+<pre><code><span class="cm"># Enable Kubernetes auth on the destination</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> auth enable kubernetes
+
+<span class="cm"># Configure with the AWS EKS cluster details</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> write auth/kubernetes/config \
+  <span class="var">kubernetes_host</span>=<span class="str">"https://ABCDEF1234.gr7.us-east-1.eks.amazonaws.com"</span> \
+  <span class="var">kubernetes_ca_cert</span>=<span class="str">@/tmp/eks-ca-cert.pem</span> \
+  <span class="var">token_reviewer_jwt</span>=<span class="str">@/tmp/eks-reviewer-token.jwt</span>
+
+<span class="cm"># Recreate Kubernetes auth roles</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> write auth/kubernetes/role/web-app \
+  <span class="var">bound_service_account_names</span>=<span class="str">"web-app-sa"</span> \
+  <span class="var">bound_service_account_namespaces</span>=<span class="str">"production"</span> \
+  <span class="var">policies</span>=<span class="str">"web-app-policy"</span> \
+  <span class="var">ttl</span>=<span class="str">"1h"</span></code></pre>
+
+        <div class="post-callout-warning">
+          <strong>Important:</strong> AppRole <code>role_id</code> values are deterministic and tied to the role name, but <code>secret_id</code> values are unique to each Vault instance. After recreating roles on the destination, you must generate new <code>secret_id</code> values and distribute them to your applications through your deployment pipeline.
+        </div>
+      </div>
+
+      <!-- Section 8: Handling Policies -->
+      <div class="post-section" id="policies">
+        <h2>8. Handling Policies</h2>
+        <p>Vault policies control which paths a token can access and what operations it can perform. Migrate every custom policy from the source to the destination before applications attempt to authenticate — otherwise, tokens will be issued with no permissions.</p>
+
+        <h3>Export All Custom Policies</h3>
+        <div class="code-label">List and export policies from the source Vault</div>
+<pre><code><span class="cm"># List all policies (exclude built-in default and root)</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> policy list | <span class="fn">grep</span> -v -E <span class="str">'^(default|root)$'</span>
+
+<span class="cm"># Export each custom policy to an HCL file</span>
+<span class="kw">for</span> <span class="var">policy</span> <span class="kw">in</span> $(<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> policy list | <span class="fn">grep</span> -v -E <span class="str">'^(default|root)$'</span>); <span class="kw">do</span>
+
+  <span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+    <span class="fn">vault</span> policy read <span class="str">"$policy"</span> > <span class="str">"/tmp/policy-${policy}.hcl"</span>
+
+  <span class="fn">echo</span> <span class="str">"Exported: $policy -> /tmp/policy-${policy}.hcl"</span>
+<span class="kw">done</span></code></pre>
+
+        <div class="code-label">Example exported policy: web-app-policy.hcl</div>
+<pre><code><span class="cm"># Allow read access to application secrets</span>
+<span class="fn">path</span> <span class="str">"secret/data/app/*"</span> {
+  <span class="var">capabilities</span> = [<span class="str">"read"</span>, <span class="str">"list"</span>]
+}
+
+<span class="cm"># Allow the app to manage its own token</span>
+<span class="fn">path</span> <span class="str">"auth/token/renew-self"</span> {
+  <span class="var">capabilities</span> = [<span class="str">"update"</span>]
+}
+
+<span class="cm"># Deny access to admin secrets</span>
+<span class="fn">path</span> <span class="str">"secret/data/admin/*"</span> {
+  <span class="var">capabilities</span> = [<span class="str">"deny"</span>]
+}</code></pre>
+
+        <h3>Import Policies to the Destination</h3>
+        <div class="code-label">Write all exported policies to the AWS Vault</div>
+<pre><code><span class="cm"># Import each policy file to the destination Vault</span>
+<span class="kw">for</span> <span class="var">policy_file</span> <span class="kw">in</span> /tmp/policy-*.hcl; <span class="kw">do</span>
+  <span class="cm"># Extract the policy name from the filename</span>
+  <span class="var">policy_name</span>=$(<span class="fn">basename</span> <span class="str">"$policy_file"</span> .hcl | <span class="fn">sed</span> <span class="str">'s/^policy-//'</span>)
+
+  <span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+    <span class="fn">vault</span> policy write <span class="str">"$policy_name"</span> <span class="str">"$policy_file"</span>
+
+  <span class="fn">echo</span> <span class="str">"Imported: $policy_name"</span>
+<span class="kw">done</span>
+
+<span class="cm"># Verify all policies exist on the destination</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> policy list</code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Tip:</strong> Review each policy before importing. Some may reference Azure-specific auth paths (e.g., <code>auth/azure/login</code>) or resource IDs that must be updated for AWS. For example, replace Azure Managed Identity references with AWS IAM role ARNs in the relevant auth method configuration.
+        </div>
+      </div>
+
+      <!-- Section 9: Validation & Verification -->
+      <div class="post-section" id="validation">
+        <h2>9. Validation &amp; Verification</h2>
+        <p>Never assume a migration succeeded. Validate every aspect: secret counts, individual values, policies, and auth methods. This section provides scripts and techniques for thorough verification.</p>
+
+        <h3>Compare Secret Counts</h3>
+        <div class="code-label">Count top-level keys on source and destination</div>
+<pre><code><span class="cm"># Count keys on source</span>
+<span class="var">SRC_COUNT</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv list -format=json secret/ | <span class="fn">jq</span> <span class="str">'length'</span>)
+
+<span class="cm"># Count keys on destination</span>
+<span class="var">DST_COUNT</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv list -format=json secret/ | <span class="fn">jq</span> <span class="str">'length'</span>)
+
+<span class="fn">echo</span> <span class="str">"Source count:      $SRC_COUNT"</span>
+<span class="fn">echo</span> <span class="str">"Destination count: $DST_COUNT"</span>
+
+<span class="kw">if</span> [ <span class="str">"$SRC_COUNT"</span> -eq <span class="str">"$DST_COUNT"</span> ]; <span class="kw">then</span>
+  <span class="fn">echo</span> <span class="str">"Counts match."</span>
+<span class="kw">else</span>
+  <span class="fn">echo</span> <span class="str">"WARNING: Count mismatch! Investigate before proceeding."</span>
+<span class="kw">fi</span></code></pre>
+
+        <h3>Spot-Check Individual Secret Values</h3>
+        <div class="code-label">Compare a specific secret between source and destination</div>
+<pre><code><span class="cm"># Read from source and destination, then compare</span>
+<span class="var">SRC_VAL</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv get -format=json secret/database/postgres \
+  | <span class="fn">jq</span> -Sc <span class="str">'.data.data'</span>)
+
+<span class="var">DST_VAL</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> \
+  <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> kv get -format=json secret/database/postgres \
+  | <span class="fn">jq</span> -Sc <span class="str">'.data.data'</span>)
+
+<span class="kw">if</span> [ <span class="str">"$SRC_VAL"</span> = <span class="str">"$DST_VAL"</span> ]; <span class="kw">then</span>
+  <span class="fn">echo</span> <span class="str">"secret/database/postgres: MATCH"</span>
+<span class="kw">else</span>
+  <span class="fn">echo</span> <span class="str">"secret/database/postgres: MISMATCH"</span>
+  <span class="fn">echo</span> <span class="str">"Source: $SRC_VAL"</span>
+  <span class="fn">echo</span> <span class="str">"Dest:   $DST_VAL"</span>
+<span class="kw">fi</span></code></pre>
+
+        <h3>Full Recursive Validation Script</h3>
+        <div class="code-label">vault-validate.sh — Compare all secrets between source and destination</div>
+<pre><code><span class="cm">#!/usr/bin/env bash</span>
+<span class="cm"># vault-validate.sh — Verify all secrets match post-migration</span>
+
+<span class="kw">set</span> -euo pipefail
+
+<span class="var">MATCH</span>=0
+<span class="var">MISMATCH</span>=0
+<span class="var">MISSING</span>=0
+
+<span class="fn">validate_path</span>() {
+  <span class="kw">local</span> <span class="var">path</span>=<span class="str">"$1"</span>
+  <span class="kw">local</span> <span class="var">keys</span>
+  <span class="var">keys</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="str">"$SOURCE_VAULT_ADDR"</span> \
+    <span class="fn">VAULT_TOKEN</span>=<span class="str">"$SOURCE_VAULT_TOKEN"</span> \
+    <span class="fn">vault</span> kv list -format=json <span class="str">"secret/${path}"</span> 2>/dev/null) || <span class="kw">return</span>
+
+  <span class="kw">for</span> <span class="var">key</span> <span class="kw">in</span> $(<span class="fn">echo</span> <span class="str">"$keys"</span> | <span class="fn">jq</span> -r <span class="str">'.[]'</span>); <span class="kw">do</span>
+    <span class="kw">if</span> [[ <span class="str">"$key"</span> == */ ]]; <span class="kw">then</span>
+      <span class="fn">validate_path</span> <span class="str">"${path}${key}"</span>
+    <span class="kw">else</span>
+      <span class="kw">local</span> <span class="var">full</span>=<span class="str">"secret/${path}${key}"</span>
+      <span class="kw">local</span> <span class="var">src</span> <span class="var">dst</span>
+
+      <span class="var">src</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="str">"$SOURCE_VAULT_ADDR"</span> \
+        <span class="fn">VAULT_TOKEN</span>=<span class="str">"$SOURCE_VAULT_TOKEN"</span> \
+        <span class="fn">vault</span> kv get -format=json <span class="str">"$full"</span> \
+        | <span class="fn">jq</span> -Sc <span class="str">'.data.data'</span>)
+
+      <span class="var">dst</span>=$(<span class="fn">VAULT_ADDR</span>=<span class="str">"$DEST_VAULT_ADDR"</span> \
+        <span class="fn">VAULT_TOKEN</span>=<span class="str">"$DEST_VAULT_TOKEN"</span> \
+        <span class="fn">vault</span> kv get -format=json <span class="str">"$full"</span> \
+        | <span class="fn">jq</span> -Sc <span class="str">'.data.data'</span> 2>/dev/null) || <span class="var">dst</span>=<span class="str">"NOT_FOUND"</span>
+
+      <span class="kw">if</span> [ <span class="str">"$dst"</span> = <span class="str">"NOT_FOUND"</span> ]; <span class="kw">then</span>
+        <span class="fn">echo</span> <span class="str">"MISSING:  $full"</span>
+        (( <span class="var">MISSING</span>++ )) || true
+      <span class="kw">elif</span> [ <span class="str">"$src"</span> = <span class="str">"$dst"</span> ]; <span class="kw">then</span>
+        <span class="fn">echo</span> <span class="str">"MATCH:    $full"</span>
+        (( <span class="var">MATCH</span>++ )) || true
+      <span class="kw">else</span>
+        <span class="fn">echo</span> <span class="str">"MISMATCH: $full"</span>
+        (( <span class="var">MISMATCH</span>++ )) || true
+      <span class="kw">fi</span>
+    <span class="kw">fi</span>
+  <span class="kw">done</span>
+}
+
+<span class="fn">echo</span> <span class="str">"=== Vault Migration Validation ==="</span>
+<span class="fn">validate_path</span> <span class="str">""</span>
+
+<span class="fn">echo</span> <span class="str">""</span>
+<span class="fn">echo</span> <span class="str">"=================================="</span>
+<span class="fn">echo</span> <span class="str">"Matched:  $MATCH"</span>
+<span class="fn">echo</span> <span class="str">"Mismatch: $MISMATCH"</span>
+<span class="fn">echo</span> <span class="str">"Missing:  $MISSING"</span>
+
+<span class="kw">if</span> [ <span class="str">"$MISMATCH"</span> -eq 0 ] && [ <span class="str">"$MISSING"</span> -eq 0 ]; <span class="kw">then</span>
+  <span class="fn">echo</span> <span class="str">"Validation PASSED"</span>
+<span class="kw">else</span>
+  <span class="fn">echo</span> <span class="str">"Validation FAILED — review mismatches above"</span>
+  <span class="kw">exit</span> 1
+<span class="kw">fi</span></code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Tip:</strong> Run the validation script immediately after migration, and again 24 hours later to catch any secrets that may have been updated on the source after the migration window.
+        </div>
+      </div>
+
+      <!-- Section 10: Security Best Practices -->
+      <div class="post-section" id="security-best-practices">
+        <h2>10. Security Best Practices</h2>
+        <p>Migrating secrets is one of the most sensitive operations you can perform. Follow every practice below to minimize the risk of exposure, unauthorized access, and compliance violations.</p>
+
+        <h3>TLS Everywhere</h3>
+        <p>Both Vault instances must use valid TLS certificates signed by a trusted Certificate Authority. Never use <code>-tls-skip-verify</code> in production — it disables certificate validation and opens the door to man-in-the-middle attacks.</p>
+
+        <div class="code-label">Verify TLS is active and valid on both endpoints</div>
+<pre><code><span class="cm"># Check TLS certificate validity</span>
+<span class="fn">curl</span> -s -o /dev/null -w <span class="str">"TLS verify: %{ssl_verify_result}\n"</span> \
+  <span class="var">$SOURCE_VAULT_ADDR</span>/v1/sys/health
+<span class="cm"># Expected output: TLS verify: 0  (0 means success)</span>
+
+<span class="fn">curl</span> -s -o /dev/null -w <span class="str">"TLS verify: %{ssl_verify_result}\n"</span> \
+  <span class="var">$DEST_VAULT_ADDR</span>/v1/sys/health
+<span class="cm"># Expected output: TLS verify: 0</span></code></pre>
+
+        <h3>Use Short-Lived, Scoped Tokens</h3>
+        <p>Create dedicated tokens for the migration with a TTL just long enough to complete the work. Scope them to the minimum required permissions.</p>
+
+        <div class="code-label">Create migration-specific tokens with limited TTL</div>
+<pre><code><span class="cm"># Create a read-only token on the source (2-hour TTL)</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">vault</span> token create \
+  <span class="var">-policy</span>=<span class="str">"migration-read-only"</span> \
+  <span class="var">-ttl</span>=<span class="str">"2h"</span> \
+  <span class="var">-display-name</span>=<span class="str">"migration-azure-to-aws"</span> \
+  <span class="var">-no-default-policy</span>=<span class="str">true</span>
+
+<span class="cm"># Create a write-only token on the destination (2-hour TTL)</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">vault</span> token create \
+  <span class="var">-policy</span>=<span class="str">"migration-write-only"</span> \
+  <span class="var">-ttl</span>=<span class="str">"2h"</span> \
+  <span class="var">-display-name</span>=<span class="str">"migration-azure-to-aws"</span> \
+  <span class="var">-no-default-policy</span>=<span class="str">true</span></code></pre>
+
+        <h3>Audit Logging</h3>
+        <p>Confirm that audit devices are active on both Vaults before starting. Every <code>kv/get</code> on the source and every <code>kv/put</code> on the destination will be logged with timestamps, client tokens, and request payloads (HMAC-hashed by default).</p>
+
+        <div class="code-label">Verify audit devices are enabled</div>
+<pre><code><span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$SOURCE_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> audit list -detailed
+
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">VAULT_TOKEN</span>=<span class="var">$DEST_VAULT_TOKEN</span> \
+  <span class="fn">vault</span> audit list -detailed</code></pre>
+
+        <h3>Securely Clean Up Temporary Files</h3>
+        <p>Any JSON, HCL, or encrypted files created during the migration must be securely deleted. Standard <code>rm</code> does not overwrite the data on disk — use <code>shred</code> instead.</p>
+
+        <div class="code-label">Securely delete all temporary migration files</div>
+<pre><code><span class="cm"># Overwrite and delete all migration artifacts</span>
+<span class="fn">shred</span> -vfz -n 3 /tmp/policy-*.hcl 2>/dev/null || true
+<span class="fn">shred</span> -vfz -n 3 /tmp/secret-*.json 2>/dev/null || true
+<span class="fn">shred</span> -vfz -n 3 /tmp/approle-*.json 2>/dev/null || true
+<span class="fn">shred</span> -vfz -n 3 /tmp/token-role-*.json 2>/dev/null || true
+<span class="fn">shred</span> -vfz -n 3 /tmp/*-encrypted.dat 2>/dev/null || true
+
+<span class="cm"># Clear shell history to remove any tokens from the session</span>
+<span class="fn">history</span> -c && <span class="fn">history</span> -w</code></pre>
+
+        <h3>Rotate Credentials Post-Migration</h3>
+        <p>Once the migration is validated and applications are pointing to the new Vault on AWS, perform these post-migration security steps:</p>
+        <ul>
+          <li><strong>Revoke migration tokens</strong> on both Vaults immediately.</li>
+          <li><strong>Rotate database passwords</strong> and API keys that were migrated. The act of reading them during migration increases their exposure risk.</li>
+          <li><strong>Generate new AppRole <code>secret_id</code> values</strong> on the destination and update your CI/CD pipelines and application configurations.</li>
+          <li><strong>Review audit logs</strong> on both Vaults for any unexpected access patterns during the migration window.</li>
+          <li><strong>Disable or delete the transit encryption key</strong> used for the migration if you used Method 3.</li>
+        </ul>
+
+        <div class="code-label">Revoke migration tokens and clean up the transit key</div>
+<pre><code><span class="cm"># Revoke the source migration token</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">vault</span> token revoke <span class="var">$SOURCE_VAULT_TOKEN</span>
+
+<span class="cm"># Revoke the destination migration token</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$DEST_VAULT_ADDR</span> <span class="fn">vault</span> token revoke <span class="var">$DEST_VAULT_TOKEN</span>
+
+<span class="cm"># Delete the transit migration key (if used)</span>
+<span class="fn">VAULT_ADDR</span>=<span class="var">$SOURCE_VAULT_ADDR</span> <span class="fn">vault</span> delete transit/keys/migration-key \
+  <span class="var">deletion_allowed</span>=<span class="str">true</span></code></pre>
+
+        <div class="post-callout-warning">
+          <strong>Final Reminder:</strong> Do not decommission the source Vault on Azure until you have fully validated the destination, updated all application configurations, and confirmed that no workloads are still reading from the old instance. Keep the source running in read-only mode for at least one full release cycle as a safety net. Monitor its audit log — if any application still hits it, you have a missed dependency.
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

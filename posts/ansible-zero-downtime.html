@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ansible Playbooks for Zero-Downtime Server Configuration — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Tutorial</span>
+        <span class="post-date">Oct 28, 2025</span>
+        <span class="post-read-time">9 min read</span>
+      </div>
+      <h1 class="post-heading">Ansible Playbooks for Zero-Downtime Server Configuration</h1>
+      <p class="post-subtitle">Writing idempotent playbooks for rolling updates and OS hardening across 100+ instances</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#why-zero-downtime">Why Zero-Downtime Config Management Matters</a></li>
+        <li><a href="#ansible-basics">Ansible Basics</a></li>
+        <li><a href="#rolling-updates">Rolling Updates with Serial</a></li>
+        <li><a href="#vault-integration">Vault Integration for Secrets</a></li>
+        <li><a href="#os-hardening">OS Hardening Role</a></li>
+        <li><a href="#health-checks">Health Checks &amp; Verification</a></li>
+        <li><a href="#scaling-strategies">Scaling Strategies for 100+ Hosts</a></li>
+        <li><a href="#takeaways">Key Takeaways</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="why-zero-downtime">
+      <h2>Why Zero-Downtime Config Management Matters</h2>
+      <p>In any environment running production workloads, the ability to update server configurations without taking services offline is not a luxury — it's a requirement. Whether you're patching a kernel vulnerability, rotating TLS certificates, or rolling out new firewall rules, every minute of downtime translates to lost revenue and eroded customer trust.</p>
+      <p>Traditional approaches to configuration management often involve maintenance windows: scheduled periods where services are deliberately taken offline for updates. But in a world of global users and 24/7 availability expectations, maintenance windows are increasingly unacceptable. We needed a way to push configuration changes across our fleet of 100+ Ubuntu instances with zero user-facing impact.</p>
+      <p>Ansible became our tool of choice for this challenge. Its agentless architecture, human-readable YAML syntax, and powerful module ecosystem made it the ideal foundation for building zero-downtime configuration workflows. Over the past year, we've refined our approach into a set of patterns that reliably deliver configuration changes to production servers without a single second of downtime.</p>
+    </div>
+
+    <div class="post-section" id="ansible-basics">
+      <h2>Ansible Basics</h2>
+      <p>Before diving into the zero-downtime patterns, let's establish the core Ansible concepts that make everything else possible.</p>
+      <p><strong>Inventory</strong> defines the hosts you manage. It can be a static INI file or a dynamic script that queries AWS, GCP, or your CMDB. <strong>Playbooks</strong> are YAML files that declare the desired state of your infrastructure. <strong>Roles</strong> organize playbooks into reusable components with their own tasks, handlers, templates, and variables. And <strong>idempotency</strong> — the most critical concept — ensures that running a playbook multiple times produces the same result as running it once.</p>
+      <pre><code><span class="cm"># inventory/production.yml</span>
+<span class="kw">all:</span>
+  <span class="kw">children:</span>
+    <span class="kw">webservers:</span>
+      <span class="kw">hosts:</span>
+        <span class="kw">web-[01:25].prod.internal:</span>
+      <span class="kw">vars:</span>
+        <span class="kw">http_port:</span> <span class="num">8080</span>
+        <span class="kw">max_connections:</span> <span class="num">1024</span>
+    <span class="kw">appservers:</span>
+      <span class="kw">hosts:</span>
+        <span class="kw">app-[01:50].prod.internal:</span>
+      <span class="kw">vars:</span>
+        <span class="kw">jvm_heap_size:</span> <span class="str">"4g"</span>
+    <span class="kw">dbservers:</span>
+      <span class="kw">hosts:</span>
+        <span class="kw">db-[01:10].prod.internal:</span>
+      <span class="kw">vars:</span>
+        <span class="kw">postgres_version:</span> <span class="num">15</span></code><span class="code-label">YAML</span></pre>
+      <p>Idempotency is what makes zero-downtime updates possible. Every Ansible module is designed to check the current state before making changes. If the desired state already matches reality, the task reports "ok" and moves on. This means you can safely re-run playbooks without fear of breaking things — a property that is essential when rolling updates across a large fleet.</p>
+    </div>
+
+    <div class="post-section" id="rolling-updates">
+      <h2>Rolling Updates with Serial</h2>
+      <p>The <code>serial</code> keyword is the cornerstone of zero-downtime Ansible deployments. Instead of updating all hosts simultaneously (the default behavior), <code>serial</code> processes hosts in controlled batches. If any batch fails, the playbook halts before affecting the remaining hosts.</p>
+
+      <div class="post-callout post-callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>Always test playbooks in a staging environment before running them against production. A seemingly harmless configuration change can cascade into a full outage if applied to all hosts at once. Use <code>serial</code> and <code>--check</code> mode to validate changes incrementally.</p>
+      </div>
+
+      <pre><code><span class="cm"># playbooks/rolling-update.yml</span>
+---
+- <span class="kw">name:</span> <span class="str">Rolling update for web servers</span>
+  <span class="kw">hosts:</span> <span class="str">webservers</span>
+  <span class="kw">serial:</span> <span class="str">"25%"</span>
+  <span class="kw">become:</span> <span class="str">yes</span>
+  <span class="kw">max_fail_percentage:</span> <span class="num">0</span>
+
+  <span class="kw">pre_tasks:</span>
+    - <span class="kw">name:</span> <span class="str">Remove host from load balancer</span>
+      <span class="kw">uri:</span>
+        <span class="kw">url:</span> <span class="str">"https://lb.internal/api/v1/backends/{{ inventory_hostname }}"</span>
+        <span class="kw">method:</span> <span class="str">DELETE</span>
+        <span class="kw">headers:</span>
+          <span class="kw">Authorization:</span> <span class="str">"Bearer {{ lb_api_token }}"</span>
+      <span class="kw">delegate_to:</span> <span class="str">localhost</span>
+
+    - <span class="kw">name:</span> <span class="str">Wait for connections to drain</span>
+      <span class="kw">wait_for:</span>
+        <span class="kw">host:</span> <span class="str">"{{ inventory_hostname }}"</span>
+        <span class="kw">port:</span> <span class="num">8080</span>
+        <span class="kw">state:</span> <span class="str">drained</span>
+        <span class="kw">timeout:</span> <span class="num">60</span>
+
+  <span class="kw">tasks:</span>
+    - <span class="kw">name:</span> <span class="str">Update application packages</span>
+      <span class="kw">apt:</span>
+        <span class="kw">name:</span> <span class="str">"{{ app_package }}"</span>
+        <span class="kw">state:</span> <span class="str">latest</span>
+        <span class="kw">update_cache:</span> <span class="str">yes</span>
+      <span class="kw">notify:</span> <span class="str">restart application</span>
+
+    - <span class="kw">name:</span> <span class="str">Deploy updated configuration</span>
+      <span class="kw">template:</span>
+        <span class="kw">src:</span> <span class="str">app-config.yml.j2</span>
+        <span class="kw">dest:</span> <span class="str">/etc/myapp/config.yml</span>
+        <span class="kw">owner:</span> <span class="str">appuser</span>
+        <span class="kw">mode:</span> <span class="str">"0640"</span>
+      <span class="kw">notify:</span> <span class="str">restart application</span>
+
+  <span class="kw">post_tasks:</span>
+    - <span class="kw">name:</span> <span class="str">Verify application is healthy</span>
+      <span class="kw">uri:</span>
+        <span class="kw">url:</span> <span class="str">"http://{{ inventory_hostname }}:8080/health"</span>
+        <span class="kw">status_code:</span> <span class="num">200</span>
+      <span class="kw">register:</span> <span class="str">health_check</span>
+      <span class="kw">retries:</span> <span class="num">10</span>
+      <span class="kw">delay:</span> <span class="num">5</span>
+      <span class="kw">until:</span> <span class="str">health_check.status == 200</span>
+
+    - <span class="kw">name:</span> <span class="str">Add host back to load balancer</span>
+      <span class="kw">uri:</span>
+        <span class="kw">url:</span> <span class="str">"https://lb.internal/api/v1/backends"</span>
+        <span class="kw">method:</span> <span class="str">POST</span>
+        <span class="kw">body_format:</span> <span class="str">json</span>
+        <span class="kw">body:</span>
+          <span class="kw">hostname:</span> <span class="str">"{{ inventory_hostname }}"</span>
+          <span class="kw">port:</span> <span class="num">8080</span>
+      <span class="kw">delegate_to:</span> <span class="str">localhost</span>
+
+  <span class="kw">handlers:</span>
+    - <span class="kw">name:</span> <span class="str">restart application</span>
+      <span class="kw">systemd:</span>
+        <span class="kw">name:</span> <span class="str">myapp</span>
+        <span class="kw">state:</span> <span class="str">restarted</span>
+        <span class="kw">daemon_reload:</span> <span class="str">yes</span></code><span class="code-label">YAML</span></pre>
+      <p>The flow is: remove 25% of servers from the load balancer, wait for active connections to drain, apply the updates, verify health, then re-add them to the pool. Only then does Ansible move to the next 25%. If any batch fails its health check, the entire playbook stops — protecting the remaining 75% of your fleet.</p>
+    </div>
+
+    <div class="post-section" id="vault-integration">
+      <h2>Vault Integration for Secrets</h2>
+      <p>Hardcoding secrets in playbooks or inventory files is a security anti-pattern. We integrate HashiCorp Vault to dynamically fetch secrets at playbook runtime, ensuring sensitive data never touches disk or version control.</p>
+      <pre><code><span class="cm"># playbooks/deploy-with-secrets.yml</span>
+---
+- <span class="kw">name:</span> <span class="str">Deploy application with Vault secrets</span>
+  <span class="kw">hosts:</span> <span class="str">appservers</span>
+  <span class="kw">become:</span> <span class="str">yes</span>
+  <span class="kw">vars:</span>
+    <span class="kw">vault_addr:</span> <span class="str">"https://vault.internal:8200"</span>
+
+  <span class="kw">tasks:</span>
+    - <span class="kw">name:</span> <span class="str">Authenticate to Vault using AppRole</span>
+      <span class="kw">uri:</span>
+        <span class="kw">url:</span> <span class="str">"{{ vault_addr }}/v1/auth/approle/login"</span>
+        <span class="kw">method:</span> <span class="str">POST</span>
+        <span class="kw">body_format:</span> <span class="str">json</span>
+        <span class="kw">body:</span>
+          <span class="kw">role_id:</span> <span class="str">"{{ lookup('env', 'VAULT_ROLE_ID') }}"</span>
+          <span class="kw">secret_id:</span> <span class="str">"{{ lookup('env', 'VAULT_SECRET_ID') }}"</span>
+      <span class="kw">register:</span> <span class="str">vault_auth</span>
+      <span class="kw">delegate_to:</span> <span class="str">localhost</span>
+      <span class="kw">run_once:</span> <span class="str">true</span>
+
+    - <span class="kw">name:</span> <span class="str">Fetch database credentials from Vault</span>
+      <span class="kw">uri:</span>
+        <span class="kw">url:</span> <span class="str">"{{ vault_addr }}/v1/secret/data/production/database"</span>
+        <span class="kw">method:</span> <span class="str">GET</span>
+        <span class="kw">headers:</span>
+          <span class="kw">X-Vault-Token:</span> <span class="str">"{{ vault_auth.json.auth.client_token }}"</span>
+      <span class="kw">register:</span> <span class="str">db_secrets</span>
+      <span class="kw">delegate_to:</span> <span class="str">localhost</span>
+      <span class="kw">run_once:</span> <span class="str">true</span>
+      <span class="kw">no_log:</span> <span class="str">true</span>
+
+    - <span class="kw">name:</span> <span class="str">Deploy database configuration</span>
+      <span class="kw">template:</span>
+        <span class="kw">src:</span> <span class="str">db-config.yml.j2</span>
+        <span class="kw">dest:</span> <span class="str">/etc/myapp/db.yml</span>
+        <span class="kw">owner:</span> <span class="str">appuser</span>
+        <span class="kw">mode:</span> <span class="str">"0600"</span>
+      <span class="kw">vars:</span>
+        <span class="kw">db_username:</span> <span class="str">"{{ db_secrets.json.data.data.username }}"</span>
+        <span class="kw">db_password:</span> <span class="str">"{{ db_secrets.json.data.data.password }}"</span>
+      <span class="kw">no_log:</span> <span class="str">true</span>
+      <span class="kw">notify:</span> <span class="str">restart application</span></code><span class="code-label">YAML</span></pre>
+      <p>The <code>no_log: true</code> directive is critical — it prevents Ansible from printing secret values in its output. The <code>run_once: true</code> ensures we only authenticate to Vault once per playbook run, regardless of how many hosts are in the inventory. Secrets are fetched into memory and never written to intermediate files.</p>
+    </div>
+
+    <div class="post-section" id="os-hardening">
+      <h2>OS Hardening Role</h2>
+      <p>Security hardening is one of the most impactful uses of Ansible. Our hardening role enforces a consistent security baseline across every server in the fleet, covering SSH configuration, firewall rules, and user management.</p>
+      <pre><code><span class="cm"># roles/os-hardening/tasks/main.yml</span>
+---
+- <span class="kw">name:</span> <span class="str">Harden SSH configuration</span>
+  <span class="kw">lineinfile:</span>
+    <span class="kw">path:</span> <span class="str">/etc/ssh/sshd_config</span>
+    <span class="kw">regexp:</span> <span class="str">"{{ item.regexp }}"</span>
+    <span class="kw">line:</span> <span class="str">"{{ item.line }}"</span>
+    <span class="kw">validate:</span> <span class="str">'sshd -t -f %s'</span>
+  <span class="kw">loop:</span>
+    - { <span class="kw">regexp:</span> <span class="str">'^#?PermitRootLogin'</span>, <span class="kw">line:</span> <span class="str">'PermitRootLogin no'</span> }
+    - { <span class="kw">regexp:</span> <span class="str">'^#?PasswordAuthentication'</span>, <span class="kw">line:</span> <span class="str">'PasswordAuthentication no'</span> }
+    - { <span class="kw">regexp:</span> <span class="str">'^#?X11Forwarding'</span>, <span class="kw">line:</span> <span class="str">'X11Forwarding no'</span> }
+    - { <span class="kw">regexp:</span> <span class="str">'^#?MaxAuthTries'</span>, <span class="kw">line:</span> <span class="str">'MaxAuthTries 3'</span> }
+    - { <span class="kw">regexp:</span> <span class="str">'^#?AllowAgentForwarding'</span>, <span class="kw">line:</span> <span class="str">'AllowAgentForwarding no'</span> }
+  <span class="kw">notify:</span> <span class="str">restart sshd</span>
+
+- <span class="kw">name:</span> <span class="str">Configure UFW firewall defaults</span>
+  <span class="kw">ufw:</span>
+    <span class="kw">state:</span> <span class="str">enabled</span>
+    <span class="kw">policy:</span> <span class="str">deny</span>
+    <span class="kw">direction:</span> <span class="str">incoming</span>
+
+- <span class="kw">name:</span> <span class="str">Allow essential inbound ports</span>
+  <span class="kw">ufw:</span>
+    <span class="kw">rule:</span> <span class="str">allow</span>
+    <span class="kw">port:</span> <span class="str">"{{ item.port }}"</span>
+    <span class="kw">proto:</span> <span class="str">"{{ item.proto }}"</span>
+    <span class="kw">from_ip:</span> <span class="str">"{{ item.from | default('any') }}"</span>
+    <span class="kw">comment:</span> <span class="str">"{{ item.comment }}"</span>
+  <span class="kw">loop:</span>
+    - { <span class="kw">port:</span> <span class="str">'22'</span>, <span class="kw">proto:</span> <span class="str">'tcp'</span>, <span class="kw">from:</span> <span class="str">'10.0.0.0/8'</span>, <span class="kw">comment:</span> <span class="str">'SSH from internal'</span> }
+    - { <span class="kw">port:</span> <span class="str">'8080'</span>, <span class="kw">proto:</span> <span class="str">'tcp'</span>, <span class="kw">comment:</span> <span class="str">'Application HTTP'</span> }
+    - { <span class="kw">port:</span> <span class="str">'9100'</span>, <span class="kw">proto:</span> <span class="str">'tcp'</span>, <span class="kw">from:</span> <span class="str">'10.0.0.0/8'</span>, <span class="kw">comment:</span> <span class="str">'Node exporter'</span> }
+
+- <span class="kw">name:</span> <span class="str">Create application service accounts</span>
+  <span class="kw">user:</span>
+    <span class="kw">name:</span> <span class="str">"{{ item.name }}"</span>
+    <span class="kw">shell:</span> <span class="str">/usr/sbin/nologin</span>
+    <span class="kw">system:</span> <span class="str">yes</span>
+    <span class="kw">create_home:</span> <span class="str">no</span>
+  <span class="kw">loop:</span>
+    - { <span class="kw">name:</span> <span class="str">'appuser'</span> }
+    - { <span class="kw">name:</span> <span class="str">'monitoring'</span> }
+
+- <span class="kw">name:</span> <span class="str">Remove unnecessary packages</span>
+  <span class="kw">apt:</span>
+    <span class="kw">name:</span>
+      - <span class="str">telnet</span>
+      - <span class="str">rsh-client</span>
+      - <span class="str">rsh-server</span>
+    <span class="kw">state:</span> <span class="str">absent</span>
+    <span class="kw">purge:</span> <span class="str">yes</span></code><span class="code-label">YAML</span></pre>
+      <p>The <code>validate</code> parameter on the SSH configuration task is a safety net — it runs <code>sshd -t</code> to verify the syntax before applying the change. If the validation fails, Ansible rolls back the change, preventing you from locking yourself out of the server with a bad SSH config.</p>
+    </div>
+
+    <div class="post-section" id="health-checks">
+      <h2>Health Checks &amp; Verification</h2>
+      <p>Health checks are the safety net that makes zero-downtime updates trustworthy. Without proper verification, you might push a broken configuration to every server before realizing something is wrong. Ansible's <code>wait_for</code> and <code>uri</code> modules provide robust primitives for building health checks into your playbooks.</p>
+      <pre><code><span class="cm"># tasks/verify-deployment.yml</span>
+---
+- <span class="kw">name:</span> <span class="str">Wait for application port to be available</span>
+  <span class="kw">wait_for:</span>
+    <span class="kw">host:</span> <span class="str">"{{ inventory_hostname }}"</span>
+    <span class="kw">port:</span> <span class="num">8080</span>
+    <span class="kw">state:</span> <span class="str">started</span>
+    <span class="kw">timeout:</span> <span class="num">120</span>
+    <span class="kw">delay:</span> <span class="num">5</span>
+
+- <span class="kw">name:</span> <span class="str">Verify HTTP health endpoint returns 200</span>
+  <span class="kw">uri:</span>
+    <span class="kw">url:</span> <span class="str">"http://{{ inventory_hostname }}:8080/health"</span>
+    <span class="kw">method:</span> <span class="str">GET</span>
+    <span class="kw">status_code:</span> <span class="num">200</span>
+    <span class="kw">return_content:</span> <span class="str">yes</span>
+  <span class="kw">register:</span> <span class="str">health_result</span>
+  <span class="kw">retries:</span> <span class="num">15</span>
+  <span class="kw">delay:</span> <span class="num">10</span>
+  <span class="kw">until:</span> <span class="str">health_result.status == 200</span>
+
+- <span class="kw">name:</span> <span class="str">Validate application version matches expected</span>
+  <span class="kw">uri:</span>
+    <span class="kw">url:</span> <span class="str">"http://{{ inventory_hostname }}:8080/info"</span>
+    <span class="kw">method:</span> <span class="str">GET</span>
+    <span class="kw">return_content:</span> <span class="str">yes</span>
+  <span class="kw">register:</span> <span class="str">info_result</span>
+  <span class="kw">failed_when:</span> <span class="str">info_result.json.version != expected_version</span>
+
+- <span class="kw">name:</span> <span class="str">Check that log file has no ERROR entries</span>
+  <span class="kw">shell:</span> <span class="str">"tail -50 /var/log/myapp/application.log | grep -c ERROR"</span>
+  <span class="kw">register:</span> <span class="str">error_count</span>
+  <span class="kw">failed_when:</span> <span class="str">error_count.stdout | int > 0</span>
+  <span class="kw">changed_when:</span> <span class="str">false</span></code><span class="code-label">YAML</span></pre>
+      <p>The combination of <code>retries</code> and <code>delay</code> gives applications time to start up before declaring failure. The <code>failed_when</code> conditional lets you define custom failure criteria beyond simple HTTP status codes. And <code>changed_when: false</code> ensures read-only verification tasks don't trigger handlers or pollute your change reports.</p>
+    </div>
+
+    <div class="post-section" id="scaling-strategies">
+      <h2>Scaling Strategies for 100+ Hosts</h2>
+      <p>Running Ansible against a handful of servers is straightforward. Running it against 100+ hosts requires deliberate optimization. Without tuning, playbook execution times can stretch to hours, and SSH connection overhead becomes the dominant bottleneck.</p>
+      <pre><code><span class="cm"># ansible.cfg - Performance tuning for large fleets</span>
+<span class="kw">[defaults]</span>
+<span class="kw">forks</span> = <span class="num">50</span>
+<span class="kw">gathering</span> = <span class="str">smart</span>
+<span class="kw">fact_caching</span> = <span class="str">jsonfile</span>
+<span class="kw">fact_caching_connection</span> = <span class="str">/tmp/ansible_facts_cache</span>
+<span class="kw">fact_caching_timeout</span> = <span class="num">3600</span>
+<span class="kw">callback_whitelist</span> = <span class="str">profile_tasks</span>
+<span class="kw">stdout_callback</span> = <span class="str">yaml</span>
+
+<span class="kw">[ssh_connection]</span>
+<span class="kw">pipelining</span> = <span class="str">True</span>
+<span class="kw">ssh_args</span> = <span class="str">-o ControlMaster=auto -o ControlPersist=60s -o PreferredAuthentications=publickey</span>
+<span class="kw">control_path_dir</span> = <span class="str">/tmp/ansible-ssh-%%h-%%p-%%r</span></code><span class="code-label">INI</span></pre>
+      <p>The key optimizations are:</p>
+      <ul>
+        <li><strong>Forks:</strong> Increase from the default of 5 to 50 (or higher, depending on your control node's resources). This controls how many hosts Ansible manages in parallel.</li>
+        <li><strong>Pipelining:</strong> Reduces the number of SSH operations per task from 4-5 to 2 by executing multiple commands over a single SSH connection. This alone can cut execution time by 40-60%.</li>
+        <li><strong>Fact caching:</strong> Prevents Ansible from re-gathering facts on every run. With <code>smart</code> gathering and JSON file caching, facts are collected once and reused for subsequent runs within the TTL.</li>
+        <li><strong>SSH multiplexing:</strong> The <code>ControlMaster</code> and <code>ControlPersist</code> settings reuse SSH connections across tasks, eliminating the overhead of establishing a new TCP handshake and SSH negotiation for every module execution.</li>
+      </ul>
+      <p>For even greater performance gains, consider <strong>Mitogen for Ansible</strong>. It replaces Ansible's default SSH-based execution with a pure-Python channel that eliminates temporary files and reduces round-trips. In our benchmarks, Mitogen cut playbook execution time from 45 minutes down to 12 minutes across 120 hosts — a 73% improvement with zero changes to the playbooks themselves.</p>
+    </div>
+
+    <div class="post-section" id="takeaways">
+      <h2>Key Takeaways</h2>
+      <p>After a year of managing 100+ production servers with Ansible, these are the principles that have served us best:</p>
+      <ul>
+        <li><strong>Idempotency is non-negotiable.</strong> Every task must be safe to run repeatedly. If a task uses <code>shell</code> or <code>command</code>, add <code>creates</code> or <code>changed_when</code> to make it idempotent. Prefer built-in modules over raw shell commands whenever possible.</li>
+        <li><strong>Serial is your safety net.</strong> Never apply changes to your entire fleet at once. Start with <code>serial: 1</code> for critical changes, then increase to <code>"25%"</code> once confidence is established. Combined with <code>max_fail_percentage: 0</code>, this guarantees that a single failed host halts the entire rollout.</li>
+        <li><strong>Health checks close the loop.</strong> A playbook without post-deployment verification is a playbook that ships broken configurations. Build health checks into every rolling update, and fail fast if something doesn't look right.</li>
+        <li><strong>Keep secrets out of version control.</strong> Use HashiCorp Vault, AWS Secrets Manager, or Ansible Vault for sensitive data. The <code>no_log</code> directive and environment variable lookups prevent accidental exposure in CI/CD logs.</li>
+        <li><strong>Invest in performance tuning early.</strong> The difference between 5 forks and 50 forks, between pipelining on and off, is the difference between a 45-minute deployment and a 12-minute one. When you're managing 100+ hosts, every optimization compounds.</li>
+        <li><strong>Roles over monolithic playbooks.</strong> Break your configuration into composable roles — hardening, monitoring, application, networking. Each role should be independently testable and reusable across different server groups.</li>
+      </ul>
+      <blockquote>
+        <p>Zero-downtime configuration management isn't about a single tool or technique. It's about combining rolling updates, health verification, and idempotent automation into a workflow that makes safe changes the default, not the exception.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="jenkins-shared-libraries.html" class="post-nav-link prev">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">Jenkins Shared Libraries: Standardizing Pipelines Across Teams</span>
+      </a>
+      <a href="disaster-recovery-aws.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">Disaster Recovery on AWS</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>

@@ -1,566 +1,477 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rahul Vadakkiniyil | DevOps Engineer</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rahul Vadakkiniyil — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Particle Canvas -->
-    <canvas id="particle-canvas"></canvas>
 
-    <!-- Three.js Canvas -->
-    <canvas id="three-canvas"></canvas>
-
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="preloader-inner">
-            <div class="preloader-bar">
-                <div class="preloader-fill" id="preloaderFill"></div>
-            </div>
-            <p class="preloader-text" id="preloaderText">Loading...</p>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo" aria-label="Rahul Vadakkiniyil — Home">
+        <div class="logo-mark">
+          <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
         </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="blog.html">Blog</a></li>
+        <li><a href="#quiz">Quiz</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <div class="theme-string"></div>
+        <div class="theme-icon">
+          <svg class="theme-moon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="8" fill="#c084fc" opacity="0.9"/>
+            <circle cx="17" cy="8" r="7" fill="var(--color-bg)"/>
+          </svg>
+          <svg class="theme-sun" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="5" fill="#fbbf24"/>
+            <line x1="12" y1="2" x2="12" y2="5" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <line x1="12" y1="19" x2="12" y2="22" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2" y1="12" x2="5" y2="12" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <line x1="19" y1="12" x2="22" y2="12" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <line x1="4.93" y1="4.93" x2="6.34" y2="6.34" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <line x1="17.66" y1="17.66" x2="19.07" y2="19.07" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <line x1="4.93" y1="19.07" x2="6.34" y2="17.66" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+            <line x1="17.66" y1="6.34" x2="19.07" y2="4.93" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </button>
     </div>
+  </nav>
 
-    <!-- Navigation -->
-    <nav id="navbar">
-        <a href="#hero" class="nav-logo">RV</a>
-        <div class="nav-links" id="navLinks">
-            <a href="#hero" class="nav-link active" data-section="hero">Home</a>
-            <a href="#about" class="nav-link" data-section="about">About</a>
-            <a href="#skills" class="nav-link" data-section="skills">Skills</a>
-            <a href="#projects" class="nav-link" data-section="projects">Projects</a>
-            <a href="#experience" class="nav-link" data-section="experience">Experience</a>
-            <a href="#contact" class="nav-link" data-section="contact">Contact</a>
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-bg-glow"></div>
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">Open to opportunities</div>
+        <h1 class="hero-name">Rahul Vadakkiniyil</h1>
+        <h2 class="hero-headline">DevOps Engineer &amp; Cloud Infrastructure Specialist</h2>
+        <p class="hero-description">I automate, deploy, and scale cloud infrastructure — building reliable CI/CD pipelines, container orchestration, and monitoring systems that keep production running smoothly.</p>
+        <div class="hero-cta">
+          <a href="#projects" class="btn btn-primary">View My Work</a>
+          <a href="#contact" class="btn btn-outline">Get In Touch</a>
+          <a href="resume.pdf" download class="btn btn-resume"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Resume</a>
         </div>
-        <div class="nav-right">
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
-            <button class="nav-toggle" id="navToggle" aria-label="Menu">
-                <span></span><span></span><span></span>
-            </button>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-number">3+</span>
+            <span class="stat-label">Years Experience</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">50+</span>
+            <span class="stat-label">Pipelines Built</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">99.9%</span>
+            <span class="stat-label">Uptime Achieved</span>
+          </div>
         </div>
-    </nav>
+      </div>
+    </div>
+    <div class="hero-scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section id="hero" class="hero-section">
-            <div class="hero-grid">
-                <div class="hero-content">
-                    <p class="hero-greeting blur-in" data-delay="0.3">Hi, I am</p>
-                    <h1 class="hero-name blur-in" data-delay="0.6">
-                        <span class="name-line">Rahul</span>
-                        <span class="name-line">Vadakkiniyil</span>
-                    </h1>
-                    <p class="hero-role blur-in" data-delay="0.9">DevOps Engineer</p>
-                    <div class="hero-buttons blur-in" data-delay="1.2">
-                        <a href="https://drive.google.com/file/d/1vjtWfqYGMIMK_rlBnmDEpKco9MiEaQss/view" target="_blank" class="btn btn-primary">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            Resume
-                        </a>
-                        <a href="#contact" class="btn btn-outline">Hire Me</a>
-                        <a href="https://github.com/rahulvadakkiniyil" target="_blank" class="btn btn-icon-only btn-outline" aria-label="GitHub">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                        </a>
-                        <a href="https://www.linkedin.com/in/rahulvadakkiniyil/" target="_blank" class="btn btn-icon-only btn-outline" aria-label="LinkedIn">
-                            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                        </a>
-                    </div>
-                </div>
-                <div class="hero-visual blur-in" data-delay="0.9">
-                    <div class="hero-keyboard-scene" id="heroKeyboardScene">
-                        <div class="hero-keyboard" id="heroKeyboard">
-                            <!-- Keys built by JS -->
-                        </div>
-                    </div>
-                    <div class="hero-key-tooltip" id="heroKeyTooltip">
-                        <div class="hero-key-tooltip-title" id="heroTooltipTitle"></div>
-                        <div class="hero-key-tooltip-desc" id="heroTooltipDesc"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="scroll-indicator blur-in" data-delay="1.5">
-                <div class="scroll-mouse">
-                    <div class="scroll-wheel"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="section">
-            <div class="section-container">
-                <h2 class="section-heading">
-                    <span class="heading-gradient">About Me</span>
-                </h2>
-                <div class="about-grid">
-                    <div class="about-text reveal-up">
-                        <p>I'm a Electrical and Electronics Engineer with experience in Development, DevOps & Database management. I have hands-on experience in deploying & automating workflows, and collaborating with clients worldwide.</p>
-                        <p>Passionate about AI and solving real-life problems through technology. Strong analytical skills, effective communication, and a team-oriented approach to driving process improvements and delivering results.</p>
-                        <div class="about-highlights">
-                            <div class="highlight-item">
-                                <span class="highlight-icon">☁️</span>
-                                <div>
-                                    <h4>Cloud Architecture</h4>
-                                    <p>Designing scalable multi-cloud solutions with high availability.</p>
-                                </div>
-                            </div>
-                            <div class="highlight-item">
-                                <span class="highlight-icon">🔄</span>
-                                <div>
-                                    <h4>CI/CD Pipelines</h4>
-                                    <p>End-to-end automation from commit to production deployment.</p>
-                                </div>
-                            </div>
-                            <div class="highlight-item">
-                                <span class="highlight-icon">📊</span>
-                                <div>
-                                    <h4>Monitoring & SRE</h4>
-                                    <p>Observability stacks, alerting, and incident response.</p>
-                                </div>
-                            </div>
-                            <div class="highlight-item">
-                                <span class="highlight-icon">🛡️</span>
-                                <div>
-                                    <h4>DevSecOps</h4>
-                                    <p>Security-first approach with automated vulnerability scanning.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="about-stats reveal-up" data-delay="0.2">
-                        <div class="stat-card">
-                            <span class="stat-number" data-target="99.9">0</span><span class="stat-suffix">%</span>
-                            <span class="stat-label">Uptime SLA</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" data-target="500">0</span><span class="stat-suffix">+</span>
-                            <span class="stat-label">Pipelines Built</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" data-target="50">0</span><span class="stat-suffix">+</span>
-                            <span class="stat-label">Microservices</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" data-target="8">0</span><span class="stat-suffix">+</span>
-                            <span class="stat-label">Years Exp</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills Section -->
-        <section id="skills" class="section">
-            <div class="section-container">
-                <h2 class="section-heading">
-                    <span class="heading-gradient">SKILLS</span>
-                </h2>
-                <div class="spline-skill-display" id="skillDisplay">
-                    <div class="skill-heading" id="skillHeading"></div>
-                    <div class="skill-desc" id="skillDesc"></div>
-                </div>
-                <div class="skills-grid">
-                    <div class="skill-category reveal-up">
-                        <h3 class="category-title">Cloud Platforms</h3>
-                        <div class="skill-items">
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt="AWS">
-                                <span>AWS</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" alt="Azure">
-                                <span>Azure</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg" alt="GCP">
-                                <span>GCP</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-category reveal-up" data-delay="0.1">
-                        <h3 class="category-title">Containers & Orchestration</h3>
-                        <div class="skill-items">
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" alt="Docker">
-                                <span>Docker</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" alt="K8s">
-                                <span>Kubernetes</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/argocd/argocd-original.svg" alt="ArgoCD">
-                                <span>ArgoCD</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-category reveal-up" data-delay="0.2">
-                        <h3 class="category-title">Infrastructure as Code</h3>
-                        <div class="skill-items">
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/terraform/terraform-original.svg" alt="Terraform">
-                                <span>Terraform</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ansible/ansible-original.svg" alt="Ansible">
-                                <span>Ansible</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt="CloudFormation">
-                                <span>AWS CloudFormation</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-category reveal-up" data-delay="0.3">
-                        <h3 class="category-title">CI/CD & Automation</h3>
-                        <div class="skill-items">
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jenkins/jenkins-original.svg" alt="Jenkins">
-                                <span>Jenkins</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/githubactions/githubactions-original.svg" alt="GitHub Actions">
-                                <span>GitHub Actions</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt="AWS CodePipeline">
-                                <span>AWS CodePipeline</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-category reveal-up" data-delay="0.4">
-                        <h3 class="category-title">Monitoring & Observability</h3>
-                        <div class="skill-items">
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prometheus/prometheus-original.svg" alt="Prometheus">
-                                <span>Prometheus</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/grafana/grafana-original.svg" alt="Grafana">
-                                <span>Grafana</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg" alt="CloudWatch">
-                                <span>AWS CloudWatch</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="skill-category reveal-up" data-delay="0.5">
-                        <h3 class="category-title">Languages & Scripting</h3>
-                        <div class="skill-items">
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" alt="Python">
-                                <span>Python</span>
-                            </div>
-                            <div class="skill-chip">
-                                <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bash/bash-original.svg" alt="Bash">
-                                <span>Bash</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Projects Section -->
-        <section id="projects" class="section">
-            <div class="section-container">
-                <h2 class="section-heading">
-                    <span class="heading-gradient">Projects</span>
-                </h2>
-                <div class="projects-filter">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="infra">Infrastructure</button>
-                    <button class="filter-btn" data-filter="cicd">CI/CD</button>
-                    <button class="filter-btn" data-filter="monitoring">Monitoring</button>
-                    <button class="filter-btn" data-filter="security">Security</button>
-                </div>
-                <div class="projects-grid">
-                    <div class="project-card reveal-up" data-category="infra">
-                        <div class="project-card-inner">
-                            <div class="project-badge">Infrastructure</div>
-                            <h3 class="project-title">Cloud Infrastructure Platform</h3>
-                            <p class="project-desc">Multi-cloud IaC platform managing 200+ services across AWS, GCP, and Azure with Terraform modules and cost optimization.</p>
-                            <div class="project-metrics">
-                                <span><strong>200+</strong> Services</span>
-                                <span><strong>40%</strong> Cost Saved</span>
-                            </div>
-                            <div class="project-tags">
-                                <span class="tag">Terraform</span>
-                                <span class="tag">AWS</span>
-                                <span class="tag">GCP</span>
-                                <span class="tag">Python</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="#" class="project-link">View Code</a>
-                                <a href="#" class="project-link">Live Demo</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="project-card reveal-up" data-category="cicd" data-delay="0.1">
-                        <div class="project-card-inner">
-                            <div class="project-badge">CI/CD</div>
-                            <h3 class="project-title">Zero-Downtime Deployment Engine</h3>
-                            <p class="project-desc">Blue-green and canary deployment system for Kubernetes with automated rollback and chaos engineering.</p>
-                            <div class="project-metrics">
-                                <span><strong>0s</strong> Downtime</span>
-                                <span><strong>99.99%</strong> SLA</span>
-                            </div>
-                            <div class="project-tags">
-                                <span class="tag">Kubernetes</span>
-                                <span class="tag">Go</span>
-                                <span class="tag">Istio</span>
-                                <span class="tag">ArgoCD</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="#" class="project-link">View Code</a>
-                                <a href="#" class="project-link">Live Demo</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="project-card reveal-up" data-category="monitoring" data-delay="0.2">
-                        <div class="project-card-inner">
-                            <div class="project-badge">Monitoring</div>
-                            <h3 class="project-title">Observability Stack</h3>
-                            <p class="project-desc">Full-stack monitoring with custom Prometheus exporters, Grafana dashboards, and AI-powered anomaly detection.</p>
-                            <div class="project-metrics">
-                                <span><strong>10M+</strong> Metrics/min</span>
-                                <span><strong>50+</strong> Dashboards</span>
-                            </div>
-                            <div class="project-tags">
-                                <span class="tag">Prometheus</span>
-                                <span class="tag">Grafana</span>
-                                <span class="tag">Jaeger</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="#" class="project-link">View Code</a>
-                                <a href="#" class="project-link">Live Demo</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="project-card reveal-up" data-category="security" data-delay="0.1">
-                        <div class="project-card-inner">
-                            <div class="project-badge">Security</div>
-                            <h3 class="project-title">DevSecOps Pipeline</h3>
-                            <p class="project-desc">Automated security pipeline with SAST/DAST scanning, secrets detection, and compliance-as-code across 100+ repos.</p>
-                            <div class="project-metrics">
-                                <span><strong>100+</strong> Repos</span>
-                                <span><strong>5min</strong> Scan Time</span>
-                            </div>
-                            <div class="project-tags">
-                                <span class="tag">GitHub Actions</span>
-                                <span class="tag">Trivy</span>
-                                <span class="tag">OPA</span>
-                                <span class="tag">Vault</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="#" class="project-link">View Code</a>
-                                <a href="#" class="project-link">Live Demo</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="project-card reveal-up" data-category="infra" data-delay="0.2">
-                        <div class="project-card-inner">
-                            <div class="project-badge">Infrastructure</div>
-                            <h3 class="project-title">Service Mesh Gateway</h3>
-                            <p class="project-desc">API gateway with rate limiting, circuit breaking, mTLS, and routing across 50+ microservices.</p>
-                            <div class="project-metrics">
-                                <span><strong>50+</strong> Services</span>
-                                <span><strong>&lt;1ms</strong> Overhead</span>
-                            </div>
-                            <div class="project-tags">
-                                <span class="tag">Envoy</span>
-                                <span class="tag">Istio</span>
-                                <span class="tag">Go</span>
-                                <span class="tag">gRPC</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="#" class="project-link">View Code</a>
-                                <a href="#" class="project-link">Live Demo</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="project-card reveal-up" data-category="infra" data-delay="0.3">
-                        <div class="project-card-inner">
-                            <div class="project-badge">Infrastructure</div>
-                            <h3 class="project-title">Auto-Scaling Platform</h3>
-                            <p class="project-desc">ML-driven auto-scaling that predicts traffic and pre-scales infra, cutting costs 35%.</p>
-                            <div class="project-metrics">
-                                <span><strong>35%</strong> Cost Cut</span>
-                                <span><strong>~0</strong> Cold Starts</span>
-                            </div>
-                            <div class="project-tags">
-                                <span class="tag">Python</span>
-                                <span class="tag">K8s HPA</span>
-                                <span class="tag">KEDA</span>
-                                <span class="tag">AWS</span>
-                            </div>
-                            <div class="project-actions">
-                                <a href="#" class="project-link">View Code</a>
-                                <a href="#" class="project-link">Live Demo</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Experience Section -->
-        <section id="experience" class="section">
-            <div class="section-container">
-                <h2 class="section-heading">
-                    <span class="heading-gradient">Experience</span>
-                </h2>
-                <div class="timeline">
-                    <div class="timeline-item reveal-up">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <span class="timeline-date">2022 - Present</span>
-                            <h3 class="timeline-role">Senior DevOps Engineer</h3>
-                            <p class="timeline-company">CloudScale Technologies</p>
-                            <ul class="timeline-details">
-                                <li>Led migration of 200+ microservices to Kubernetes, achieving 99.99% uptime</li>
-                                <li>Designed multi-region DR strategy reducing RTO from 4 hours to 15 minutes</li>
-                                <li>Built GitOps workflows with ArgoCD serving 50+ development teams</li>
-                                <li>Reduced cloud spend by 40% through rightsizing and spot instance strategies</li>
-                            </ul>
-                            <div class="timeline-tags">
-                                <span class="tag">K8s</span>
-                                <span class="tag">AWS</span>
-                                <span class="tag">Terraform</span>
-                                <span class="tag">ArgoCD</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="timeline-item reveal-up" data-delay="0.15">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <span class="timeline-date">2019 - 2022</span>
-                            <h3 class="timeline-role">DevOps Engineer</h3>
-                            <p class="timeline-company">DataFlow Systems</p>
-                            <ul class="timeline-details">
-                                <li>Implemented CI/CD pipelines reducing deployment time from 2 hours to 10 minutes</li>
-                                <li>Containerized legacy applications and orchestrated with Docker Swarm & K8s</li>
-                                <li>Built observability platform processing 10M+ metrics per minute</li>
-                                <li>Automated infrastructure provisioning with Terraform across 3 cloud providers</li>
-                            </ul>
-                            <div class="timeline-tags">
-                                <span class="tag">Docker</span>
-                                <span class="tag">Jenkins</span>
-                                <span class="tag">Prometheus</span>
-                                <span class="tag">Ansible</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="timeline-item reveal-up" data-delay="0.3">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content">
-                            <span class="timeline-date">2017 - 2019</span>
-                            <h3 class="timeline-role">Systems Administrator</h3>
-                            <p class="timeline-company">TechStart Inc.</p>
-                            <ul class="timeline-details">
-                                <li>Managed Linux/Windows server fleet of 100+ machines</li>
-                                <li>Introduced configuration management with Ansible, automating 80% of tasks</li>
-                                <li>Set up monitoring with Nagios/Zabbix and centralized logging with ELK</li>
-                                <li>Migrated on-prem workloads to AWS, reducing infrastructure costs by 30%</li>
-                            </ul>
-                            <div class="timeline-tags">
-                                <span class="tag">Linux</span>
-                                <span class="tag">Ansible</span>
-                                <span class="tag">AWS</span>
-                                <span class="tag">Bash</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="section">
-            <div class="section-container">
-                <h2 class="section-heading">
-                    <span class="heading-gradient">Get In Touch</span>
-                </h2>
-                <p class="section-subtitle">Have a project in mind? Let's build something amazing together.</p>
-                <div class="contact-grid">
-                    <form id="contact-form" class="contact-form reveal-up">
-                        <div class="form-group">
-                            <label for="name">Name</label>
-                            <input type="text" id="name" name="name" placeholder="Your name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="you@example.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" name="message" placeholder="Tell me about your project..." rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-full">Send Message</button>
-                    </form>
-                    <div class="contact-info reveal-up" data-delay="0.2">
-                        <div class="contact-card">
-                            <h3>Let's Connect</h3>
-                            <p>Whether you need infrastructure automation, cloud solutions, or a reliable DevOps pipeline - I'm here to help.</p>
-                            <div class="contact-links">
-                                <a href="mailto:rahulvadakkiniyil@gmail.com" class="contact-link-item">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                                    <span>rahulvadakkiniyil@gmail.com</span>
-                                </a>
-                                <a href="https://www.linkedin.com/in/rahulvadakkiniyil/" target="_blank" class="contact-link-item">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                                    <span>LinkedIn</span>
-                                </a>
-                                <a href="https://github.com/rahulvadakkiniyil" target="_blank" class="contact-link-item">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                                    <span>GitHub</span>
-                                </a>
-                            </div>
-                            <div class="availability">
-                                <span class="status-dot"></span>
-                                <span>Available for new opportunities</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer id="footer">
-        <div class="footer-content">
-            <div class="footer-social">
-                <a href="https://github.com/rahulvadakkiniyil" target="_blank" aria-label="GitHub">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                </a>
-                <a href="https://www.linkedin.com/in/rahulvadakkiniyil/" target="_blank" aria-label="LinkedIn">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                </a>
-            </div>
-            <p class="footer-text">Designed & Built by Rahul Vadakkiniyil</p>
-            <p class="footer-sub">&copy; 2026 All rights reserved.</p>
+  <!-- About Section -->
+  <section class="about" id="about">
+    <div class="container">
+      <p class="section-label">About</p>
+      <h2 class="section-title">Who I Am</h2>
+      <div class="about-content">
+        <!-- Introduction -->
+        <div class="about-intro">
+          <p>I'm Rahul Vadakkiniyil, a DevOps engineer with 3+ years of experience building and maintaining cloud infrastructure, CI/CD pipelines, and container orchestration platforms. I'm passionate about automating everything — from code deployment to infrastructure provisioning.</p>
+          <p>I thrive at the intersection of development and operations, ensuring teams ship faster with confidence. When I'm not writing Terraform or debugging Kubernetes clusters, I contribute to open-source DevOps tooling and write about infrastructure best practices.</p>
         </div>
-    </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="script.js"></script>
+        <div class="about-grid">
+          <!-- Education & Certifications -->
+          <div class="about-block">
+            <h3>Education &amp; Certifications</h3>
+            <div class="about-item">
+              <span class="about-item-title">B.Tech in Electrical &amp; Electronics Engineering</span>
+              <span class="about-item-sub">Kannur University, Kerala</span>
+              <span class="about-item-meta">2014 &ndash; 2018</span>
+            </div>
+            <a href="https://www.credly.com/badges/26c67c1d-31ee-4970-895f-dd571d7c6b4f/public_url" target="_blank" rel="noopener noreferrer" class="about-item about-item-link">
+              <span class="about-item-title">AWS Certified Solutions Architect – Associate <svg class="cert-link-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+              <span class="about-item-sub">Amazon Web Services</span>
+              <span class="about-item-meta">2024</span>
+            </a>
+            <a href="https://www.credly.com/badges/9c9c8a95-ecc3-42d3-bfca-708cce963a3a/public_url" target="_blank" rel="noopener noreferrer" class="about-item about-item-link">
+              <span class="about-item-title">AWS Knowledge: Architecting <svg class="cert-link-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+              <span class="about-item-sub">Amazon Web Services</span>
+              <span class="about-item-meta">2025</span>
+            </a>
+            <a href="https://www.credly.com/badges/443488a2-fa41-418c-af52-ae4880eaf45b/public_url" target="_blank" rel="noopener noreferrer" class="about-item about-item-link">
+              <span class="about-item-title">AWS Knowledge: Amazon EKS <svg class="cert-link-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+              <span class="about-item-sub">Amazon Web Services</span>
+              <span class="about-item-meta">2025</span>
+            </a>
+            <div class="about-item">
+              <span class="about-item-title">Certified Kubernetes Administrator (CKA) <span class="cert-upcoming">Upcoming</span></span>
+              <span class="about-item-sub">Cloud Native Computing Foundation</span>
+            </div>
+          </div>
+
+          <!-- Skills -->
+          <div class="about-block">
+            <h3>Skills</h3>
+            <div class="skills-category">
+              <span class="skills-category-label">Cloud &amp; Infrastructure</span>
+              <div class="skills-grid">
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M18.75 11.35a4.32 4.32 0 00-3.1-4.15 6.1 6.1 0 00-11.9 1.65A4.07 4.07 0 004.4 17h13.35a4.07 4.07 0 001-8.65z" fill="none" stroke="#ff9900" stroke-width="1.5"/><path d="M6.5 14.5l2-2 2 2m-2-2v5" fill="none" stroke="#ff9900" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>AWS</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2l10 6v8l-10 6-10-6V8z" fill="none" stroke="#0089d6" stroke-width="1.5"/><path d="M12 8v8m-4-4h8" stroke="#0089d6" stroke-width="1.2" stroke-linecap="round"/></svg>Azure</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="none" stroke="#4285f4" stroke-width="1.5"/><path d="M12 6v6l4 2" fill="none" stroke="#ea4335" stroke-width="1.2" stroke-linecap="round"/><circle cx="12" cy="12" r="2" fill="#34a853"/></svg>GCP</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M2 6l4-4h12l4 4-10 16z" fill="none" stroke="#7b42bc" stroke-width="1.5" stroke-linejoin="round"/><path d="M6 2l4 4-4 4m12-8l-4 4 4 4" fill="none" stroke="#7b42bc" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>Terraform</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M4 4h16v16H4z" fill="none" stroke="#ff9900" stroke-width="1.5" rx="1"/><path d="M8 8h8M8 12h6M8 16h4" stroke="#ff9900" stroke-width="1.2" stroke-linecap="round"/></svg>CloudFormation</span>
+              </div>
+            </div>
+            <div class="skills-category">
+              <span class="skills-category-label">Containers &amp; Orchestration</span>
+              <div class="skills-grid">
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2" fill="none" stroke="#2496ed" stroke-width="1.5"/><path d="M7 8V5m5 3V4m5 4V6" stroke="#2496ed" stroke-width="1.5" stroke-linecap="round"/></svg>Docker</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#326ce5" stroke-width="1.5"/><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" stroke="#326ce5" stroke-width="0.8"/><circle cx="12" cy="12" r="3" fill="none" stroke="#326ce5" stroke-width="1.2"/></svg>Kubernetes</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2l-2 8h4l-2 8" fill="none" stroke="#0f1689" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" fill="none" stroke="#0f1689" stroke-width="1.2"/></svg>Helm</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#ef7b4d" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="#ef7b4d" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="#ef7b4d" stroke-width="1"/></svg>ArgoCD</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><rect x="2" y="4" width="8" height="7" rx="1" fill="none" stroke="#2496ed" stroke-width="1.3"/><rect x="14" y="4" width="8" height="7" rx="1" fill="none" stroke="#2496ed" stroke-width="1.3"/><rect x="8" y="13" width="8" height="7" rx="1" fill="none" stroke="#2496ed" stroke-width="1.3"/><path d="M10 11v2m4-2v2" stroke="#2496ed" stroke-width="1" stroke-linecap="round"/></svg>Docker Compose</span>
+              </div>
+            </div>
+            <div class="skills-category">
+              <span class="skills-category-label">CI/CD &amp; Automation</span>
+              <div class="skills-grid">
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#d33833" stroke-width="1.5"/><path d="M12 7v5l3 3" fill="none" stroke="#d33833" stroke-width="1.5" stroke-linecap="round"/><path d="M9 2h6" stroke="#d33833" stroke-width="1.5" stroke-linecap="round"/></svg>Jenkins</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#2088ff" stroke-width="1.5"/><path d="M12 6v6l4 2" fill="none" stroke="#2088ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 16l-3 3m11-3l3 3" stroke="#2088ff" stroke-width="1.2" stroke-linecap="round"/></svg>GitHub Actions</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="none" stroke="#fc6d26" stroke-width="1.5" rx="2"/><path d="M12 7v10M7 12h10" stroke="#fc6d26" stroke-width="1.5" stroke-linecap="round"/></svg>GitLab CI</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M12 2L2 22h20z" fill="none" stroke="#ee0000" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 8v6m0 3v.01" stroke="#ee0000" stroke-width="1.5" stroke-linecap="round"/></svg>Ansible</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="#4eaa25" stroke-width="1.5"/><path d="M7 12l3 3 4-6" fill="none" stroke="#4eaa25" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><text x="14" y="16" font-size="6" fill="#4eaa25" font-weight="bold">$</text></svg>Bash</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M10 4l-6 16h4l1.5-4h5l1.5 4h4L14 4z" fill="none" stroke="#3776ab" stroke-width="1.5" stroke-linejoin="round"/><circle cx="17" cy="7" r="2.5" fill="none" stroke="#ffd43b" stroke-width="1.2"/><circle cx="7" cy="17" r="2.5" fill="none" stroke="#ffd43b" stroke-width="1.2"/></svg>Python</span>
+              </div>
+            </div>
+            <div class="skills-category">
+              <span class="skills-category-label">Monitoring &amp; Observability</span>
+              <div class="skills-grid">
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="#e6522c" stroke-width="1.5"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4" stroke="#e6522c" stroke-width="1.2" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="#e6522c" stroke-width="1.5"/></svg>Prometheus</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="#f46800" stroke-width="1.5"/><path d="M6 16l4-5 3 3 5-7" fill="none" stroke="#f46800" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Grafana</span>
+                <span class="skill-tag"><svg class="skill-icon" width="16" height="16" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9z" fill="none" stroke="#06ac38" stroke-width="1.5" stroke-linejoin="round"/></svg>PagerDuty</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience Section -->
+  <section class="experience" id="experience">
+    <div class="container">
+      <p class="section-label">Experience</p>
+      <h2 class="section-title">Work History</h2>
+      <div class="experience-timeline">
+
+        <div class="experience-item">
+          <div class="experience-marker"></div>
+          <div class="experience-content">
+            <div class="experience-header">
+              <div>
+                <h3 class="experience-role">DevOps Engineer</h3>
+                <span class="experience-company">Company Name</span>
+              </div>
+              <span class="experience-duration">2023 &ndash; Present</span>
+            </div>
+            <ul class="experience-highlights">
+              <li>Architected and managed multi-cluster Kubernetes (EKS) infrastructure across AWS regions with automated failover and service mesh</li>
+              <li>Built end-to-end CI/CD pipelines using GitHub Actions, ArgoCD, and Helm reducing deployment time by 70%</li>
+              <li>Implemented infrastructure as code with Terraform managing 500+ cloud resources across multiple AWS accounts</li>
+              <li>Set up full observability stack (Prometheus, Grafana, Loki, PagerDuty) monitoring 200+ microservices with 99.9% uptime SLA</li>
+            </ul>
+            <div class="experience-tags">
+              <span>AWS</span><span>Kubernetes</span><span>Terraform</span><span>ArgoCD</span><span>GitHub Actions</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="experience-item">
+          <div class="experience-marker"></div>
+          <div class="experience-content">
+            <div class="experience-header">
+              <div>
+                <h3 class="experience-role">Junior DevOps Engineer</h3>
+                <span class="experience-company">Company Name</span>
+              </div>
+              <span class="experience-duration">2021 &ndash; 2023</span>
+            </div>
+            <ul class="experience-highlights">
+              <li>Containerized legacy applications using Docker and Docker Compose, migrating services to cloud-native architecture</li>
+              <li>Automated server provisioning and configuration management with Ansible across 50+ EC2 instances</li>
+              <li>Configured Jenkins CI/CD pipelines for automated testing, building, and deployment of microservices</li>
+              <li>Managed AWS infrastructure including VPCs, EC2, S3, RDS, and IAM with CloudFormation templates</li>
+            </ul>
+            <div class="experience-tags">
+              <span>Docker</span><span>Jenkins</span><span>Ansible</span><span>AWS</span><span>CloudFormation</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section class="projects" id="projects">
+    <div class="container">
+      <p class="section-label">Work</p>
+      <h2 class="section-title">Featured Projects</h2>
+      <div class="projects-grid">
+
+        <article class="project-card">
+          <div class="project-image">
+            <div class="project-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Kubernetes Multi-Cluster Platform</h3>
+            <p>Designed and deployed a multi-cluster Kubernetes platform across AWS regions with automated failover, service mesh (Istio), and centralized logging.</p>
+            <div class="project-tags">
+              <span>Kubernetes</span><span>AWS EKS</span><span>Istio</span><span>Terraform</span>
+            </div>
+            <div class="project-links">
+              <a href="case-studies/kubernetes-multi-cluster.html" class="btn-link">Case Study &rarr;</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-image">
+            <div class="project-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Full Observability Stack</h3>
+            <p>Implemented a full observability platform with Prometheus, Grafana, and Loki for metrics, dashboards, alerting, and centralized log aggregation across 200+ microservices.</p>
+            <div class="project-tags">
+              <span>Prometheus</span><span>Grafana</span><span>Loki</span><span>Alertmanager</span>
+            </div>
+            <div class="project-links">
+              <a href="case-studies/observability-stack.html" class="btn-link">Case Study &rarr;</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-image">
+            <div class="project-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+          </div>
+          <div class="project-info">
+            <h3>Terraform Multi-Account AWS Infrastructure</h3>
+            <p>Architected multi-account AWS infrastructure with Terraform — shared modules, cross-account IAM roles, CI/CD pipelines, and automated drift detection.</p>
+            <div class="project-tags">
+              <span>Terraform</span><span>AWS</span><span>IAM</span><span>Organizations</span>
+            </div>
+            <div class="project-links">
+              <a href="case-studies/terraform-multi-account.html" class="btn-link">Case Study &rarr;</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+      <div class="projects-view-all">
+        <a href="projects.html" class="btn btn-outline">View All Projects &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog Section -->
+  <section class="blog" id="blog">
+    <div class="container">
+      <p class="section-label">Writing</p>
+      <h2 class="section-title">Latest Posts</h2>
+      <div class="blog-grid">
+
+        <article class="blog-card">
+          <div class="blog-date">Mar 20, 2026</div>
+          <h3>Migrating from NGINX Ingress Controller to Istio</h3>
+          <p>How we replaced NGINX Ingress with Istio's service mesh across 200+ microservices — mTLS, traffic splitting, and zero-downtime cutover.</p>
+          <a href="posts/nginx-ingress-to-istio-migration.html" class="btn-link">Read More &rarr;</a>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-date">Mar 14, 2026</div>
+          <h3>Top 10 Scripts Every DevOps Engineer Should Use Daily</h3>
+          <p>Battle-tested Bash scripts for health checks, Docker cleanup, Kubernetes monitoring, SSL alerts, and more.</p>
+          <a href="posts/top-10-devops-scripts.html" class="btn-link">Read More &rarr;</a>
+        </article>
+
+        <article class="blog-card">
+          <div class="blog-date">Mar 2, 2026</div>
+          <h3>GitOps vs Traditional CI/CD: Which One Wins?</h3>
+          <p>A practical comparison of push-based and pull-based deployment models, and when GitOps with ArgoCD truly shines.</p>
+          <a href="posts/gitops-argocd-github-actions.html" class="btn-link">Read More &rarr;</a>
+        </article>
+
+      </div>
+      <div class="blog-view-all">
+        <a href="blog.html" class="btn btn-outline">View All Posts &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- DevOps Quiz Challenge -->
+  <section class="quiz-gate" id="quiz">
+    <div class="container">
+      <p class="section-label">Challenge</p>
+      <h2 class="section-title">Think You Know DevOps?</h2>
+      <div class="quiz-container">
+        <div class="quiz-header">
+          <div class="quiz-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><circle cx="12" cy="12" r="10"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <p class="quiz-subtitle">Test your DevOps knowledge with 10 random questions. How many can you get right?</p>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="quiz-progress-fill"></div>
+          </div>
+          <div class="quiz-score-display">
+            <span id="quiz-current">0</span> / <span>10</span>
+          </div>
+        </div>
+        <div class="quiz-body" id="quiz-body">
+          <!-- Questions injected by JS -->
+        </div>
+        <div class="quiz-footer" id="quiz-footer">
+          <button class="btn btn-primary quiz-btn" id="quiz-submit" disabled>Check Answer</button>
+          <div class="quiz-feedback" id="quiz-feedback"></div>
+        </div>
+        <div class="quiz-result" id="quiz-result" style="display:none;">
+          <!-- Shown on completion -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <p class="section-label">Contact</p>
+      <h2 class="section-title">Get In Touch</h2>
+      <p class="contact-subtitle">Have a project in mind or just want to say hello? I'd love to hear from you.</p>
+      <form class="contact-form" id="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="you@example.com">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          </a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+          </a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Microsoft Teams" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script src="script.js"></script>
 </body>
 </html>

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Migrating from NGINX Ingress Controller to Istio — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Infrastructure</span>
+        <span class="post-date">Mar 20, 2026</span>
+        <span class="post-read-time">14 min read</span>
+      </div>
+      <h1 class="post-heading">Migrating from NGINX Ingress Controller to Istio: A Production Playbook</h1>
+      <p class="post-subtitle">How we replaced NGINX Ingress with Istio's service mesh across 200+ microservices — covering the architecture shift, traffic migration strategy, mTLS rollout, and the production gotchas that caught us off guard.</p>
+    </div>
+  </header>
+
+  <div class="post-content">
+
+    <div class="post-toc post-section">
+      <h4>Table of Contents</h4>
+      <ol>
+        <li><a href="#why-migrate">Why We Migrated</a></li>
+        <li><a href="#nginx-vs-istio">NGINX Ingress vs Istio: Key Differences</a></li>
+        <li><a href="#architecture">Istio Architecture Overview</a></li>
+        <li><a href="#install-istio">Installing Istio on EKS</a></li>
+        <li><a href="#sidecar-injection">Sidecar Injection Strategy</a></li>
+        <li><a href="#converting-ingress">Converting Ingress to VirtualService</a></li>
+        <li><a href="#traffic-management">Advanced Traffic Management</a></li>
+        <li><a href="#mtls">mTLS Rollout</a></li>
+        <li><a href="#observability">Observability with Istio</a></li>
+        <li><a href="#migration-strategy">Zero-Downtime Migration Strategy</a></li>
+        <li><a href="#gotchas">Production Gotchas</a></li>
+        <li><a href="#results">Results &amp; Lessons Learned</a></li>
+      </ol>
+    </div>
+
+    <div class="post-section" id="why-migrate">
+      <h2>Why We Migrated</h2>
+      <p>NGINX Ingress Controller served us well for two years. It handled TLS termination, path-based routing, and rate limiting across our EKS clusters. But as we scaled to 200+ microservices, we kept running into limitations:</p>
+      <ul>
+        <li><strong>No service-to-service traffic control.</strong> NGINX only manages north-south traffic (external to cluster). East-west traffic between microservices was completely unmanaged — no retries, no circuit breaking, no traffic splitting.</li>
+        <li><strong>No mutual TLS.</strong> Services talked to each other over plain HTTP inside the cluster. Our security team flagged this as a compliance risk — we needed encryption in transit for all internal communication.</li>
+        <li><strong>Limited observability.</strong> NGINX gave us request-level metrics at the ingress layer, but we had zero visibility into inter-service latency, error rates, or dependency graphs without instrumenting every application.</li>
+        <li><strong>Canary deployments were fragile.</strong> We had hacked together a canary system using NGINX annotations and custom Lua scripts. It worked, but was brittle, hard to debug, and impossible for other teams to use without our help.</li>
+      </ul>
+      <p>Istio solved all of these problems at the infrastructure layer, without requiring application code changes. The decision wasn't "NGINX is bad" — it was "we've outgrown what an ingress controller alone can provide."</p>
+    </div>
+
+    <div class="post-section" id="nginx-vs-istio">
+      <h2>NGINX Ingress vs Istio: Key Differences</h2>
+      <p>Understanding the fundamental difference is critical before migrating. These are not the same category of tool.</p>
+      <table style="width:100%; border-collapse:collapse; margin:20px 0; font-size:0.88rem;">
+        <thead>
+          <tr style="border-bottom:2px solid var(--color-border);">
+            <th style="text-align:left; padding:12px 16px; color:var(--color-accent); font-weight:600;">Capability</th>
+            <th style="text-align:left; padding:12px 16px; color:var(--color-text-secondary); font-weight:600;">NGINX Ingress</th>
+            <th style="text-align:left; padding:12px 16px; color:var(--color-text-secondary); font-weight:600;">Istio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:10px 16px; color:var(--color-text);">Traffic scope</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">North-south only</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">North-south + east-west</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:10px 16px; color:var(--color-text);">mTLS</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Manual cert management</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Automatic, zero-config</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:10px 16px; color:var(--color-text);">Traffic splitting</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Annotation-based (limited)</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">VirtualService (fine-grained)</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:10px 16px; color:var(--color-text);">Circuit breaking</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Not supported</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">DestinationRule</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:10px 16px; color:var(--color-text);">Observability</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Ingress metrics only</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Full mesh telemetry</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:10px 16px; color:var(--color-text);">Resource overhead</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Low (~50MB per pod)</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Higher (~100MB sidecar per pod)</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 16px; color:var(--color-text);">Complexity</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Simple, well-understood</td>
+            <td style="padding:10px 16px; color:var(--color-text-muted);">Steep learning curve</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>NGINX Ingress is an <strong>ingress controller</strong> — it routes external traffic into your cluster. Istio is a <strong>service mesh</strong> — it manages all traffic between every service, including ingress. Istio uses Envoy proxy sidecars injected into every pod, giving it full visibility and control over the entire communication graph.</p>
+    </div>
+
+    <div class="post-section" id="architecture">
+      <h2>Istio Architecture Overview</h2>
+      <p>Before diving into the migration, it's important to understand what Istio deploys into your cluster:</p>
+      <ul>
+        <li><strong>istiod (Control Plane)</strong> — The single binary that handles service discovery, certificate management, and pushing Envoy configurations to all sidecars. It replaces the older Pilot, Citadel, and Galley components.</li>
+        <li><strong>Envoy Sidecar Proxies (Data Plane)</strong> — Automatically injected into every pod. All inbound and outbound traffic flows through this proxy, which enforces routing rules, mTLS, retries, and collects telemetry.</li>
+        <li><strong>Istio Ingress Gateway</strong> — Replaces NGINX Ingress. A standalone Envoy deployment at the edge of the mesh that handles external traffic. Configured via Gateway and VirtualService resources.</li>
+      </ul>
+
+      <div class="post-callout post-callout-info">
+        <div class="callout-title">Note</div>
+        <p>Istio's ambient mode (available since Istio 1.22) removes the need for sidecar proxies by using a per-node ztunnel proxy. This significantly reduces resource overhead. However, for full L7 traffic management features, sidecar mode is still required as of early 2026.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="install-istio">
+      <h2>Installing Istio on EKS</h2>
+      <p>We used <code>istioctl</code> for installation rather than the Helm chart, as it gives better control over the installation profile and makes upgrades more predictable:</p>
+      <pre><code><span class="cm"># Download istioctl</span>
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=<span class="str">1.23.0</span> sh -
+cd istio-<span class="str">1.23.0</span>
+export PATH=$PWD/bin:$PATH
+
+<span class="cm"># Install with production profile</span>
+istioctl install --set profile=<span class="str">default</span> \
+  --set meshConfig.accessLogFile=<span class="str">"/dev/stdout"</span> \
+  --set meshConfig.enableTracing=<span class="num">true</span> \
+  --set meshConfig.defaultConfig.holdApplicationUntilProxyStarts=<span class="num">true</span> \
+  --set values.pilot.resources.requests.cpu=<span class="str">500m</span> \
+  --set values.pilot.resources.requests.memory=<span class="str">2Gi</span> \
+  --set values.pilot.resources.limits.cpu=<span class="str">1000m</span> \
+  --set values.pilot.resources.limits.memory=<span class="str">4Gi</span> \
+  -y
+
+<span class="cm"># Verify installation</span>
+istioctl verify-install
+kubectl get pods -n istio-system</code><span class="code-label">Shell</span></pre>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Always set <code>holdApplicationUntilProxyStarts: true</code> in production. Without this, your application container can start before the Envoy sidecar is ready, causing connection failures during startup. This is the single most common issue teams hit when adopting Istio.</p>
+      </div>
+
+      <h3>Istio Ingress Gateway with AWS NLB</h3>
+      <p>The Istio Ingress Gateway needs a LoadBalancer service. On EKS, we use an AWS Network Load Balancer for better performance and static IP support:</p>
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">v1</span>
+<span class="kw">kind:</span> <span class="str">Service</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">istio-ingressgateway</span>
+  <span class="kw">namespace:</span> <span class="str">istio-system</span>
+  <span class="kw">annotations:</span>
+    <span class="kw">service.beta.kubernetes.io/aws-load-balancer-type:</span> <span class="str">"nlb"</span>
+    <span class="kw">service.beta.kubernetes.io/aws-load-balancer-scheme:</span> <span class="str">"internet-facing"</span>
+    <span class="kw">service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled:</span> <span class="str">"true"</span>
+    <span class="kw">service.beta.kubernetes.io/aws-load-balancer-backend-protocol:</span> <span class="str">"tcp"</span>
+<span class="kw">spec:</span>
+  <span class="kw">type:</span> <span class="str">LoadBalancer</span>
+  <span class="kw">selector:</span>
+    <span class="kw">istio:</span> <span class="str">ingressgateway</span>
+  <span class="kw">ports:</span>
+  - <span class="kw">name:</span> <span class="str">http</span>
+    <span class="kw">port:</span> <span class="num">80</span>
+    <span class="kw">targetPort:</span> <span class="num">8080</span>
+  - <span class="kw">name:</span> <span class="str">https</span>
+    <span class="kw">port:</span> <span class="num">443</span>
+    <span class="kw">targetPort:</span> <span class="num">8443</span></code><span class="code-label">YAML</span></pre>
+    </div>
+
+    <div class="post-section" id="sidecar-injection">
+      <h2>Sidecar Injection Strategy</h2>
+      <p>Don't enable sidecar injection cluster-wide on day one. We used a phased approach, namespace by namespace:</p>
+      <pre><code><span class="cm"># Phase 1: Enable injection for a single non-critical namespace</span>
+kubectl label namespace <span class="str">staging</span> istio-injection=enabled --overwrite
+
+<span class="cm"># Restart pods to inject sidecars</span>
+kubectl rollout restart deployment -n <span class="str">staging</span>
+
+<span class="cm"># Verify sidecars are running (each pod should show 2/2 containers)</span>
+kubectl get pods -n <span class="str">staging</span>
+
+<span class="cm"># Phase 2: After validation, enable for production namespaces one at a time</span>
+kubectl label namespace <span class="str">production-api</span> istio-injection=enabled --overwrite
+kubectl rollout restart deployment -n <span class="str">production-api</span>
+
+<span class="cm"># To exclude specific pods from injection (e.g., Jobs, CronJobs)</span>
+<span class="cm"># Add this annotation to the pod spec:</span>
+<span class="cm"># sidecar.istio.io/inject: "false"</span></code><span class="code-label">Shell</span></pre>
+
+      <div class="post-callout post-callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>CronJobs and one-shot Jobs should have sidecar injection disabled. The Envoy sidecar never terminates on its own, so your Job will stay in <code>Running</code> state forever even after the main container completes. Use the annotation <code>sidecar.istio.io/inject: "false"</code> on these workloads.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="converting-ingress">
+      <h2>Converting Ingress to VirtualService</h2>
+      <p>This is the core of the migration — translating every NGINX Ingress resource into Istio's Gateway + VirtualService model. Here's a real before/after example:</p>
+
+      <h3>Before: NGINX Ingress</h3>
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">networking.k8s.io/v1</span>
+<span class="kw">kind:</span> <span class="str">Ingress</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-server</span>
+  <span class="kw">annotations:</span>
+    <span class="kw">nginx.ingress.kubernetes.io/rewrite-target:</span> <span class="str">/$2</span>
+    <span class="kw">nginx.ingress.kubernetes.io/ssl-redirect:</span> <span class="str">"true"</span>
+    <span class="kw">nginx.ingress.kubernetes.io/proxy-body-size:</span> <span class="str">"50m"</span>
+    <span class="kw">nginx.ingress.kubernetes.io/rate-limit-rps:</span> <span class="str">"100"</span>
+    <span class="kw">nginx.ingress.kubernetes.io/cors-allow-origin:</span> <span class="str">"https://app.example.com"</span>
+    <span class="kw">cert-manager.io/cluster-issuer:</span> <span class="str">"letsencrypt-prod"</span>
+<span class="kw">spec:</span>
+  <span class="kw">ingressClassName:</span> <span class="str">nginx</span>
+  <span class="kw">tls:</span>
+  - <span class="kw">hosts:</span>
+    - <span class="str">api.example.com</span>
+    <span class="kw">secretName:</span> <span class="str">api-tls</span>
+  <span class="kw">rules:</span>
+  - <span class="kw">host:</span> <span class="str">api.example.com</span>
+    <span class="kw">http:</span>
+      <span class="kw">paths:</span>
+      - <span class="kw">path:</span> <span class="str">/api(/|$)(.*)</span>
+        <span class="kw">pathType:</span> <span class="str">ImplementationSpecific</span>
+        <span class="kw">backend:</span>
+          <span class="kw">service:</span>
+            <span class="kw">name:</span> <span class="str">api-server</span>
+            <span class="kw">port:</span>
+              <span class="kw">number:</span> <span class="num">8080</span>
+      - <span class="kw">path:</span> <span class="str">/auth(/|$)(.*)</span>
+        <span class="kw">pathType:</span> <span class="str">ImplementationSpecific</span>
+        <span class="kw">backend:</span>
+          <span class="kw">service:</span>
+            <span class="kw">name:</span> <span class="str">auth-service</span>
+            <span class="kw">port:</span>
+              <span class="kw">number:</span> <span class="num">8080</span></code><span class="code-label">YAML</span></pre>
+
+      <h3>After: Istio Gateway + VirtualService</h3>
+      <pre><code><span class="cm"># Gateway — shared across multiple VirtualServices</span>
+<span class="kw">apiVersion:</span> <span class="str">networking.istio.io/v1beta1</span>
+<span class="kw">kind:</span> <span class="str">Gateway</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-gateway</span>
+  <span class="kw">namespace:</span> <span class="str">istio-system</span>
+<span class="kw">spec:</span>
+  <span class="kw">selector:</span>
+    <span class="kw">istio:</span> <span class="str">ingressgateway</span>
+  <span class="kw">servers:</span>
+  - <span class="kw">port:</span>
+      <span class="kw">number:</span> <span class="num">443</span>
+      <span class="kw">name:</span> <span class="str">https</span>
+      <span class="kw">protocol:</span> <span class="str">HTTPS</span>
+    <span class="kw">tls:</span>
+      <span class="kw">mode:</span> <span class="str">SIMPLE</span>
+      <span class="kw">credentialName:</span> <span class="str">api-tls</span>
+    <span class="kw">hosts:</span>
+    - <span class="str">api.example.com</span>
+  - <span class="kw">port:</span>
+      <span class="kw">number:</span> <span class="num">80</span>
+      <span class="kw">name:</span> <span class="str">http</span>
+      <span class="kw">protocol:</span> <span class="str">HTTP</span>
+    <span class="kw">tls:</span>
+      <span class="kw">httpsRedirect:</span> <span class="num">true</span>
+    <span class="kw">hosts:</span>
+    - <span class="str">api.example.com</span>
+---
+<span class="cm"># VirtualService — routing rules</span>
+<span class="kw">apiVersion:</span> <span class="str">networking.istio.io/v1beta1</span>
+<span class="kw">kind:</span> <span class="str">VirtualService</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-routes</span>
+  <span class="kw">namespace:</span> <span class="str">production</span>
+<span class="kw">spec:</span>
+  <span class="kw">hosts:</span>
+  - <span class="str">api.example.com</span>
+  <span class="kw">gateways:</span>
+  - <span class="str">istio-system/api-gateway</span>
+  <span class="kw">http:</span>
+  - <span class="kw">match:</span>
+    - <span class="kw">uri:</span>
+        <span class="kw">prefix:</span> <span class="str">/api</span>
+    <span class="kw">rewrite:</span>
+      <span class="kw">uri:</span> <span class="str">/</span>
+    <span class="kw">route:</span>
+    - <span class="kw">destination:</span>
+        <span class="kw">host:</span> <span class="str">api-server.production.svc.cluster.local</span>
+        <span class="kw">port:</span>
+          <span class="kw">number:</span> <span class="num">8080</span>
+    <span class="kw">timeout:</span> <span class="str">30s</span>
+    <span class="kw">retries:</span>
+      <span class="kw">attempts:</span> <span class="num">3</span>
+      <span class="kw">perTryTimeout:</span> <span class="str">10s</span>
+      <span class="kw">retryOn:</span> <span class="str">gateway-error,connect-failure,refused-stream</span>
+  - <span class="kw">match:</span>
+    - <span class="kw">uri:</span>
+        <span class="kw">prefix:</span> <span class="str">/auth</span>
+    <span class="kw">rewrite:</span>
+      <span class="kw">uri:</span> <span class="str">/</span>
+    <span class="kw">route:</span>
+    - <span class="kw">destination:</span>
+        <span class="kw">host:</span> <span class="str">auth-service.production.svc.cluster.local</span>
+        <span class="kw">port:</span>
+          <span class="kw">number:</span> <span class="num">8080</span></code><span class="code-label">YAML</span></pre>
+
+      <p>Notice how Istio gives us built-in retries and timeouts that would have required custom NGINX configuration snippets. The VirtualService also works for <strong>internal</strong> service-to-service routing — not just ingress traffic.</p>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>Use fully qualified service names (<code>service.namespace.svc.cluster.local</code>) in VirtualService destinations. Short names can cause ambiguous resolution issues when services exist in multiple namespaces.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="traffic-management">
+      <h2>Advanced Traffic Management</h2>
+      <p>This is where Istio truly shines compared to NGINX Ingress. Here are the patterns we use daily:</p>
+
+      <h3>Canary Deployments with Traffic Splitting</h3>
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">networking.istio.io/v1beta1</span>
+<span class="kw">kind:</span> <span class="str">VirtualService</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-server-canary</span>
+<span class="kw">spec:</span>
+  <span class="kw">hosts:</span>
+  - <span class="str">api-server</span>
+  <span class="kw">http:</span>
+  - <span class="kw">route:</span>
+    - <span class="kw">destination:</span>
+        <span class="kw">host:</span> <span class="str">api-server</span>
+        <span class="kw">subset:</span> <span class="str">stable</span>
+      <span class="kw">weight:</span> <span class="num">90</span>
+    - <span class="kw">destination:</span>
+        <span class="kw">host:</span> <span class="str">api-server</span>
+        <span class="kw">subset:</span> <span class="str">canary</span>
+      <span class="kw">weight:</span> <span class="num">10</span>
+---
+<span class="kw">apiVersion:</span> <span class="str">networking.istio.io/v1beta1</span>
+<span class="kw">kind:</span> <span class="str">DestinationRule</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">api-server</span>
+<span class="kw">spec:</span>
+  <span class="kw">host:</span> <span class="str">api-server</span>
+  <span class="kw">trafficPolicy:</span>
+    <span class="kw">connectionPool:</span>
+      <span class="kw">tcp:</span>
+        <span class="kw">maxConnections:</span> <span class="num">100</span>
+      <span class="kw">http:</span>
+        <span class="kw">h2UpgradePolicy:</span> <span class="str">DEFAULT</span>
+        <span class="kw">maxRequestsPerConnection:</span> <span class="num">10</span>
+    <span class="kw">outlierDetection:</span>
+      <span class="kw">consecutive5xxErrors:</span> <span class="num">5</span>
+      <span class="kw">interval:</span> <span class="str">30s</span>
+      <span class="kw">baseEjectionTime:</span> <span class="str">60s</span>
+      <span class="kw">maxEjectionPercent:</span> <span class="num">50</span>
+  <span class="kw">subsets:</span>
+  - <span class="kw">name:</span> <span class="str">stable</span>
+    <span class="kw">labels:</span>
+      <span class="kw">version:</span> <span class="str">v1</span>
+  - <span class="kw">name:</span> <span class="str">canary</span>
+    <span class="kw">labels:</span>
+      <span class="kw">version:</span> <span class="str">v2</span></code><span class="code-label">YAML</span></pre>
+
+      <h3>Header-Based Routing for Testing</h3>
+      <p>Route internal testers to the canary version without affecting real users:</p>
+      <pre><code><span class="kw">http:</span>
+- <span class="kw">match:</span>
+  - <span class="kw">headers:</span>
+      <span class="kw">x-canary:</span>
+        <span class="kw">exact:</span> <span class="str">"true"</span>
+  <span class="kw">route:</span>
+  - <span class="kw">destination:</span>
+      <span class="kw">host:</span> <span class="str">api-server</span>
+      <span class="kw">subset:</span> <span class="str">canary</span>
+- <span class="kw">route:</span>
+  - <span class="kw">destination:</span>
+      <span class="kw">host:</span> <span class="str">api-server</span>
+      <span class="kw">subset:</span> <span class="str">stable</span></code><span class="code-label">YAML</span></pre>
+
+      <p>With NGINX Ingress, this required custom Lua scripts and ConfigMap hacks. In Istio, it's a few lines of YAML.</p>
+    </div>
+
+    <div class="post-section" id="mtls">
+      <h2>mTLS Rollout</h2>
+      <p>One of the biggest wins of moving to Istio is automatic mutual TLS between all services. But rolling it out in production requires a careful phased approach:</p>
+
+      <h3>Phase 1: Permissive Mode (Accept Both)</h3>
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">security.istio.io/v1beta1</span>
+<span class="kw">kind:</span> <span class="str">PeerAuthentication</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">default</span>
+  <span class="kw">namespace:</span> <span class="str">istio-system</span>
+<span class="kw">spec:</span>
+  <span class="kw">mtls:</span>
+    <span class="kw">mode:</span> <span class="str">PERMISSIVE</span>  <span class="cm"># Accepts both mTLS and plaintext</span></code><span class="code-label">YAML</span></pre>
+      <p>Start here. This allows services with sidecars to communicate via mTLS while still accepting plaintext from services that haven't been injected yet.</p>
+
+      <h3>Phase 2: Validate with Kiali</h3>
+      <pre><code><span class="cm"># Check which connections are using mTLS</span>
+istioctl x describe pod <span class="var">$POD_NAME</span> -n production
+
+<span class="cm"># Look for "mTLS" in the output. Any plaintext connections</span>
+<span class="cm"># indicate services that still need sidecar injection.</span></code><span class="code-label">Shell</span></pre>
+
+      <h3>Phase 3: Strict Mode (Enforce mTLS)</h3>
+      <pre><code><span class="cm"># Only enable strict AFTER all services in the namespace have sidecars</span>
+<span class="kw">apiVersion:</span> <span class="str">security.istio.io/v1beta1</span>
+<span class="kw">kind:</span> <span class="str">PeerAuthentication</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">default</span>
+  <span class="kw">namespace:</span> <span class="str">production</span>
+<span class="kw">spec:</span>
+  <span class="kw">mtls:</span>
+    <span class="kw">mode:</span> <span class="str">STRICT</span>  <span class="cm"># Rejects all plaintext traffic</span></code><span class="code-label">YAML</span></pre>
+
+      <div class="post-callout post-callout-warning">
+        <div class="callout-title">Warning</div>
+        <p>Don't jump straight to STRICT mode mesh-wide. If any service doesn't have a sidecar (monitoring agents, legacy services, external integrations), it will be blocked from communicating. Enable STRICT per-namespace only after verifying 100% sidecar coverage with <code>istioctl analyze</code>.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="observability">
+      <h2>Observability with Istio</h2>
+      <p>Istio generates detailed telemetry for every request that flows through the mesh — without any application instrumentation. We integrated it with our existing Prometheus and Grafana stack:</p>
+
+      <h3>Key Metrics Available Out of the Box</h3>
+      <pre><code><span class="cm"># Request rate by service</span>
+<span class="fn">sum</span>(<span class="fn">rate</span>(istio_requests_total{reporter=<span class="str">"destination"</span>}[<span class="num">5m</span>])) by (destination_service_name)
+
+<span class="cm"># P99 latency by service</span>
+<span class="fn">histogram_quantile</span>(<span class="num">0.99</span>,
+  <span class="fn">sum</span>(<span class="fn">rate</span>(istio_request_duration_milliseconds_bucket{reporter=<span class="str">"destination"</span>}[<span class="num">5m</span>]))
+  by (destination_service_name, le)
+)
+
+<span class="cm"># Error rate (5xx responses)</span>
+<span class="fn">sum</span>(<span class="fn">rate</span>(istio_requests_total{response_code=~<span class="str">"5.."</span>,reporter=<span class="str">"destination"</span>}[<span class="num">5m</span>]))
+/
+<span class="fn">sum</span>(<span class="fn">rate</span>(istio_requests_total{reporter=<span class="str">"destination"</span>}[<span class="num">5m</span>]))
+
+<span class="cm"># TCP connections by service</span>
+<span class="fn">sum</span>(istio_tcp_connections_opened_total) by (destination_service_name)</code><span class="code-label">PromQL</span></pre>
+
+      <h3>Distributed Tracing</h3>
+      <p>Istio automatically generates trace spans for every request. We configured it to export to Jaeger:</p>
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">install.istio.io/v1alpha1</span>
+<span class="kw">kind:</span> <span class="str">IstioOperator</span>
+<span class="kw">spec:</span>
+  <span class="kw">meshConfig:</span>
+    <span class="kw">enableTracing:</span> <span class="num">true</span>
+    <span class="kw">extensionProviders:</span>
+    - <span class="kw">name:</span> <span class="str">jaeger</span>
+      <span class="kw">opentelemetry:</span>
+        <span class="kw">service:</span> <span class="str">jaeger-collector.observability.svc.cluster.local</span>
+        <span class="kw">port:</span> <span class="num">4317</span>
+    <span class="kw">defaultConfig:</span>
+      <span class="kw">tracing:</span>
+        <span class="kw">sampling:</span> <span class="num">10</span>  <span class="cm"># Sample 10% of requests in production</span></code><span class="code-label">YAML</span></pre>
+
+      <p>The biggest observability improvement was being able to see the full dependency graph of our 200+ services — something that was completely invisible with NGINX Ingress.</p>
+    </div>
+
+    <div class="post-section" id="migration-strategy">
+      <h2>Zero-Downtime Migration Strategy</h2>
+      <p>We ran NGINX Ingress and Istio Ingress Gateway in parallel for 4 weeks before fully cutting over. Here's the strategy:</p>
+      <ol>
+        <li><strong>Week 1:</strong> Install Istio, enable sidecar injection in staging namespaces. Run all integration tests. Validate that existing NGINX routing still works with sidecars present.</li>
+        <li><strong>Week 2:</strong> Create Istio Gateway + VirtualService equivalents for all NGINX Ingress resources. Deploy Istio Ingress Gateway with its own NLB. Route internal test traffic to Istio using a separate DNS entry (e.g., <code>api-istio.example.com</code>).</li>
+        <li><strong>Week 3:</strong> Use Route 53 weighted routing to send 10% of real traffic through Istio, 90% through NGINX. Monitor error rates and latency on both paths. Gradually increase Istio's weight: 10% → 30% → 50% → 80%.</li>
+        <li><strong>Week 4:</strong> Switch DNS to 100% Istio. Keep NGINX running but receiving no traffic for one week as a rollback safety net. Once stable, remove NGINX Ingress Controller entirely.</li>
+      </ol>
+
+      <pre><code><span class="cm"># Route 53 weighted routing — gradual cutover</span>
+<span class="cm"># NGINX record (weight reduces over time)</span>
+<span class="kw">api.example.com  A  ALIAS</span>  nginx-nlb-xxxx.elb.amazonaws.com  <span class="kw">weight:</span> <span class="num">0</span>
+<span class="cm"># Istio record (weight increases over time)</span>
+<span class="kw">api.example.com  A  ALIAS</span>  istio-nlb-yyyy.elb.amazonaws.com  <span class="kw">weight:</span> <span class="num">100</span></code><span class="code-label">DNS</span></pre>
+
+      <div class="post-callout post-callout-tip">
+        <div class="callout-title">Pro Tip</div>
+        <p>During the parallel-run phase, tag your Prometheus metrics with a <code>gateway=nginx|istio</code> label so you can compare latency, error rates, and throughput side-by-side in Grafana. This gives you hard data for go/no-go decisions.</p>
+      </div>
+    </div>
+
+    <div class="post-section" id="gotchas">
+      <h2>Production Gotchas</h2>
+      <p>After running Istio in production for 6 months across multiple EKS clusters, these are the issues that caught us off guard:</p>
+      <ul>
+        <li><strong>Memory overhead is real.</strong> Each Envoy sidecar consumes ~50-100MB of memory. With 200+ services running 3+ replicas each, that's an additional 30-60GB of memory cluster-wide. Budget for this before migrating.</li>
+        <li><strong>Startup ordering matters.</strong> Without <code>holdApplicationUntilProxyStarts</code>, apps that make network calls during initialization will fail because the sidecar isn't ready yet. We lost 2 hours debugging this on day one.</li>
+        <li><strong>503 errors on HPA scale-up.</strong> When HPA rapidly creates new pods, there's a brief window where the pod is receiving traffic but the sidecar hasn't finished configuring routes. Fix this with proper readiness probes on the sidecar: <code>sidecar.istio.io/rewriteAppHTTPProbers: "true"</code>.</li>
+        <li><strong>Headless services need special handling.</strong> Istio doesn't manage traffic for headless services (like StatefulSets with <code>clusterIP: None</code>) the same way. You may need to add <code>traffic.sidecar.istio.io/excludeOutboundIPRanges</code> for databases and message brokers.</li>
+        <li><strong>AWS ALB Ingress doesn't work with sidecars.</strong> If you use the AWS Load Balancer Controller for ALB-based ingress, the health checks will fail once sidecars are injected. Switch to NLB or use Istio's gateway instead.</li>
+        <li><strong>Upgrade istiod carefully.</strong> Istio control plane upgrades are non-disruptive, but the data plane (sidecars) needs a rolling restart. Use canary upgrades with revision-based installations to avoid restarting all pods simultaneously.</li>
+        <li><strong>External services need ServiceEntry.</strong> Any external API your services call (Stripe, Twilio, etc.) must be registered as a ServiceEntry or it will be blocked by Istio's default outbound traffic policy. We forgot about this and broke payment processing on our first deploy.</li>
+      </ul>
+
+      <h3>ServiceEntry for External APIs</h3>
+      <pre><code><span class="kw">apiVersion:</span> <span class="str">networking.istio.io/v1beta1</span>
+<span class="kw">kind:</span> <span class="str">ServiceEntry</span>
+<span class="kw">metadata:</span>
+  <span class="kw">name:</span> <span class="str">stripe-api</span>
+<span class="kw">spec:</span>
+  <span class="kw">hosts:</span>
+  - <span class="str">api.stripe.com</span>
+  <span class="kw">ports:</span>
+  - <span class="kw">number:</span> <span class="num">443</span>
+    <span class="kw">name:</span> <span class="str">https</span>
+    <span class="kw">protocol:</span> <span class="str">TLS</span>
+  <span class="kw">resolution:</span> <span class="str">DNS</span>
+  <span class="kw">location:</span> <span class="str">MESH_EXTERNAL</span></code><span class="code-label">YAML</span></pre>
+    </div>
+
+    <div class="post-section" id="results">
+      <h2>Results &amp; Lessons Learned</h2>
+      <p>After completing the migration and running Istio in production for 6 months:</p>
+      <ul>
+        <li><strong>mTLS coverage: 100%.</strong> All inter-service communication is now encrypted in transit. Security audit passed without findings.</li>
+        <li><strong>Canary deployment time: 5 minutes</strong> (down from 30+ minutes with our hacky NGINX Lua scripts). Any team can run a canary by editing a VirtualService.</li>
+        <li><strong>MTTR reduced by 40%.</strong> With full mesh telemetry and distributed tracing, we can pinpoint failing services in seconds instead of grepping logs across 200 services.</li>
+        <li><strong>Zero customer-facing outages</strong> during the 4-week migration, thanks to the parallel-run strategy.</li>
+        <li><strong>Cluster memory usage increased by ~18%</strong> due to sidecar overhead. This was expected and budgeted for.</li>
+      </ul>
+
+      <blockquote>
+        <p>The migration from NGINX Ingress to Istio isn't just swapping one proxy for another — it's a fundamental shift from managing edge traffic to managing all traffic. The operational complexity is higher, but the capabilities you gain in traffic control, security, and observability are transformative. Start with a clear "why", run in parallel, and migrate namespace by namespace.</p>
+      </blockquote>
+    </div>
+
+    <nav class="post-nav post-section">
+      <a href="top-10-devops-scripts.html" class="post-nav-link">
+        <span class="post-nav-label">Previous Article</span>
+        <span class="post-nav-title">Top 10 Scripts Every DevOps Engineer Should Use Daily</span>
+      </a>
+      <a href="kubernetes-auto-scaling.html" class="post-nav-link next">
+        <span class="post-nav-label">Next Article</span>
+        <span class="post-nav-title">Kubernetes Auto-Scaling: HPA, VPA &amp; Cluster Autoscaler</span>
+      </a>
+    </nav>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc,.post-nav').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>
