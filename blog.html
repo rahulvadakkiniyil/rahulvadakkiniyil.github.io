@@ -128,7 +128,59 @@
     <div class="container">
       <div class="bp-grid">
 
-        <!-- Post — Vault Transit Secrets Engine (Newest) -->
+        <!-- Post — CloudWatch Agent on Ubuntu (Newest) -->
+        <article class="bp-card" data-category="tutorial infrastructure">
+          <a href="posts/cloudwatch-agent-ubuntu.html" class="bp-card-link">
+            <div class="bp-thumbnail">
+              <div class="bp-thumbnail-placeholder">
+                <svg width="220" height="120" viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Ubuntu server box (left) -->
+                  <rect x="20" y="40" width="100" height="80" rx="6" stroke="#febc2e" stroke-width="1.2" opacity="0.45"/>
+                  <text x="70" y="58" fill="#febc2e" font-size="9" font-family="monospace" text-anchor="middle" opacity="0.65">Ubuntu</text>
+                  <text x="70" y="70" fill="#febc2e" font-size="6" font-family="monospace" text-anchor="middle" opacity="0.4">22.04 / 24.04</text>
+                  <!-- Agent process inside the server -->
+                  <rect x="32" y="80" width="76" height="14" rx="3" stroke="#7c5cfc" stroke-width="0.8" opacity="0.5"/>
+                  <text x="70" y="90" fill="#c084fc" font-size="6" font-family="monospace" text-anchor="middle" opacity="0.55">cwagent</text>
+                  <!-- /var/log indicator -->
+                  <rect x="32" y="100" width="34" height="10" rx="2" stroke="#34d399" stroke-width="0.6" opacity="0.4"/>
+                  <text x="49" y="108" fill="#34d399" font-size="5" font-family="monospace" text-anchor="middle" opacity="0.55">/var/log</text>
+                  <!-- /proc indicator -->
+                  <rect x="72" y="100" width="34" height="10" rx="2" stroke="#34d399" stroke-width="0.6" opacity="0.4"/>
+                  <text x="89" y="108" fill="#34d399" font-size="5" font-family="monospace" text-anchor="middle" opacity="0.55">/proc</text>
+                  <!-- Stream arrows -->
+                  <line x1="120" y1="80" x2="195" y2="60" stroke="#c084fc" stroke-width="1.2" opacity="0.45" stroke-dasharray="4 3"/>
+                  <polygon points="193,55 205,60 195,67" fill="#c084fc" opacity="0.5"/>
+                  <text x="155" y="55" fill="#c084fc" font-size="6" font-family="monospace" text-anchor="middle" opacity="0.45">metrics</text>
+                  <line x1="120" y1="100" x2="195" y2="115" stroke="#7c5cfc" stroke-width="1.2" opacity="0.45" stroke-dasharray="4 3"/>
+                  <polygon points="193,110 205,115 195,122" fill="#7c5cfc" opacity="0.5"/>
+                  <text x="155" y="125" fill="#7c5cfc" font-size="6" font-family="monospace" text-anchor="middle" opacity="0.45">logs</text>
+                  <!-- CloudWatch box (right) -->
+                  <rect x="205" y="35" width="100" height="90" rx="6" stroke="#7c5cfc" stroke-width="1.2" opacity="0.45"/>
+                  <text x="255" y="55" fill="#c084fc" font-size="9" font-family="monospace" text-anchor="middle" opacity="0.65">CloudWatch</text>
+                  <!-- Metrics chart inside CW -->
+                  <polyline points="218,90 230,82 242,86 254,75 266,80 278,70 290,72" stroke="#c084fc" stroke-width="1" fill="none" opacity="0.55"/>
+                  <line x1="218" y1="100" x2="290" y2="100" stroke="#7c5cfc" stroke-width="0.5" opacity="0.3"/>
+                  <!-- Log lines -->
+                  <line x1="218" y1="108" x2="290" y2="108" stroke="#7c5cfc" stroke-width="0.6" opacity="0.4"/>
+                  <line x1="218" y1="113" x2="280" y2="113" stroke="#7c5cfc" stroke-width="0.6" opacity="0.35"/>
+                  <line x1="218" y1="118" x2="285" y2="118" stroke="#7c5cfc" stroke-width="0.6" opacity="0.4"/>
+                </svg>
+              </div>
+            </div>
+            <div class="bp-body">
+              <div class="bp-meta">
+                <span class="bp-tag">Tutorial</span>
+                <span class="bp-date">May 2, 2026</span>
+                <span class="bp-read">11 min read</span>
+              </div>
+              <h3 class="bp-title">Install and Configure the CloudWatch Agent on Ubuntu 22.04 &amp; 24.04</h3>
+              <p class="bp-excerpt">A complete walkthrough — IAM setup, package install, the configuration wizard, custom metrics and log collection, systemd management, and the troubleshooting steps that actually matter.</p>
+              <span class="bp-read-more">Read Article &rarr;</span>
+            </div>
+          </a>
+        </article>
+
+        <!-- Post — Vault Transit Secrets Engine -->
         <article class="bp-card" data-category="tutorial guide">
           <a href="posts/vault-transit-secrets-engine.html" class="bp-card-link">
             <div class="bp-thumbnail">

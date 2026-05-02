@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Install and Configure the CloudWatch Agent on Ubuntu 22.04 &amp; 24.04 — Rahul Vadakkiniyil</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../blog-post.css">
+
+</head>
+<body>
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="../index.html" class="nav-logo" aria-label="Home">
+        <div class="logo-mark">
+                    <svg class="logo-icon" width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rounded square container with subtle glow -->
+            <rect class="logo-container" x="1" y="1" width="44" height="44" rx="10" fill="url(#rv-bg)" stroke="url(#rv-border)" stroke-width="0.8"/>
+            <!-- Terminal traffic lights -->
+            <circle cx="8" cy="6.5" r="1.3" fill="#ff5f57" opacity="0.9"/>
+            <circle cx="12.5" cy="6.5" r="1.3" fill="#febc2e" opacity="0.9"/>
+            <circle cx="17" cy="6.5" r="1.3" fill="#28c840" opacity="0.9"/>
+            <!-- Terminal prompt chevron -->
+            <path class="logo-prompt" d="M5.5 14l3.5 3-3.5 3" fill="none" stroke="#28c840" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+            <!-- R letterform — elegant serif -->
+            <path d="M11 34V12h7c2.2 0 3.9.6 5 1.7 1.1 1.1 1.6 2.5 1.6 4.2 0 1.4-.4 2.6-1.1 3.5-.7.9-1.8 1.5-3.1 1.9L24.8 34h-2.6l-4.6-10.2h-.1l-.7.02H13.2V34H11zm2.2-12.8h4.6c1.6 0 2.8-.4 3.6-1.2.8-.8 1.2-1.8 1.2-3.2 0-1.3-.4-2.3-1.2-3.1-.8-.8-2-1.1-3.6-1.1h-4.6v8.6z" fill="url(#rv-r-grad)"/>
+            <!-- V letterform — overlapping with gradient -->
+            <path d="M23 12h2.4l6 19.5L37.4 12h2.4L32.5 36h-2.2L23 12z" fill="url(#rv-v-grad)"/>
+            <!-- DevOps infinity loop — subtle, woven below letters -->
+            <path class="logo-infinity" d="M10 39c0-2.2 1.8-4 4-4s3.2 1.4 4.2 2.8c1-1.4 2.2-2.8 4.2-2.8s4 1.8 4 4-1.8 4-4 4-3.2-1.4-4.2-2.8c-1 1.4-2.2 2.8-4.2 2.8s-4-1.8-4-4z" fill="none" stroke="url(#rv-infinity-grad)" stroke-width="0.8"/>
+            <!-- Pipeline connection dots -->
+            <circle class="logo-pipe-dot" cx="30" cy="39" r="1" fill="#7c5cfc" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="33.5" cy="39" r="1" fill="#9b7fff" opacity="0.5"/>
+            <circle class="logo-pipe-dot" cx="37" cy="39" r="1" fill="#c084fc" opacity="0.5"/>
+            <!-- Blinking cursor -->
+            <rect class="logo-cursor" x="41" y="12" width="1.5" height="14" rx="0.75" fill="#28c840" opacity="0.8"/>
+            <defs>
+              <linearGradient id="rv-bg" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#12111f"/>
+                <stop offset="1" stop-color="#0d0c18"/>
+              </linearGradient>
+              <linearGradient id="rv-border" x1="0" y1="0" x2="46" y2="46">
+                <stop stop-color="#7c5cfc" stop-opacity="0.4"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.2"/>
+                <stop offset="1" stop-color="#7c5cfc" stop-opacity="0.1"/>
+              </linearGradient>
+              <linearGradient id="rv-r-grad" x1="11" y1="12" x2="24" y2="34">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.7" stop-color="#e8deff"/>
+                <stop offset="1" stop-color="#d4bfff"/>
+              </linearGradient>
+              <linearGradient id="rv-v-grad" x1="23" y1="12" x2="38" y2="36">
+                <stop stop-color="#c084fc"/>
+                <stop offset="0.5" stop-color="#9b7fff"/>
+                <stop offset="1" stop-color="#7c5cfc"/>
+              </linearGradient>
+              <linearGradient id="rv-infinity-grad" x1="10" y1="39" x2="26" y2="39">
+                <stop stop-color="#7c5cfc" stop-opacity="0.6"/>
+                <stop offset="0.5" stop-color="#c084fc" stop-opacity="0.4"/>
+                <stop offset="1" stop-color="#9b7fff" stop-opacity="0.6"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-glow"></div>
+        </div>
+        <span class="logo-text">Rahul <span class="logo-text-last">Vadakkiniyil</span></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#about">About</a></li>
+        <li><a href="../projects.html">Projects</a></li>
+        <li><a href="../blog.html" class="active">Blog</a></li>
+        <li><a href="../index.html#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <header class="post-header">
+    <div class="container">
+      <div class="post-meta-top">
+        <span class="post-tag">Tutorial</span>
+        <span class="post-date">May 2, 2026</span>
+        <span class="post-read-time">11 min read</span>
+      </div>
+      <h1 class="post-heading">Install and Configure the CloudWatch Agent on Ubuntu 22.04 &amp; 24.04</h1>
+      <p class="post-subtitle">A complete walkthrough for getting the Amazon CloudWatch Agent running on Jammy and Noble — IAM setup, package install, the configuration wizard, custom metrics and log collection, systemd management, and the troubleshooting steps that actually matter.</p>
+    </div>
+  </header>
+
+  <article class="post-content">
+    <div class="container">
+
+      <!-- Table of Contents -->
+      <div class="post-toc post-section">
+        <h2>Table of Contents</h2>
+        <ol>
+          <li><a href="#why-agent">Why the CloudWatch Agent</a></li>
+          <li><a href="#prerequisites">Prerequisites</a></li>
+          <li><a href="#iam-setup">IAM Setup — Role or User</a></li>
+          <li><a href="#install-agent">Install the Agent on Ubuntu</a></li>
+          <li><a href="#wizard">Generate a Config With the Wizard</a></li>
+          <li><a href="#manual-config">Hand-Write a Config File</a></li>
+          <li><a href="#start-agent">Start, Stop, and Reload the Agent</a></li>
+          <li><a href="#log-collection">Collect Application Log Files</a></li>
+          <li><a href="#verify">Verify Metrics and Logs in CloudWatch</a></li>
+          <li><a href="#troubleshoot">Troubleshooting</a></li>
+          <li><a href="#best-practices">Best Practices</a></li>
+        </ol>
+      </div>
+
+      <!-- Section 1 -->
+      <div class="post-section" id="why-agent">
+        <h2>1. Why the CloudWatch Agent</h2>
+        <p>By default, an EC2 instance reports a small set of metrics to CloudWatch — CPU utilization, network in/out, disk read/write bytes — collected from the hypervisor. What it does <strong>not</strong> report is anything the hypervisor cannot see: memory usage, disk space (as opposed to disk I/O), per-process metrics, or the contents of any log file on the instance.</p>
+
+        <p>The CloudWatch Agent fills that gap. It runs as a systemd service on the instance, reads metrics from <code>/proc</code> and <code>/sys</code>, tails arbitrary log files, and ships everything to CloudWatch Metrics and CloudWatch Logs. It is the supported AWS-native way to get memory utilization, disk usage, swap, and application logs into the same place as your other observability data.</p>
+
+        <h3>What You Get</h3>
+        <ul>
+          <li><strong>System metrics</strong> — memory, disk, swap, network at much finer granularity than the default EC2 metrics.</li>
+          <li><strong>Process metrics</strong> — per-process CPU, memory, and file-descriptor counts via <code>procstat</code>.</li>
+          <li><strong>Log shipping</strong> — tail any file on disk and stream lines into a CloudWatch log group, with timestamp parsing and multi-line message support.</li>
+          <li><strong>Custom metrics from StatsD or collectd</strong> — push application-defined metrics through the agent without writing AWS SDK code.</li>
+        </ul>
+
+        <div class="post-callout-info">
+          <strong>Note:</strong> The agent is open-source (<code>aws/amazon-cloudwatch-agent</code> on GitHub) and the binary is the same across Amazon Linux, Ubuntu, RHEL, and SUSE. What changes between distros is the package format and the systemd unit path. This guide focuses on the <code>.deb</code> install for Ubuntu 22.04 (Jammy) and 24.04 LTS (Noble).
+        </div>
+      </div>
+
+      <!-- Section 2 -->
+      <div class="post-section" id="prerequisites">
+        <h2>2. Prerequisites</h2>
+        <p>Confirm each item below before installing. Most of the install issues people hit are actually IAM or networking issues that surface as confusing agent log messages.</p>
+
+        <ul>
+          <li><strong>An EC2 instance</strong> running Ubuntu Server 22.04 LTS or 24.04 LTS (the latest LTS), <code>amd64</code> or <code>arm64</code>. The agent works on both architectures and the install steps are identical apart from the package URL.</li>
+          <li><strong>Outbound HTTPS (443)</strong> from the instance to the regional CloudWatch endpoints (<code>monitoring.&lt;region&gt;.amazonaws.com</code>, <code>logs.&lt;region&gt;.amazonaws.com</code>). If you are inside a private subnet without a NAT gateway, you need VPC endpoints for both services.</li>
+          <li><strong>An IAM role attached to the instance</strong> with permissions to publish metrics and write logs. Local AWS credentials work too, but a role is the only sensible choice on EC2.</li>
+          <li><strong>Sudo access</strong> on the instance.</li>
+          <li><strong>The <code>wget</code> or <code>curl</code> package installed</strong> for downloading the <code>.deb</code>. Both ship by default on Ubuntu Server.</li>
+        </ul>
+
+        <div class="code-label">Confirm the OS version and architecture</div>
+<pre><code><span class="fn">lsb_release</span> -a
+<span class="cm"># Distributor ID: Ubuntu
+# Release:        24.04
+# Codename:       noble</span>
+
+<span class="fn">dpkg</span> --print-architecture
+<span class="cm"># amd64  (or arm64 on Graviton)</span></code></pre>
+      </div>
+
+      <!-- Section 3 -->
+      <div class="post-section" id="iam-setup">
+        <h2>3. IAM Setup — Role or User</h2>
+        <p>The agent needs permission to write metrics, write log events, and (optionally) read its configuration from SSM Parameter Store. AWS publishes a managed policy that covers all of this — <code>CloudWatchAgentServerPolicy</code> — and you should attach it to a role rather than reinventing the wheel.</p>
+
+        <div class="code-label">Create an IAM role and attach the managed policy (one-time, from your workstation)</div>
+<pre><code><span class="cm"># Trust policy that lets EC2 assume the role</span>
+<span class="fn">cat</span> &gt; trust-policy.json &lt;&lt;<span class="str">'EOF'</span>
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": { "Service": "ec2.amazonaws.com" },
+    "Action": "sts:AssumeRole"
+  }]
+}
+EOF
+
+<span class="fn">aws</span> iam create-role \
+  <span class="var">--role-name</span> <span class="str">CloudWatchAgentServerRole</span> \
+  <span class="var">--assume-role-policy-document</span> file://trust-policy.json
+
+<span class="fn">aws</span> iam attach-role-policy \
+  <span class="var">--role-name</span> <span class="str">CloudWatchAgentServerRole</span> \
+  <span class="var">--policy-arn</span> <span class="str">arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy</span>
+
+<span class="cm"># Wrap the role in an instance profile and attach to the EC2 instance</span>
+<span class="fn">aws</span> iam create-instance-profile \
+  <span class="var">--instance-profile-name</span> <span class="str">CloudWatchAgentServerRole</span>
+
+<span class="fn">aws</span> iam add-role-to-instance-profile \
+  <span class="var">--instance-profile-name</span> <span class="str">CloudWatchAgentServerRole</span> \
+  <span class="var">--role-name</span> <span class="str">CloudWatchAgentServerRole</span>
+
+<span class="fn">aws</span> ec2 associate-iam-instance-profile \
+  <span class="var">--instance-id</span> <span class="str">i-0123456789abcdef0</span> \
+  <span class="var">--iam-instance-profile</span> <span class="str">Name=CloudWatchAgentServerRole</span></code></pre>
+
+        <div class="code-label">Verify the role is visible from inside the instance</div>
+<pre><code><span class="cm"># From the EC2 instance — IMDSv2 token first</span>
+<span class="fn">TOKEN</span>=$(curl -X PUT <span class="str">"http://169.254.169.254/latest/api/token"</span> \
+  -H <span class="str">"X-aws-ec2-metadata-token-ttl-seconds: 21600"</span>)
+
+<span class="fn">curl</span> -H <span class="str">"X-aws-ec2-metadata-token: $TOKEN"</span> \
+  http://169.254.169.254/latest/meta-data/iam/security-credentials/
+<span class="cm"># CloudWatchAgentServerRole</span></code></pre>
+
+        <div class="post-callout-warning">
+          <strong>Important:</strong> The agent will silently fail to publish if the role is missing or the policy is wrong. The error shows up in the agent log as a 403 from the CloudWatch API — easy to miss. Test the role <em>before</em> installing the agent.
+        </div>
+      </div>
+
+      <!-- Section 4 -->
+      <div class="post-section" id="install-agent">
+        <h2>4. Install the Agent on Ubuntu</h2>
+        <p>The agent ships as a <code>.deb</code> package directly from AWS. There is no need to add an apt repository for the install itself, though you can if you want apt-managed upgrades. The same package works on both Ubuntu 22.04 and 24.04.</p>
+
+        <div class="code-label">Download and install — amd64</div>
+<pre><code><span class="fn">cd</span> /tmp
+
+<span class="fn">wget</span> https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+
+<span class="fn">sudo</span> dpkg -i -E ./amazon-cloudwatch-agent.deb
+
+<span class="cm"># Confirm the install</span>
+<span class="fn">dpkg</span> -l | <span class="fn">grep</span> amazon-cloudwatch-agent</code></pre>
+
+        <div class="code-label">Download and install — arm64 (Graviton)</div>
+<pre><code><span class="fn">cd</span> /tmp
+
+<span class="fn">wget</span> https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/arm64/latest/amazon-cloudwatch-agent.deb
+
+<span class="fn">sudo</span> dpkg -i -E ./amazon-cloudwatch-agent.deb</code></pre>
+
+        <p>The package installs the binary at <code>/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent</code>, drops a systemd unit at <code>/etc/systemd/system/amazon-cloudwatch-agent.service</code>, and creates the runtime directories under <code>/opt/aws/amazon-cloudwatch-agent/</code>. The service is installed but not started — that comes after you supply a config.</p>
+
+        <div class="code-label">Where the agent lives on disk</div>
+<pre><code><span class="cm"># Binary
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent
+
+# Wrapper CLI (start/stop/fetch-config)
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+
+# Wizard
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard
+
+# Configuration files
+/opt/aws/amazon-cloudwatch-agent/etc/
+
+# Logs
+/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log</span></code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Tip:</strong> On Ubuntu 24.04 the package may pull in a couple of additional shared library dependencies the first time. If <code>dpkg -i</code> complains about unmet dependencies, run <code>sudo apt-get install -f</code> immediately after to resolve them.
+        </div>
+      </div>
+
+      <!-- Section 5 -->
+      <div class="post-section" id="wizard">
+        <h2>5. Generate a Config With the Wizard</h2>
+        <p>The fastest way to get a working configuration is the interactive wizard. It walks through a series of questions about which metrics and logs you want, then writes a JSON config to <code>/opt/aws/amazon-cloudwatch-agent/bin/config.json</code>.</p>
+
+        <div class="code-label">Launch the wizard</div>
+<pre><code><span class="fn">sudo</span> /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-config-wizard</code></pre>
+
+        <p>The wizard asks roughly the following questions, in order. Answer them based on your environment.</p>
+
+        <ul>
+          <li><strong>OS</strong> — pick Linux.</li>
+          <li><strong>Hosting environment</strong> — EC2 (or on-premises if not on AWS).</li>
+          <li><strong>Which user to run as</strong> — accept the default <code>cwagent</code>; the package created this user during install.</li>
+          <li><strong>Collect StatsD metrics?</strong> — only say yes if your application actually sends StatsD.</li>
+          <li><strong>Collect CollectD metrics?</strong> — same — only if collectd is actually running.</li>
+          <li><strong>Monitor host metrics?</strong> — yes. Choose a default level (Basic, Standard, Advanced). <em>Standard</em> is a sensible starting point.</li>
+          <li><strong>Metric collection interval</strong> — 60 seconds is the safe default. Anything below 60 puts you on high-resolution metrics, which cost more.</li>
+          <li><strong>Monitor log files?</strong> — yes. Provide the file path, log group name, log stream name, and timestamp format for each file you want shipped.</li>
+          <li><strong>Save config to SSM Parameter Store?</strong> — yes if you want to deploy the same config to a fleet. Otherwise, no.</li>
+        </ul>
+
+        <p>When the wizard exits, the generated config is at <code>/opt/aws/amazon-cloudwatch-agent/bin/config.json</code>. Read it, version-control it, and treat it as the source of truth for that instance class.</p>
+
+        <div class="post-callout-info">
+          <strong>Note:</strong> The wizard is convenient for the first install. For everything after that — fleets, infrastructure-as-code, environment-specific configs — hand-write the config and ship it via SSM, S3, or your config management tool. Section 6 shows what the file actually looks like.
+        </div>
+      </div>
+
+      <!-- Section 6 -->
+      <div class="post-section" id="manual-config">
+        <h2>6. Hand-Write a Config File</h2>
+        <p>The agent config is plain JSON with three top-level sections: <code>agent</code> (global settings), <code>metrics</code> (what to collect from the host), and <code>logs</code> (what files to tail). The example below is a sensible production starting point — memory, disk, swap, network, and a couple of common log files.</p>
+
+        <div class="code-label">/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json</div>
+<pre><code>{
+  <span class="str">"agent"</span>: {
+    <span class="str">"metrics_collection_interval"</span>: <span class="var">60</span>,
+    <span class="str">"run_as_user"</span>: <span class="str">"cwagent"</span>,
+    <span class="str">"logfile"</span>: <span class="str">"/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"</span>
+  },
+  <span class="str">"metrics"</span>: {
+    <span class="str">"namespace"</span>: <span class="str">"CWAgent/Linux"</span>,
+    <span class="str">"append_dimensions"</span>: {
+      <span class="str">"InstanceId"</span>: <span class="str">"${aws:InstanceId}"</span>,
+      <span class="str">"AutoScalingGroupName"</span>: <span class="str">"${aws:AutoScalingGroupName}"</span>
+    },
+    <span class="str">"aggregation_dimensions"</span>: [[<span class="str">"AutoScalingGroupName"</span>], [<span class="str">"InstanceId"</span>]],
+    <span class="str">"metrics_collected"</span>: {
+      <span class="str">"mem"</span>: {
+        <span class="str">"measurement"</span>: [<span class="str">"mem_used_percent"</span>, <span class="str">"mem_available_percent"</span>]
+      },
+      <span class="str">"disk"</span>: {
+        <span class="str">"resources"</span>: [<span class="str">"/"</span>],
+        <span class="str">"measurement"</span>: [<span class="str">"used_percent"</span>, <span class="str">"inodes_used"</span>],
+        <span class="str">"ignore_file_system_types"</span>: [<span class="str">"sysfs"</span>, <span class="str">"devtmpfs"</span>, <span class="str">"tmpfs"</span>]
+      },
+      <span class="str">"swap"</span>: {
+        <span class="str">"measurement"</span>: [<span class="str">"swap_used_percent"</span>]
+      },
+      <span class="str">"netstat"</span>: {
+        <span class="str">"measurement"</span>: [<span class="str">"tcp_established"</span>, <span class="str">"tcp_time_wait"</span>]
+      }
+    }
+  },
+  <span class="str">"logs"</span>: {
+    <span class="str">"logs_collected"</span>: {
+      <span class="str">"files"</span>: {
+        <span class="str">"collect_list"</span>: [
+          {
+            <span class="str">"file_path"</span>: <span class="str">"/var/log/syslog"</span>,
+            <span class="str">"log_group_name"</span>: <span class="str">"/ubuntu/syslog"</span>,
+            <span class="str">"log_stream_name"</span>: <span class="str">"{instance_id}"</span>,
+            <span class="str">"timestamp_format"</span>: <span class="str">"%b %d %H:%M:%S"</span>,
+            <span class="str">"retention_in_days"</span>: <span class="var">30</span>
+          },
+          {
+            <span class="str">"file_path"</span>: <span class="str">"/var/log/nginx/access.log"</span>,
+            <span class="str">"log_group_name"</span>: <span class="str">"/nginx/access"</span>,
+            <span class="str">"log_stream_name"</span>: <span class="str">"{instance_id}"</span>,
+            <span class="str">"retention_in_days"</span>: <span class="var">14</span>
+          }
+        ]
+      }
+    }
+  }
+}</code></pre>
+
+        <p>A few decisions worth understanding before you copy this verbatim.</p>
+
+        <ul>
+          <li><strong><code>namespace</code></strong> — every metric the agent publishes lands here. Pick a name you can search by; <code>CWAgent</code> is the AWS default but a project- or team-specific namespace makes filtering easier.</li>
+          <li><strong><code>append_dimensions</code></strong> — these dimensions are added to every metric. <code>${aws:InstanceId}</code> and <code>${aws:AutoScalingGroupName}</code> are resolved at runtime from instance metadata.</li>
+          <li><strong><code>aggregation_dimensions</code></strong> — tells CloudWatch to also publish aggregated views (e.g., the whole ASG together) so you can alarm on a single line per ASG instead of per instance.</li>
+          <li><strong><code>retention_in_days</code></strong> — sets log retention on first write. Without this, log groups default to <em>Never expire</em>, which is the most expensive setting.</li>
+          <li><strong><code>{instance_id}</code></strong> — a token the agent expands. You can use <code>{hostname}</code>, <code>{ip_address}</code>, or any environment variable.</li>
+        </ul>
+      </div>
+
+      <!-- Section 7 -->
+      <div class="post-section" id="start-agent">
+        <h2>7. Start, Stop, and Reload the Agent</h2>
+        <p>The agent is managed through its own wrapper script, <code>amazon-cloudwatch-agent-ctl</code>. It is a thin layer over <code>systemctl</code> that also handles the &ldquo;fetch and apply this config&rdquo; step. You can call <code>systemctl</code> directly too — both work.</p>
+
+        <div class="code-label">Apply a local config file and start the agent</div>
+<pre><code><span class="fn">sudo</span> /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  <span class="var">-a</span> fetch-config \
+  <span class="var">-m</span> ec2 \
+  <span class="var">-c</span> file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json \
+  <span class="var">-s</span></code></pre>
+
+        <div class="code-label">Apply a config stored in SSM Parameter Store</div>
+<pre><code><span class="cm"># Replace the parameter name with your own</span>
+<span class="fn">sudo</span> /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  <span class="var">-a</span> fetch-config \
+  <span class="var">-m</span> ec2 \
+  <span class="var">-c</span> ssm:AmazonCloudWatch-linux-prod \
+  <span class="var">-s</span></code></pre>
+
+        <div class="code-label">Service control through systemd</div>
+<pre><code><span class="cm"># Status</span>
+<span class="fn">sudo</span> systemctl status amazon-cloudwatch-agent
+
+<span class="cm"># Stop and start</span>
+<span class="fn">sudo</span> systemctl stop amazon-cloudwatch-agent
+<span class="fn">sudo</span> systemctl start amazon-cloudwatch-agent
+
+<span class="cm"># Restart after editing the config file directly</span>
+<span class="fn">sudo</span> systemctl restart amazon-cloudwatch-agent
+
+<span class="cm"># Enable on boot (the package usually does this for you)</span>
+<span class="fn">sudo</span> systemctl enable amazon-cloudwatch-agent</code></pre>
+
+        <div class="post-callout-tip">
+          <strong>Tip:</strong> After editing <code>amazon-cloudwatch-agent.json</code>, always re-run the <code>fetch-config -s</code> command rather than just restarting the service. <code>fetch-config</code> validates the JSON, translates it into the agent's internal TOML format, and only then restarts. A plain restart will load the previous translated config.
+        </div>
+      </div>
+
+      <!-- Section 8 -->
+      <div class="post-section" id="log-collection">
+        <h2>8. Collect Application Log Files</h2>
+        <p>The most common reason to install the agent is log shipping. The pattern is the same for every file: add an entry to <code>logs.logs_collected.files.collect_list</code>, give it a log group, set retention, re-apply the config.</p>
+
+        <div class="code-label">Add an application log to the existing config</div>
+<pre><code>{
+  <span class="str">"file_path"</span>: <span class="str">"/var/log/myapp/app.log"</span>,
+  <span class="str">"log_group_name"</span>: <span class="str">"/myapp/application"</span>,
+  <span class="str">"log_stream_name"</span>: <span class="str">"{instance_id}"</span>,
+  <span class="str">"timestamp_format"</span>: <span class="str">"%Y-%m-%d %H:%M:%S"</span>,
+  <span class="str">"timezone"</span>: <span class="str">"UTC"</span>,
+  <span class="str">"multi_line_start_pattern"</span>: <span class="str">"^\\d{4}-\\d{2}-\\d{2}"</span>,
+  <span class="str">"retention_in_days"</span>: <span class="var">14</span>
+}</code></pre>
+
+        <p>A few of those fields are worth calling out:</p>
+
+        <ul>
+          <li><strong><code>timestamp_format</code></strong> — uses Go's <code>strftime</code>-style placeholders. If the agent cannot match the timestamp, it stamps each line with the time it was read instead of the time it was logged. Set this for any log where ordering matters.</li>
+          <li><strong><code>multi_line_start_pattern</code></strong> — a regex marking the first line of a new event. Without it, multi-line stack traces are split into one CloudWatch event per line, making them very hard to read.</li>
+          <li><strong><code>timezone</code></strong> — defaults to local. Set to <code>UTC</code> for any log that does not include a timezone in its timestamp.</li>
+          <li><strong>File permissions</strong> — the <code>cwagent</code> user must be able to read the log file. Add it to the relevant group (e.g., <code>adm</code> for syslog, <code>nginx</code> for nginx logs) rather than chmodding files world-readable.</li>
+        </ul>
+
+        <div class="code-label">Grant cwagent read access via group membership</div>
+<pre><code><span class="cm"># Add cwagent to the adm group (lets it read /var/log/syslog and friends)</span>
+<span class="fn">sudo</span> usermod -aG adm cwagent
+
+<span class="cm"># For nginx logs</span>
+<span class="fn">sudo</span> usermod -aG adm cwagent  <span class="cm"># nginx access/error logs are usually adm-readable on Ubuntu</span>
+
+<span class="cm"># Restart so the new group membership takes effect</span>
+<span class="fn">sudo</span> systemctl restart amazon-cloudwatch-agent</code></pre>
+      </div>
+
+      <!-- Section 9 -->
+      <div class="post-section" id="verify">
+        <h2>9. Verify Metrics and Logs in CloudWatch</h2>
+        <p>Within roughly one collection interval (60 seconds in the example config) you should see metrics arriving in the CloudWatch console under your chosen namespace, and log events under each log group.</p>
+
+        <div class="code-label">Check from the CLI without leaving the instance</div>
+<pre><code><span class="cm"># List recent metrics in your namespace</span>
+<span class="fn">aws</span> cloudwatch list-metrics \
+  <span class="var">--namespace</span> <span class="str">"CWAgent/Linux"</span> \
+  <span class="var">--region</span> <span class="str">"us-east-1"</span>
+
+<span class="cm"># Pull a single data point for mem_used_percent</span>
+<span class="fn">aws</span> cloudwatch get-metric-statistics \
+  <span class="var">--namespace</span> <span class="str">"CWAgent/Linux"</span> \
+  <span class="var">--metric-name</span> <span class="str">"mem_used_percent"</span> \
+  <span class="var">--dimensions</span> <span class="str">"Name=InstanceId,Value=i-0123456789abcdef0"</span> \
+  <span class="var">--start-time</span> <span class="str">"$(date -u -d '5 minutes ago' +%FT%TZ)"</span> \
+  <span class="var">--end-time</span> <span class="str">"$(date -u +%FT%TZ)"</span> \
+  <span class="var">--period</span> <span class="var">60</span> \
+  <span class="var">--statistics</span> <span class="str">Average</span>
+
+<span class="cm"># List log groups created by the agent</span>
+<span class="fn">aws</span> logs describe-log-groups \
+  <span class="var">--log-group-name-prefix</span> <span class="str">"/ubuntu"</span></code></pre>
+
+        <div class="code-label">Tail the agent's own log to confirm it is publishing</div>
+<pre><code><span class="fn">sudo</span> tail -f /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+
+<span class="cm"># What you want to see:
+# Successfully built the agent runtime
+# Got Home directory: /root
+# I! Starting AmazonCloudWatchAgent CWAgent/<version>
+# I! Loaded inputs: cpu disk diskio mem net netstat swap
+# I! Loaded outputs: cloudwatch cloudwatchlogs</span></code></pre>
+      </div>
+
+      <!-- Section 10 -->
+      <div class="post-section" id="troubleshoot">
+        <h2>10. Troubleshooting</h2>
+        <p>The agent is generally well-behaved, but four issues account for almost every failed install.</p>
+
+        <h3>403 from the CloudWatch API</h3>
+        <p>The agent log shows <code>AccessDenied</code> when calling <code>PutMetricData</code> or <code>PutLogEvents</code>. Either the IAM role is not attached, or the policy is missing one of the required actions. Re-run the IAM verification from section 3 and confirm <code>CloudWatchAgentServerPolicy</code> is attached.</p>
+
+        <h3>Agent starts then immediately exits</h3>
+        <p>Check <code>journalctl -u amazon-cloudwatch-agent -n 50</code>. The most common cause is a malformed JSON config — a trailing comma, a missing brace, or a wrong key name. The wrapper script does validate, but only at <code>fetch-config</code> time, so a directly-edited file with a syntax error will fail at boot.</p>
+
+        <div class="code-label">Validate the JSON before applying</div>
+<pre><code><span class="fn">jq</span> . /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+<span class="cm"># If jq prints the parsed JSON, syntax is fine.
+# If it errors, fix the file before restarting.</span></code></pre>
+
+        <h3>Logs are flowing but timestamps look wrong</h3>
+        <p>The <code>timestamp_format</code> in your config does not match the actual format in the file. CloudWatch then stamps each line with the time it was read, which clusters everything around restart times. Open the log file, copy a real timestamp, and translate it character-by-character into the strftime placeholders.</p>
+
+        <h3>Metrics are publishing but disk usage is missing</h3>
+        <p>By default the agent only collects disk metrics for filesystems whose mount type is in its allowlist. Containerized or LVM setups often miss <code>/</code>. Either add <code>resources</code> with explicit mount points (as in the section 6 example) or adjust <code>ignore_file_system_types</code>.</p>
+
+        <div class="post-callout-warning">
+          <strong>Important:</strong> Never set <code>metrics_collection_interval</code> below 60 unless you actually need high-resolution metrics. Anything under 60 seconds is billed as a high-resolution metric and the cost can climb very fast on a fleet of any size.
+        </div>
+      </div>
+
+      <!-- Section 11 -->
+      <div class="post-section" id="best-practices">
+        <h2>11. Best Practices</h2>
+        <p>The patterns below are what I have seen actually hold up across fleets running this agent.</p>
+
+        <ul>
+          <li><strong>Store the config in SSM Parameter Store, one parameter per role.</strong> Keep <code>AmazonCloudWatch-web</code>, <code>AmazonCloudWatch-worker</code>, etc. as separate parameters and have each instance fetch the one matching its role tag. This is the cleanest path to a fleet-wide rollout.</li>
+          <li><strong>Always set <code>retention_in_days</code> on every log group.</strong> The default is <em>Never expire</em>, which silently grows your CloudWatch Logs bill forever. Pick a retention that matches your actual investigation window.</li>
+          <li><strong>Tag log groups</strong> the same way you tag the instances writing to them. Cost allocation reports become useful only when log groups carry the team / environment / service tags.</li>
+          <li><strong>Run the wizard once, version-control the JSON forever.</strong> The wizard is a starting point; the config belongs in the same repo as the rest of your infrastructure code.</li>
+          <li><strong>Bake the agent into your AMIs</strong> rather than installing it on first boot. The package install itself is fast, but doing it inline with cloud-init pushes the &ldquo;instance is ready&rdquo; checkpoint out by 30+ seconds.</li>
+          <li><strong>Use append_dimensions, not custom dimensions per metric.</strong> <code>${aws:InstanceId}</code> and <code>${aws:AutoScalingGroupName}</code> are resolved by the agent and stay correct across instance replacements.</li>
+          <li><strong>Watch <code>amazon-cloudwatch-agent.log</code> itself.</strong> The agent will keep running even when CloudWatch calls are failing — symptoms only show up when you go looking for the metric or log later. Add the agent's own log file to its <code>collect_list</code> so it ships its own logs.</li>
+          <li><strong>Upgrade quarterly.</strong> AWS publishes regular fixes and metric additions; <code>apt-get install --only-upgrade amazon-cloudwatch-agent</code> if you added the apt source, or just re-download the latest <code>.deb</code>.</li>
+        </ul>
+
+        <div class="post-callout-info">
+          <strong>Wrap-up:</strong> Once installed, the CloudWatch Agent is one of those services you set up once and barely think about again. The hard parts are getting IAM right and committing to a sensible config that you actually maintain. Do those two things well and the rest — metrics, logs, alarms, dashboards — is just a matter of pointing CloudWatch at the data the agent is already shipping.
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p>&copy; 2026 Rahul Vadakkiniyil. All rights reserved.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/in/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+          <a href="https://github.com/rahulvadakkiniyil" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+          <a href="mailto:rahulvadakkiniyil@gmail.com" aria-label="Gmail" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 010 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg></a>
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=rahulvadakkiniyil@outlook.com" target="_blank" rel="noopener noreferrer" aria-label="Teams" class="social-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.404 4.478c0 1.242-1.005 2.249-2.246 2.249a2.248 2.248 0 01-2.247-2.249A2.247 2.247 0 0117.158 2.23c1.241 0 2.246 1.007 2.246 2.248zM22.461 6.727h-5.593a.528.528 0 00-.527.528v5.593a3.324 3.324 0 003.324 3.324 3.324 3.324 0 003.323-3.324V7.255a.528.528 0 00-.527-.528zM14.26 7.255v6.649c0 2.878-2.333 5.21-5.21 5.21a5.21 5.21 0 01-5.21-5.21V7.255a.528.528 0 01.528-.528h9.364a.528.528 0 01.528.528zM9.05 2.23a2.776 2.776 0 100 5.553 2.776 2.776 0 000-5.553z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script>
+    const navToggle=document.getElementById('nav-toggle'),navLinks=document.getElementById('nav-links');
+    navToggle.addEventListener('click',()=>{navToggle.classList.toggle('active');navLinks.classList.toggle('open')});
+    navLinks.querySelectorAll('a').forEach(l=>l.addEventListener('click',()=>{navToggle.classList.remove('active');navLinks.classList.remove('open')}));
+    const progressBar=document.getElementById('reading-progress');
+    window.addEventListener('scroll',()=>{const s=window.scrollY,d=document.documentElement.scrollHeight-window.innerHeight;progressBar.style.width=(s/d)*100+'%'});
+    const observer=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.post-section,.post-content pre,.post-toc').forEach(el=>observer.observe(el));
+    const backToTop=document.getElementById('back-to-top');
+    window.addEventListener('scroll',()=>{backToTop.classList.toggle('visible',window.scrollY>400)});
+    backToTop.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'})});
+  </script>
+</body>
+</html>
